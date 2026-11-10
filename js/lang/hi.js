@@ -186,7 +186,7 @@
   "Gerade läuft eine Runde. Wenn alle fertig sind, schaust du dir das Ergebnis mit an. In der nächsten Runde spielst du dann mit.": "अभी एक राउंड चल रहा है। सबके पूरा होने पर आप भी नतीजा देखेंगे। अगले राउंड में आप खेलेंगे।",
   "Beitritt nicht möglich.": "जुड़ना संभव नहीं।",
   "Einen Moment …": "एक पल …",
-  "Das ge-vibe-codete Synchronspiel.": "वाइब-कोडिंग से बना डबिंग गेम।",
+  "Das gevibe codete Synchronspiel.": "वाइब-कोडिंग से बना डबिंग गेम।",
   "Spiel hosten": "खेल होस्ट करें",
   "Dieser Bildschirm zeigt die Szene. Du spielst automatisch mit, die anderen kommen per Handy oder PC dazu.": "यह स्क्रीन सीन दिखाती है। आप अपने आप खेल में शामिल हैं, बाकी लोग फ़ोन या PC से जुड़ते हैं।",
   "Raum erstellen": "कमरा बनाएँ",

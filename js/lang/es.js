@@ -186,7 +186,7 @@
   "Gerade läuft eine Runde. Wenn alle fertig sind, schaust du dir das Ergebnis mit an. In der nächsten Runde spielst du dann mit.": "Hay una ronda en curso. Cuando todos terminen, verás el resultado. En la próxima ronda jugarás.",
   "Beitritt nicht möglich.": "No es posible unirse.",
   "Einen Moment …": "Un momento …",
-  "Das ge-vibe-codete Synchronspiel.": "El juego de doblaje hecho con vibe coding.",
+  "Das gevibe codete Synchronspiel.": "El juego de doblaje hecho con vibe coding.",
   "Spiel hosten": "Crear una partida",
   "Dieser Bildschirm zeigt die Szene. Du spielst automatisch mit, die anderen kommen per Handy oder PC dazu.": "Esta pantalla muestra la escena. Tú juegas automáticamente y los demás se unen con el móvil o el PC.",
   "Raum erstellen": "Crear sala",

@@ -39,7 +39,7 @@ window.VD_CONFIG = {
   // Glas-Effekt auf Knöpfen und Boxen (js/glass.js). enabled: false schaltet ihn ganz ab.
   // Art, Farbe und Stärke der Tönung pro Element stehen in css/style.css (--lg-mode, --lg-rgb, --lg-amt).
   glass: {
-    enabled: true,
+    enabled: false,   // false = altes Aussehen (Milchglas), true = Glas-Effekt
     thick: 50,           // Glasdicke in Pixeln (stärkere Brechung)
     bezel: 30,           // Breite des gewölbten Randes in Pixeln
     ior: 1.5,            // Brechungsindex

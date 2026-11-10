@@ -186,7 +186,7 @@
   "Gerade läuft eine Runde. Wenn alle fertig sind, schaust du dir das Ergebnis mit an. In der nächsten Runde spielst du dann mit.": "Un tour est en cours. Quand tout le monde a fini, vous regardez le résultat aussi. Au prochain tour, vous jouez.",
   "Beitritt nicht möglich.": "Impossible de rejoindre.",
   "Einen Moment …": "Un instant …",
-  "Das ge-vibe-codete Synchronspiel.": "Le jeu de doublage codé à la vibe.",
+  "Das gevibe codete Synchronspiel.": "Le jeu de doublage codé à la vibe.",
   "Spiel hosten": "Organiser une partie",
   "Dieser Bildschirm zeigt die Szene. Du spielst automatisch mit, die anderen kommen per Handy oder PC dazu.": "Cet écran montre la scène. Vous jouez automatiquement, les autres rejoignent par téléphone ou PC.",
   "Raum erstellen": "Créer un salon",

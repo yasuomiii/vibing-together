@@ -186,7 +186,7 @@
   "Gerade läuft eine Runde. Wenn alle fertig sind, schaust du dir das Ergebnis mit an. In der nächsten Runde spielst du dann mit.": "Há uma rodada em andamento. Quando todos terminarem, você também vê o resultado. Na próxima rodada você joga.",
   "Beitritt nicht möglich.": "Não é possível entrar.",
   "Einen Moment …": "Um momento …",
-  "Das ge-vibe-codete Synchronspiel.": "O jogo de dublagem feito com vibe coding.",
+  "Das gevibe codete Synchronspiel.": "O jogo de dublagem feito com vibe coding.",
   "Spiel hosten": "Criar um jogo",
   "Dieser Bildschirm zeigt die Szene. Du spielst automatisch mit, die anderen kommen per Handy oder PC dazu.": "Esta tela mostra a cena. Você joga automaticamente e os outros entram pelo celular ou PC.",
   "Raum erstellen": "Criar sala",
