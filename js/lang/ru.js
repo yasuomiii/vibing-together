@@ -2,6 +2,7 @@
 (function () {
   const VD = (window.VD = window.VD || {});
   VD.addLang('ru', {
+  "Helles oder dunkles Design": "Светлая или тёмная тема",
   "Rauschunterdrückung ist in diesem Browser nicht verfügbar.": "Шумоподавление недоступно в этом браузере.",
   "Während der Aufnahme lässt sich der Filter nicht umschalten.": "Во время записи фильтр переключить нельзя.",
   "Rauschunterdrückung nicht verfügbar": "Шумоподавление недоступно",

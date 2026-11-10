@@ -2,6 +2,7 @@
 (function () {
   const VD = (window.VD = window.VD || {});
   VD.addLang('fr', {
+  "Helles oder dunkles Design": "Mode clair ou sombre",
   "Rauschunterdrückung ist in diesem Browser nicht verfügbar.": "La suppression du bruit n'est pas disponible dans ce navigateur.",
   "Während der Aufnahme lässt sich der Filter nicht umschalten.": "Le filtre ne peut pas être modifié pendant l'enregistrement.",
   "Rauschunterdrückung nicht verfügbar": "Suppression du bruit indisponible",

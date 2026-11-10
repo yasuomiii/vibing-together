@@ -15,7 +15,7 @@
   }
 
   VD.applyI18n();
-  document.querySelectorAll('.lang-slot').forEach((e) => e.append(VD.langPicker()));
+  document.querySelectorAll('.lang-slot').forEach((e) => e.append(VD.ui.themeBtn(), VD.langPicker()));
 
   const params = new URLSearchParams(location.search);
   const cleanCode = (s) => (s || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4);

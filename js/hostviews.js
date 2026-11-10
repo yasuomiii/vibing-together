@@ -40,7 +40,7 @@
       const sound = h('button', { class: 'icon-btn', title: VD.t('Ton an/aus'), 'aria-label': VD.t('Ton an oder aus'), onclick: (e) => { VD.sfx.enabled = !VD.sfx.enabled; e.currentTarget.classList.toggle('off', !VD.sfx.enabled); } }, '♪');
       const full = h('button', { class: 'icon-btn', title: VD.t('Vollbild'), 'aria-label': VD.t('Vollbild'), onclick: () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } }, '⛶');
       this.dnBtn = VD.Denoise.iconEl(); this.dnBtn.hidden = true;
-      const header = h('header', { class: 'h-top' }, h('div', { class: 'brand', text: window.VD_CONFIG.appName }), this.roomChip, h('div', { class: 'h-tools' }, this.dnBtn, sound, full));
+      const header = h('header', { class: 'h-top' }, h('div', { class: 'brand', text: window.VD_CONFIG.appName }), this.roomChip, h('div', { class: 'h-tools' }, this.dnBtn, sound, VD.ui.themeBtn(), full));
       this.root.replaceChildren(header, this.stage, this.strip, this.bar);
       this.stripMap = new Map();
       this.barRefs = null;

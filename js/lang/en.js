@@ -2,6 +2,7 @@
 (function () {
   const VD = (window.VD = window.VD || {});
   VD.addLang('en', {
+  "Helles oder dunkles Design": "Light or dark mode",
   "Rauschunterdrückung ist in diesem Browser nicht verfügbar.": "Noise suppression isn't available in this browser.",
   "Während der Aufnahme lässt sich der Filter nicht umschalten.": "The filter can't be switched while recording.",
   "Rauschunterdrückung nicht verfügbar": "Noise suppression unavailable",

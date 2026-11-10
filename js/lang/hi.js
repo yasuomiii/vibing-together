@@ -2,6 +2,7 @@
 (function () {
   const VD = (window.VD = window.VD || {});
   VD.addLang('hi', {
+  "Helles oder dunkles Design": "लाइट या डार्क मोड",
   "Rauschunterdrückung ist in diesem Browser nicht verfügbar.": "इस ब्राउज़र में शोर कम करने की सुविधा उपलब्ध नहीं है।",
   "Während der Aufnahme lässt sich der Filter nicht umschalten.": "रिकॉर्डिंग के दौरान फ़िल्टर बदला नहीं जा सकता।",
   "Rauschunterdrückung nicht verfügbar": "शोर कम करना उपलब्ध नहीं",

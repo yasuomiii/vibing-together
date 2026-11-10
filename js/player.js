@@ -140,7 +140,7 @@
     renderTop() {
       // Im Spiel sitzt der Filter-Knopf oben; der Host hat ihn in seiner eigenen Kopfzeile
       const dn = this.canRecord && !this.local && this.phase !== 'lobby' ? VD.Denoise.iconEl() : null;
-      this.top.replaceChildren(VD.ui.avatar(this.profile, 'sm'), h('span', { class: 'pc-name', text: this.profile.name }), ...(dn ? [dn] : []));
+      this.top.replaceChildren(VD.ui.avatar(this.profile, 'sm'), h('span', { class: 'pc-name', text: this.profile.name }), ...(dn ? [dn] : []), ...(this.local ? [] : [VD.ui.themeBtn()]));
     }
     setView(key, build, force) {
       if (this.viewKey === key && !force) return this.body.firstElementChild;
@@ -479,7 +479,8 @@
       if (!cw || !ch) return;
       if (c.width !== Math.round(cw * dpr)) { c.width = Math.round(cw * dpr); c.height = Math.round(ch * dpr); }
       const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, cw, ch);
-      g.fillStyle = 'rgba(255,255,255,.045)'; g.fillRect(0, 0, cw, ch);
+      const wc = VD.waveColors();
+      g.fillStyle = wc.bg; g.fillRect(0, 0, cw, ch);
       const mid = ch / 2;
       const area = (arr, fill, stroke) => {
         if (!arr || !arr.length) return;
@@ -490,9 +491,9 @@
         for (let i = n - 1; i >= 0; i--) g.lineTo(((i + 0.5) / n) * cw, mid + Math.max(1, arr[i] * (mid - 3)));
         g.closePath(); g.fillStyle = fill; g.fill(); g.strokeStyle = stroke; g.lineWidth = 1; g.stroke();
       };
-      area(w.orig, 'rgba(143,124,255,.5)', 'rgba(180,168,255,.9)');
-      area(w.mine, 'rgba(48,209,88,.7)', 'rgba(130,240,160,.95)');
-      if (w.pos != null) { g.fillStyle = '#fff'; g.fillRect(Math.round(w.pos * cw) - 1, 0, 2, ch); }
+      area(w.orig, wc.a, wc.aLine);
+      area(w.mine, wc.b, wc.bLine);
+      if (w.pos != null) { g.fillStyle = wc.pos; g.fillRect(Math.round(w.pos * cw) - 1, 0, 2, ch); }
     }
 
     micLatencyMs() {
