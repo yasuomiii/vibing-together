@@ -21,8 +21,6 @@
   const cleanCode = (s) => (s || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4);
 
   /* ---------- Startseite ---------- */
-  const touchFirst = matchMedia('(pointer: coarse)').matches && innerWidth < 900;
-  document.body.classList.toggle('touch-first', touchFirst);
 
   $('#btn-host').addEventListener('click', async () => {
     show('host');
@@ -145,6 +143,6 @@
   const room = cleanCode(params.get('room'));
   if (room.length === 4) showJoin(room);
   else show('home');
-  // Jetzt ist alles übersetzt und das Glas gezeichnet: Inhalt zeigen (zwei Bilder später, damit Größenänderungen durch die Übersetzung schon neu gezeichnet sind)
+  // Jetzt ist alles übersetzt: Inhalt zeigen (zwei Bilder später, damit Größenänderungen durch die Übersetzung schon neu gezeichnet sind)
   requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.remove('booting')));
 })();

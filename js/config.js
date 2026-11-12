@@ -36,22 +36,6 @@ window.VD_CONFIG = {
     maxClipsPerPack: 1500            // mehr Zeilen pro Pack werden ignoriert
   },
 
-  // Glas-Effekt auf Knöpfen und Boxen (js/glass.js). enabled: false schaltet ihn ganz ab.
-  // Art, Farbe und Stärke der Tönung pro Element stehen in css/style.css (--lg-mode, --lg-rgb, --lg-amt).
-  glass: {
-    enabled: false,   // false = altes Aussehen (Milchglas), true = Glas-Effekt
-    thick: 50,           // Glasdicke in Pixeln (stärkere Brechung)
-    bezel: 30,           // Breite des gewölbten Randes in Pixeln
-    ior: 1.5,            // Brechungsindex
-    dispersion: 0.04,    // Farbsaum am Rand
-    blur: 1,             // Weichzeichner in Pixeln (0 = ganz klar, 1 = ganz leicht weich)
-    specular: 0.55,      // Glanzkante, 0 bis 1
-    saturation: 140,     // Sättigung in Prozent
-    rimWidth: 24,        // Breite des gemalten Randstreifens bei klarem Glas in Pixeln
-    liveRefraction: true, // Schwebende Leisten brechen in Chrome und Edge den Inhalt dahinter echt
-    maxShift: 36         // größte Verschiebung dieser Brechung in Pixeln
-  },
-
   // Spielablauf: Zeiten und Werte, an denen man das Spielgefühl einstellen kann
   game: {
     leadSec: 0.6,          // so viele Sekunden Video laufen vor einer Zeile (Anlauf)
