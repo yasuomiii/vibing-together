@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#15122e">
   <meta name="color-scheme" content="dark light">
   <meta name="description" content="Vibing Together – dub movie scenes with friends, right in your browser.">
@@ -48,6 +48,7 @@
           </form>
         </article>
       </div>
+      <p class="home-maker"><button class="btn link" id="btn-maker" type="button" hidden data-i18n="Dub-Pack erstellen">Dub-Pack erstellen</button></p>
       <p class="home-foot" data-i18n="Läuft komplett im Browser. Packs bleiben auf deinem Gerät.">Läuft komplett im Browser. Packs bleiben auf deinem Gerät.</p>
     </div>
   </section>
@@ -68,6 +69,9 @@
       <button class="btn link" type="button" id="btn-join-back" data-i18n="Zurück">Zurück</button>
     </form>
   </section>
+
+  <!-- Dub-Pack-Ersteller (optional, siehe js/maker.js) -->
+  <section id="v-maker" class="screen maker" hidden></section>
 
   <!-- Host-Bildschirm -->
   <section id="v-host" class="screen host" hidden></section>
@@ -102,6 +106,7 @@
   <script src="js/player.js"></script>
   <script src="js/host.js"></script>
   <script src="js/hostviews.js"></script>
+  <script src="js/maker.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

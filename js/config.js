@@ -25,6 +25,17 @@ window.VD_CONFIG = {
     { urls: 'stun:global.stun.twilio.com:3478' }
   ],
 
+  // Dub-Pack-Ersteller. Auf false setzen, dann verschwindet der Knopf.
+  maker: {
+    enabled: true,
+    transformersUrl: 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1',
+    models: [
+      { id: 'Xenova/whisper-tiny', label: 'Schnell, ca. 40 MB' },
+      { id: 'Xenova/whisper-base', label: 'Ausgewogen, ca. 80 MB' },
+      { id: 'Xenova/whisper-small', label: 'Genau, ca. 250 MB, langsam' }
+    ]
+  },
+
   limits: {
     maxPlayers: 8,
     maxNameLength: 14,

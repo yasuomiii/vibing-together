@@ -2,7 +2,7 @@
 (function () {
   const VD = window.VD;
   const $ = VD.$;
-  const screens = ['home', 'join', 'host', 'player'];
+  const screens = ['home', 'join', 'maker', 'host', 'player'];
   const show = (name) => screens.forEach((s) => { $('#v-' + s).hidden = s !== name; });
 
   /* Spieler-ID pro Browser-Tab, damit ein Neuladen wieder in den Raum findet */
@@ -21,6 +21,12 @@
   const cleanCode = (s) => (s || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4);
 
   /* ---------- Startseite ---------- */
+
+  const mkBtn = $('#btn-maker');
+  if (VD.Maker && VD_CONFIG.maker && VD_CONFIG.maker.enabled) {
+    mkBtn.hidden = false;
+    mkBtn.addEventListener('click', () => { show('maker'); VD.Packs.init && VD.Packs.init(); VD.Maker.open($('#v-maker'), () => show('home')); window.scrollTo(0, 0); });
+  }
 
   $('#btn-host').addEventListener('click', async () => {
     show('host');
