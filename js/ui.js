@@ -23,14 +23,17 @@
   VD.waveColors = () => {
     if (VD._wave) return VD._wave;
     const cs = getComputedStyle(document.documentElement), g = (n) => cs.getPropertyValue(n).trim();
-    return (VD._wave = { bg: g('--wave-bg'), a: g('--wave-a'), aLine: g('--wave-a-line'), b: g('--wave-b'), bLine: g('--wave-b-line'), pos: g('--wave-pos') });
+    return (VD._wave = { bg: g('--wave-bg'), a: g('--wave-a'), aLine: g('--wave-a-line'), b: g('--wave-b'), bLine: g('--wave-b-line') });
   };
+
+  /* Ein Listener für alle Design-Knöpfe (statt einem pro Knopf, der nie wieder entfernt wurde) */
+  const themeIcon = () => (VD.theme.get() === 'light' ? '☾' : '☀');
+  document.addEventListener('vt-theme', () => { const ic = themeIcon(); document.querySelectorAll('.theme-btn').forEach((b) => { b.textContent = ic; }); });
 
   VD.ui = {
     themeBtn() {
       const b = h('button', { class: 'icon-btn theme-btn', type: 'button', title: VD.t('Helles oder dunkles Design'), 'aria-label': VD.t('Helles oder dunkles Design'), onclick: () => VD.theme.toggle() });
-      const sync = () => { b.textContent = VD.theme.get() === 'light' ? '☾' : '☀'; };
-      sync(); document.addEventListener('vt-theme', () => { if (b.isConnected) sync(); });
+      b.textContent = themeIcon();
       return b;
     },
 

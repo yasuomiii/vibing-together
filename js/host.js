@@ -46,7 +46,7 @@
       VD.Packs.on('change', () => this.onPacksChanged());
       this.updateRoomChip();
       document.addEventListener('keydown', (e) => this.onKey(e));
-      if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then((w) => (this.wake = w)).catch(() => {});
+      VD.wake.on();
       this.gotoLobby();
     }
 
@@ -206,7 +206,7 @@
       this.root.append(dock);
       document.body.classList.add('has-dock');
       const pair = VD.localPair();
-      const ctrl = new VD.Controller(inner, { mic, profile, local: true, onKicked: () => this.removeLocalPlayer(true), onAttention: () => dock.classList.remove('min'), onBig: (on, key) => { dock.classList.toggle('big', on); if (on) dock.classList.remove('min'); else if (key === 'final') dock.classList.add('min'); } });
+      const ctrl = new VD.Controller(inner, { mic, profile, local: true, onKicked: () => this.removeLocalPlayer(true), onAttention: () => dock.classList.remove('min'), onBig: (on, key) => { dock.classList.toggle('big', on); if (on) dock.classList.remove('min'); else if (key === 'final') dock.classList.add('min'); if (!on && this.strip) this.stripLoop(); } });
       
       this.local = { mic, ctrl, dock, pair, profile };
       this._localBusy = false;
@@ -273,13 +273,20 @@
 
     /* ---------- Spiel ---------- */
     async startGame() {
+      // Ein zweiter Klick, während noch auf das Mikrofon gewartet wird, darf kein zweites Spiel starten
+      if (this._starting || this.state !== 'lobby') return;
       const pack = VD.Packs.current();
       if (!pack) { VD.toast(VD.t('Lade zuerst ein Dub-Pack in die Lobby.'), 'warn'); return; }
-      // Der Host spielt automatisch mit, außer er hat sich selbst entfernt
-      if (!this.local && !this._optOut) await this.addLocalPlayer();
-      const recs = this.list().filter((p) => p.connected && p.canRecord);
-      if (!recs.length) { VD.toast(VD.t('Mindestens ein Spieler mit Mikrofon wird gebraucht.'), 'warn'); return; }
-      await VD.audio.ensure();
+      let recs;
+      this._starting = true;
+      try {
+        // Der Host spielt automatisch mit, außer er hat sich selbst entfernt
+        if (!this.local && !this._optOut) await this.addLocalPlayer();
+        recs = this.list().filter((p) => p.connected && p.canRecord);
+        if (!recs.length) { VD.toast(VD.t('Mindestens ein Spieler mit Mikrofon wird gebraucht.'), 'warn'); return; }
+        await VD.audio.ensure();
+      } finally { this._starting = false; }
+      if (this.state !== 'lobby') return;
       this.state = 'playing'; this.pending = null;
       this.list().forEach((p) => { p.active = p.connected; p.ready = false; p.assign = null; p.takes = new Map(); p.done = false; p.wantDone = false; p.loaded = false; p.loadFailed = false; p.assetsSent = false; p.prog = null; p.watchSent = null; p.watchLoaded = false; p.hasMix = false; });
       this.onRosterChanged();

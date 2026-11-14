@@ -99,6 +99,25 @@
     setTimeout(() => s.remove(), 650);
   }, { passive: true });
 
+  /* Bildschirm wach halten. Der Browser gibt die Sperre frei, sobald der Tab in den Hintergrund geht;
+     beim Zurückkommen wird sie deshalb neu angefordert (sonst ging das Handy mitten im Spiel aus). */
+  VD.wake = {
+    want: false, lock: null,
+    async _req() {
+      if (!this.want || this.lock || document.hidden || !('wakeLock' in navigator)) return;
+      try { const l = await navigator.wakeLock.request('screen'); if (!this.want) { l.release().catch(() => {}); return; } this.lock = l; l.addEventListener('release', () => { if (this.lock === l) this.lock = null; }); } catch { /* nicht erlaubt: egal */ }
+    },
+    on() { this.want = true; this._req(); },
+    off() { this.want = false; const l = this.lock; this.lock = null; try { l && l.release().catch(() => {}); } catch { /* ignore */ } }
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) return;
+    VD.wake._req();
+    // Handys halten den Ton an, wenn die Seite im Hintergrund war: beim Zurückkommen wieder starten
+    const ctx = VD.audio && VD.audio.ctx;
+    if (ctx && ctx.state !== 'running' && ctx.state !== 'closed') { try { ctx.resume().catch(() => {}); } catch { /* ignore */ } }
+  });
+
   VD.vibrate = (p) => { try { navigator.vibrate && navigator.vibrate(p); } catch { /* ignore */ } };
 
   VD.AVATARS = ['🎤', '🦊', '🐙', '🦄', '🐸', '🤖', '👻', '🐯', '🦖', '🍕', '🚀', '🎸'];

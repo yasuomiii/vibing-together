@@ -123,7 +123,7 @@ registerProcessor('vd-rec', VdRec);`;
   VD.Mic = class {
     constructor() {
       this.chunks = []; this.base = 0; this.len = 0; this.keep = 0;
-      this.peak = 0; this.running = false; this.sr = 48000;
+      this.peak = 0; this.peakHold = 0; this.running = false; this.sr = 48000;
     }
     async start() {
       const ctx = await audio.ensure();
@@ -191,8 +191,11 @@ registerProcessor('vd-rec', VdRec);`;
       let pk = 0;
       for (let i = 0; i < f.length; i++) { const a = f[i] < 0 ? -f[i] : f[i]; if (a > pk) pk = a; }
       this.peak = pk;
+      if (pk > this.peakHold) this.peakHold = pk;
       while (this.len > this.keep && this.chunks.length > 1) { const c = this.chunks.shift(); this.len -= c.length; this.base += c.length; }
     }
+    /* Lautester Wert seit der letzten Abfrage (damit beim seltenen Abfragen kein kurzer Ausschlag verloren geht) */
+    takePeak() { const p = this.peakHold; this.peakHold = 0; return p; }
     get total() { return this.base + this.len; }
     mark() { return this.total; }
     slice(a, b) {

@@ -44,6 +44,9 @@
       this.root.replaceChildren(header, this.stage, this.strip, this.bar);
       this.stripMap = new Map();
       this.barRefs = null;
+      // Echte Höhe der Steuerleiste merken: Auf schmalen Bildschirmen ist sie zweizeilig und damit höher als der feste
+      // Standardwert. Der Aufnahme-Bereich des Hosts (local-dock) endete sonst hinter der Leiste, Knöpfe lagen übereinander.
+      if (window.ResizeObserver) new ResizeObserver(() => { const hh = this.bar.offsetHeight; if (hh) this.root.style.setProperty('--bar-real', hh + 'px'); }).observe(this.bar);
 
       // Drag & Drop für Packs (nur in der Lobby). Auch im Spiel wird das Ablegen abgefangen,
       // sonst öffnet der Browser die Datei und das laufende Spiel wäre weg.
@@ -54,7 +57,6 @@
         document.body.classList.remove('dragging');
         if (this.state === 'lobby') this.importFiles(await filesFromDrop(e.dataTransfer));
       });
-      this.stripLoop();
     },
 
     showStage(key, build) {
@@ -106,27 +108,36 @@
         c.el.style.setProperty('--c', p.color);
         c.el.classList.toggle('off', !p.connected || !p.active);
         c.el.classList.toggle('done', !!p.done);
-        const av = VD.ui.avatar(p, 'sm'); c.av.replaceWith(av); c.av = av;
-        c.name.textContent = p.name; c.st.textContent = stateText(p);
+        const avKey = (p.emoji || '') + '|' + (p.color || '');
+        if (c.avKey !== avKey) { c.avKey = avKey; const av = VD.ui.avatar(p, 'sm'); c.av.replaceWith(av); c.av = av; }
+        if (c.name.textContent !== p.name) c.name.textContent = p.name;
+        const st = stateText(p); if (c.st.textContent !== st) c.st.textContent = st;
       });
       for (const [pid, c] of this.stripMap) if (!ids.has(pid)) { c.el.classList.add('out'); setTimeout(() => c.el.remove(), 250); this.stripMap.delete(pid); }
+      this.stripLoop();
     },
+    /* Pegel in der Spielerleiste. Die Schleife läuft nur, solange jemand aufnimmt oder ein Pegel noch ausklingt;
+       sonst schläft sie (kein Dauerlauf mit 60 Bildern pro Sekunde in Lobby, Ladebildschirm und Ergebnis).
+       refreshStrip weckt sie wieder, sobald sich bei einem Spieler etwas ändert. */
     stripLoop() {
+      if (this._stripRaf) return;
       const loop = () => {
-        // Im Hintergrund-Tab oder bei versteckter Leiste (Lobby) gibt es nichts zu zeichnen
-        if (!document.hidden && !this.strip.hidden) {
-          for (const [pid, c] of this.stripMap) {
-            const p = this.players.get(pid);
-            if (!p) continue;
-            const live = p.prog && p.prog.st === 'rec' ? p.lvl : 0;
-            p._vu = (p._vu || 0) * 0.8 + live * 0.2;
-            const sc = p._vu < 0.002 ? 0 : Math.min(1, Math.pow(p._vu * 1.4, 0.7));
-            if (c._sc !== sc && !(c._sc === 0 && sc === 0)) { c._sc = sc; c.fill.style.transform = `scaleY(${sc})`; }
-          }
+        this._stripRaf = 0;
+        // Leiste versteckt (Lobby) oder verdeckt (der Host nimmt gerade selbst bildschirmfüllend auf): nichts zu zeichnen
+        if (this.strip.hidden || (this.local && this.local.dock.classList.contains('big'))) return;
+        let busy = false;
+        for (const [pid, c] of this.stripMap) {
+          const p = this.players.get(pid);
+          if (!p) continue;
+          const rec = !!(p.prog && p.prog.st === 'rec');
+          p._vu = (p._vu || 0) * 0.8 + (rec ? p.lvl : 0) * 0.2;
+          const sc = p._vu < 0.002 ? 0 : Math.min(1, Math.pow(p._vu * 1.4, 0.7));
+          if (c._sc !== sc && !(c._sc === 0 && sc === 0)) { c._sc = sc; c.fill.style.transform = `scaleY(${sc})`; }
+          if (rec || sc > 0) busy = true;
         }
-        requestAnimationFrame(loop);
+        if (busy) this._stripRaf = requestAnimationFrame(loop);
       };
-      requestAnimationFrame(loop);
+      this._stripRaf = requestAnimationFrame(loop);
     },
 
     /* ---------- Steuerleiste ---------- */
@@ -290,14 +301,37 @@
       if (this.stageKey !== 'lobby' || !this.lobbyRefs) return;
       const box = this.lobbyRefs.players;
       const ps = this.list();
+      // Karten bleiben stehen und werden nur aktualisiert. Vorher wurden bei jeder Kleinigkeit (jemand ist bereit,
+      // wählt eine Wunschrolle …) alle Karten neu gebaut und sprangen mit ihrer Einblend-Animation neu auf.
+      const cards = this.lobbyRefs.cards || (this.lobbyRefs.cards = new Map());
       if (!ps.length) {
+        cards.clear();
         box.replaceChildren(h('p', { class: 'empty', text: this.code ? VD.t('Noch niemand da. Andere treten mit dem Code bei (Handy oder PC).') : VD.t('Tippe auf „Mit diesem Gerät mitspielen“.') }));
       } else {
-        box.replaceChildren(...ps.map((p) => h('div', { class: 'pcard' + (p.connected ? '' : ' off'), style: { '--c': p.color } },
-          VD.ui.avatar(p, 'lg'), h('span', { class: 'pc-n', text: p.name }),
-          h('em', { class: 'pc-s' }, !p.connected ? VD.t('getrennt') : !p.canRecord ? VD.t('nur zuschauen') : p.ready ? VD.t('bereit ✓') : VD.t('wartet'),
-            p.wish && p.canRecord && this.wishOn() ? h('span', { class: 'pc-w', text: ' · ' + p.wish }) : null),
-          h('button', { class: 'kick', 'aria-label': VD.t('{name} entfernen', { name: p.name }), title: VD.t('Entfernen'), onclick: () => this.removePlayer(p, !p.isLocal) }, '✕'))));
+        if (!cards.size) box.replaceChildren();   // Hinweis "Noch niemand da" entfernen
+        const seen = new Set();
+        ps.forEach((p, i) => {
+          seen.add(p.pid);
+          let c = cards.get(p.pid);
+          const key = (p.emoji || '') + '|' + p.color + '|' + p.name;
+          if (!c || c.key !== key || c.p !== p) {
+            const st = h('em', { class: 'pc-s' });
+            const el = h('div', { class: 'pcard', style: { '--c': p.color } }, VD.ui.avatar(p, 'lg'), h('span', { class: 'pc-n', text: p.name }), st,
+              h('button', { class: 'kick', 'aria-label': VD.t('{name} entfernen', { name: p.name }), title: VD.t('Entfernen'), onclick: () => this.removePlayer(p, !p.isLocal) }, '✕'));
+            if (c) c.el.replaceWith(el);
+            c = { el, st, key, p, sig: null }; cards.set(p.pid, c);
+          }
+          const text = !p.connected ? VD.t('getrennt') : !p.canRecord ? VD.t('nur zuschauen') : p.ready ? VD.t('bereit ✓') : VD.t('wartet');
+          const wish = p.wish && p.canRecord && this.wishOn() ? p.wish : '';
+          const sig = text + '|' + wish + '|' + (p.connected ? 1 : 0);
+          if (c.sig !== sig) {
+            c.sig = sig;
+            c.el.classList.toggle('off', !p.connected);
+            c.st.replaceChildren(text, wish ? h('span', { class: 'pc-w', text: ' · ' + wish }) : '');
+          }
+          if (box.children[i] !== c.el) box.insertBefore(c.el, box.children[i] || null);
+        });
+        for (const [pid, c] of cards) if (!seen.has(pid)) { c.el.remove(); cards.delete(pid); }
       }
       this.renderHostRoles();
       this.updateLobbySummary();
@@ -369,8 +403,25 @@
     },
     updateLoad() {
       const box = VD.$('#load-cast'); if (!box || this.stageKey !== 'load') return;
-      box.replaceChildren(...this.list().filter((p) => p.assign && p.connected).map((p) => h('div', { class: 'cast-card' + (p.loaded ? ' ok' : ''), style: { '--c': p.color } },
-        VD.ui.avatar(p, 'lg'), h('b', { text: p.name }), h('small', { text: p.loaded ? VD.t('bereit ✓') : VD.t('lädt …') }))));
+      // Karten bleiben stehen und werden nur aktualisiert: Diese Funktion läuft während des Ladens alle 200 ms,
+      // ein kompletter Neuaufbau ließ die Einblend-Animation jedes Mal von vorn beginnen.
+      const cards = box._cards || (box._cards = new Map());
+      const ps = this.list().filter((p) => p.assign && p.connected);
+      const seen = new Set();
+      ps.forEach((p, i) => {
+        seen.add(p.pid);
+        let c = cards.get(p.pid);
+        const key = (p.emoji || '') + '|' + p.color + '|' + p.name;
+        if (!c || c.key !== key) {
+          const st = h('small');
+          const el = h('div', { class: 'cast-card', style: { '--c': p.color } }, VD.ui.avatar(p, 'lg'), h('b', { text: p.name }), st);
+          if (c) c.el.replaceWith(el);
+          c = { el, st, key, ok: null }; cards.set(p.pid, c);
+        }
+        if (c.ok !== !!p.loaded) { c.ok = !!p.loaded; c.el.classList.toggle('ok', c.ok); c.st.textContent = c.ok ? VD.t('bereit ✓') : VD.t('lädt …'); }
+        if (box.children[i] !== c.el) box.insertBefore(c.el, box.children[i] || null);
+      });
+      for (const [pid, c] of cards) if (!seen.has(pid)) { c.el.remove(); cards.delete(pid); }
     },
 
     /* Übersicht während der Aufnahme: jeder in seinem eigenen Tempo */

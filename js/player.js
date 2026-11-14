@@ -25,6 +25,10 @@
       this.renderTop();
       this.viewKey = '';
       this.setView('wait', () => this.vWait(VD.t('Verbinde …')));
+      // Wellenform passt sich sofort an, wenn das Design gewechselt oder das Fenster in der Größe geändert wird
+      this._onRedraw = () => this.waveRender();
+      document.addEventListener('vt-theme', this._onRedraw);
+      window.addEventListener('resize', this._onRedraw);
     }
 
     resetScene() {
@@ -45,8 +49,8 @@
       link.send({ t: 'hello', pid: this.profile.pid, name: this.profile.name, emoji: this.profile.emoji, color: this.profile.color, canRecord: this.canRecord, sceneId: this.loaded ? this.sceneId : null, ver: 2 });
       this.setOffline(false);
       if (this.loaded) this.resync();
-      // Bildschirm wach halten; nach einem Neuverbinden die alte Sperre zuerst freigeben
-      if (!this.local && 'wakeLock' in navigator) { try { this.wake && this.wake.release(); } catch { /* ignore */ } navigator.wakeLock.request('screen').then((w) => (this.wake = w)).catch(() => {}); }
+      // Bildschirm wach halten (auch nach einem Tab-Wechsel, siehe VD.wake)
+      if (!this.local) VD.wake.on();
     }
     setOffline(on) { this.offline.hidden = !on; }
     send(m) { this.link && this.link.send(m); }
@@ -206,17 +210,19 @@
         this.send({ t: 'wish', c: null }); this.fx('click'); this.updateRoles();
       } }, h('b', { text: VD.t('Überrasch mich') }))));
     }
+    /* Pegelbalken in der Lobby. Das Mikro liefert nur etwa alle 20 ms einen neuen Wert und der Balken gleitet per CSS,
+       deshalb reichen 30 Schritte pro Sekunde über einen Zeitgeber (kein Dauerlauf mit jedem Bild). */
     startMeter() {
-      cancelAnimationFrame(this._mraf);
+      clearTimeout(this._mtimer);
       const el = this._meterEl;
-      let seen = false;
+      let seen = false, last = -1;
       const loop = () => {
         if (!el || el !== this._meterEl) return;
-        if (!el.isConnected) { if (seen) return; this._mraf = requestAnimationFrame(loop); return; }   // beim Aufbau ist das Element noch nicht eingebaut: kurz warten
+        if (!el.isConnected) { if (seen) return; this._mtimer = setTimeout(loop, 33); return; }   // beim Aufbau ist das Element noch nicht eingebaut: kurz warten
         seen = true;
-        const v = this.mic ? Math.min(1, Math.pow(this.mic.peak * 2.2, 0.6)) : 0;
-        el.firstChild.style.transform = `scaleX(${v})`;
-        this._mraf = requestAnimationFrame(loop);
+        const v = this.mic ? Math.round(Math.min(1, Math.pow(this.mic.peak * 2.2, 0.6)) * 200) / 200 : 0;
+        if (v !== last) { last = v; el.firstChild.style.transform = `scaleX(${v})`; }
+        this._mtimer = setTimeout(loop, 33);
       };
       loop();
     }
@@ -226,7 +232,7 @@
       const was = this.phase;
       this.phase = m.phase;
       if ((was === 'lobby') !== (m.phase === 'lobby')) this.renderTop();
-      if (m.phase !== 'lobby') cancelAnimationFrame(this._mraf);
+      if (m.phase !== 'lobby') clearTimeout(this._mtimer);
       if (m.phase === 'lobby') { this.resetScene(); this.setView('lobby', () => this.vLobby(), true); return; }
       if (m.spectate) { this.stopAll(); this.setView('spectate', () => this.vSpectate(m), true); return; }
       if (m.phase === 'load') {
@@ -278,6 +284,7 @@
       const sub = h('div', { class: 'dp-sub' });
       const bar = h('i', { class: 'dp-barfill' });
       const live = h('canvas', { class: 'dp-live', 'aria-label': VD.t('Wellenform: Original und deine Aufnahme') });
+      const pos = h('i', { class: 'dp-pos', hidden: true, 'aria-hidden': 'true' });   // Positionsstrich über der Wellenform
       const status = h('p', { class: 'hint dp-status', text: '' });
       const mk = (cls, label, fn) => h('button', { class: 'btn ' + cls, onclick: fn }, label);
       const bBack = mk('dp-back', '◀', () => this.go(-1)); bBack.setAttribute('aria-label', VD.t('Vorherige Zeile')); bBack.disabled = idx === 0;
@@ -286,8 +293,8 @@
       const bTake = mk('', VD.t('Mein Take'), () => this.doTake());
       const bNext = mk('primary', idx === total - 1 ? VD.t('Fertig ▶') : VD.t('Weiter ▶'), () => this.go(1));
       bTake.disabled = !take; bNext.disabled = !take;
-      this.ui = { still, video, sub, bar, live, status, bBack, bOrig, bRec, bTake, bNext, line };
-      this.wv = { orig: (line.pk || []).map((v) => v / 100), mine: take ? this.peaksOf(take.data, line) : [], pos: null, run: false };
+      this.ui = { still, video, sub, bar, live, pos, status, bBack, bOrig, bRec, bTake, bNext, line };
+      this.wv = { orig: (line.pk || []).map((v) => v / 100), mine: take ? this.peaksOf(take.data, line) : [], run: false };
       requestAnimationFrame(() => this.waveRender());
       const screen = h('div', { class: 'dp-screen' }, still, video, sub, h('div', { class: 'dp-bar' }, bar));
       this.fitScreen(screen, video);
@@ -301,7 +308,7 @@
         h('p', { class: 'dp-who' }, h('b', { style: { '--c': this.profile.color }, text: line.char.toUpperCase() }), ' · ' + VD.t('Du bist dran')),
         h('p', { class: 'dp-cap', text: line.caption || '' }),
         trEl,
-        live, status,
+        h('div', { class: 'dp-livewrap' }, live, pos), status,
         h('div', { class: 'dp-btns' }, bBack, bOrig, bRec, bTake, bNext));
       this.setView('play', () => el, true);
       this.sendProg('idle');
@@ -316,12 +323,31 @@
       u.bOrig.textContent = kind === 'orig' ? VD.t('Stopp') : VD.t('Original');
       u.bRec.textContent = kind === 'rec' ? VD.t('Stopp') : VD.t('Aufnahme');
       u.bTake.textContent = kind === 'take' ? VD.t('Stopp') : VD.t('Mein Take');
+      this.recRing(u, kind === 'rec');
       const t = this.takes.get(u.line.i);
       u.bBack.disabled = kind != null || this.cur === 0;
       u.bNext.disabled = kind != null || !t;
       u.bOrig.disabled = kind === 'rec' || kind === 'take';
       u.bTake.disabled = kind === 'rec' || kind === 'orig' || (!t && kind !== 'take');
       u.bRec.disabled = kind === 'orig' || kind === 'take';
+    }
+
+    /* Pulsierender Ring um den Aufnahme-Knopf. Er ist ein eigenes Element hinter dem Knopf und wird nur skaliert und
+       ausgeblendet. Das erledigt die Grafikkarte, die Seite muss dafür nicht bei jedem Bild neu gezeichnet werden. */
+    recRing(u, on) {
+      if (!on) { if (u.ring) { u.ringObs && u.ringObs.disconnect(); u.ring.remove(); u.ring = u.ringObs = null; } return; }
+      if (u.ring) return;
+      const b = u.bRec, box = b.parentNode;
+      if (!box) return;
+      const ring = (u.ring = h('i', { class: 'rec-ring', 'aria-hidden': 'true' }));
+      const place = () => {
+        const w = b.offsetWidth, hh = b.offsetHeight;
+        if (!w || !hh) return;
+        ring.style.left = b.offsetLeft + 'px'; ring.style.top = b.offsetTop + 'px'; ring.style.width = w + 'px'; ring.style.height = hh + 'px';
+        ring.style.setProperty('--sx', String((w + 24) / w)); ring.style.setProperty('--sy', String((hh + 24) / hh));
+      };
+      box.append(ring); place();
+      if (window.ResizeObserver) { u.ringObs = new ResizeObserver(place); u.ringObs.observe(b); u.ringObs.observe(box); }
     }
 
     /* Szene abspielen: Video (falls möglich) ab dem Anfang der Zeile, dazu optional Ton */
@@ -370,6 +396,7 @@
     }
     stopAll() {
       this.stopPlayback();
+      if (this.ui) this.recRing(this.ui, false);
       clearInterval(this._lvl);
       this.busy = null; this.stopping = false;
     }
@@ -448,41 +475,62 @@
       }
       return out.map((v) => (mx > 0.002 ? v / mx : 0));
     }
+    /* Der Positionsstrich ist ein eigenes Element und gleitet per CSS (das erledigt die Grafikkarte, so wie beim Balken
+       unter dem Bild). Beim Anhören des eigenen Takes muss deshalb gar nichts mehr pro Bild gezeichnet werden; während
+       der Aufnahme wird nur die wachsende eigene Kurve nachgezeichnet, etwa 30 Mal pro Sekunde. */
     waveStart(mode, started, line) {
-      const w = this.wv; if (!w) return;
+      const w = this.wv, u = this.ui; if (!w || !u) return;
       const dur = line.s1 - line.s0, lead = Math.max(0, (started.vt0 || line.s0) - line.s0);
       w.mode = mode; w.run = true; w.dur = dur; w.t0 = started.t0 - lead * 1000;
-      if (mode === 'rec') { w.lat = (this.micLatencyMs() + 10) / 1000; w.mine = new Array(160).fill(0); w.raw = new Array(160).fill(0); w.rmax = 0; }
+      const p0 = Math.min(1, Math.max(0, (performance.now() - w.t0) / 1000 / dur));
+      const el = u.pos;
+      el.style.transition = 'none'; el.style.transform = `translateX(${p0 * 100}%)`; el.hidden = false;
+      void el.offsetWidth;
+      el.style.transition = `transform ${Math.max(0, dur * (1 - p0))}s linear`; el.style.transform = 'translateX(100%)';
+      if (mode !== 'rec') { this.waveRender(); return; }
+      w.lat = (this.micLatencyMs() + 10) / 1000; w.mine = new Array(160).fill(0); w.raw = new Array(160).fill(0); w.rmax = 0; w.lastB = -1;
+      if (this.mic && this.mic.takePeak) this.mic.takePeak();   // alten Höchstwert verwerfen
+      // Zeitgeber statt „jedes Bild“: So entsteht nur dann ein neues Bild, wenn auch wirklich neu gezeichnet wird
       const tick = () => {
         if (!w.run || this.wv !== w) return;
-        w.pos = Math.min(1, Math.max(0, (performance.now() - w.t0) / 1000 / dur));
-        if (mode === 'rec' && this.mic) {
+        if (this.mic) {
           // Wie nach der Aufnahme: auf den lautesten Moment normiert, frühere Balken passen sich mit an
           // Das Mikrofon meldet mit Verzögerung: Der Pegel gehört zu einem früheren Zeitpunkt (so wie bei der fertigen Aufnahme)
           const tPos = Math.max(0, ((performance.now() - w.t0) / 1000 - w.lat) / dur);
-          const b = Math.min(159, Math.floor(tPos * 160)); const pk = this.mic.peak || 0;
-          if (pk > w.raw[b]) w.raw[b] = pk;
+          const b = Math.min(159, Math.floor(tPos * 160)); const pk = (this.mic.takePeak ? this.mic.takePeak() : this.mic.peak) || 0;
+          // alle Balken seit dem letzten Schritt füllen (bei kurzen Zeilen liegen mehrere dazwischen), sonst entstünden Lücken
+          for (let k = w.lastB < 0 ? b : Math.min(b, w.lastB + 1); k <= b; k++) if (pk > w.raw[k]) w.raw[k] = pk;
+          w.lastB = b;
           if (pk > w.rmax) w.rmax = pk;
           const ref = Math.max(w.rmax, 0.01);
           for (let k = 0; k < 160; k++) w.mine[k] = Math.min(1, w.raw[k] / ref);
         }
         this.waveRender();
-        requestAnimationFrame(tick);
+        w.timer = setTimeout(tick, 33);
       };
-      requestAnimationFrame(tick);
+      w.timer = setTimeout(tick, 33);
     }
-    waveStop() { const w = this.wv; if (!w) return; w.run = false; w.pos = null; this.waveRender(); }
+    waveStop() {
+      const w = this.wv; if (!w) return;
+      w.run = false; clearTimeout(w.timer);
+      const el = this.ui && this.ui.pos;
+      if (el) { el.style.transition = 'none'; el.hidden = true; }
+      this.waveRender();
+    }
+    /* Zeichnet die Wellenform. Was sich nicht bewegt (Hintergrund, Original und – außer während der Aufnahme – die eigene
+       Aufnahme), wird einmal auf eine zweite Zeichenfläche gemalt und danach nur noch kopiert. Neu gezeichnet wird nur
+       während der Aufnahme die wachsende eigene Kurve. Der Positionsstrich liegt als eigenes Element darüber. */
     waveRender() {
       const w = this.wv, c = this.ui && this.ui.live;
       if (!w || !c || !c.isConnected) return;
       const dpr = window.devicePixelRatio || 1, cw = c.clientWidth, ch = c.clientHeight;
       if (!cw || !ch) return;
-      if (c.width !== Math.round(cw * dpr)) { c.width = Math.round(cw * dpr); c.height = Math.round(ch * dpr); }
-      const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, cw, ch);
+      const W = Math.round(cw * dpr), H = Math.round(ch * dpr);
+      let redraw = false;
+      if (c.width !== W || c.height !== H) { c.width = W; c.height = H; redraw = true; }
       const wc = VD.waveColors();
-      g.fillStyle = wc.bg; g.fillRect(0, 0, cw, ch);
       const mid = ch / 2;
-      const area = (arr, fill, stroke) => {
+      const area = (g, arr, fill, stroke) => {
         if (!arr || !arr.length) return;
         const n = arr.length;
         g.beginPath(); g.moveTo(0, mid);
@@ -491,9 +539,22 @@
         for (let i = n - 1; i >= 0; i--) g.lineTo(((i + 0.5) / n) * cw, mid + Math.max(1, arr[i] * (mid - 3)));
         g.closePath(); g.fillStyle = fill; g.fill(); g.strokeStyle = stroke; g.lineWidth = 1; g.stroke();
       };
-      area(w.orig, wc.a, wc.aLine);
-      area(w.mine, wc.b, wc.bLine);
-      if (w.pos != null) { g.fillStyle = wc.pos; g.fillRect(Math.round(w.pos * cw) - 1, 0, 2, ch); }
+      const live = !!w.run && w.mode === 'rec';   // eigene Kurve ändert sich gerade laufend
+      const key = W + 'x' + H + (live ? 'L' : 'S') + VD.theme.get();
+      if (w.cacheKey !== key || (!live && w.cacheMine !== w.mine)) {
+        const off = w.cache || (w.cache = document.createElement('canvas'));
+        off.width = W; off.height = H;
+        const og = off.getContext('2d'); og.setTransform(dpr, 0, 0, dpr, 0, 0);
+        og.fillStyle = wc.bg; og.fillRect(0, 0, cw, ch);
+        area(og, w.orig, wc.a, wc.aLine);
+        if (!live) area(og, w.mine, wc.b, wc.bLine);
+        w.cacheKey = key; w.cacheMine = w.mine; redraw = true;
+      }
+      if (!live && !redraw) return;   // nichts hat sich geändert
+      const g = c.getContext('2d');
+      g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H); g.drawImage(w.cache, 0, 0);
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (live) area(g, w.mine, wc.b, wc.bLine);
     }
 
     micLatencyMs() {
@@ -649,8 +710,10 @@
 
     destroy() {
       this.stopAll();
-      clearInterval(this._lvl); cancelAnimationFrame(this._mraf);
-      try { this.wake && this.wake.release(); } catch { /* ignore */ }
+      clearInterval(this._lvl); clearTimeout(this._mtimer);
+      document.removeEventListener('vt-theme', this._onRedraw);
+      window.removeEventListener('resize', this._onRedraw);
+      if (!this.local) VD.wake.off();
     }
   };
 })();

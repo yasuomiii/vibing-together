@@ -3,7 +3,8 @@
   const VD = window.VD;
   const $ = VD.$;
   const screens = ['home', 'join', 'maker', 'host', 'player'];
-  const show = (name) => screens.forEach((s) => { $('#v-' + s).hidden = s !== name; });
+  // Fehlt ein Bereich (z. B. der Ersteller wurde aus index.html entfernt), wird er einfach übersprungen
+  const show = (name) => screens.forEach((s) => { const el = $('#v-' + s); if (el) el.hidden = s !== name; });
 
   /* Spieler-ID pro Browser-Tab, damit ein Neuladen wieder in den Raum findet */
   function getPid() {
@@ -23,7 +24,7 @@
   /* ---------- Startseite ---------- */
 
   const mkBtn = $('#btn-maker');
-  if (VD.Maker && VD_CONFIG.maker && VD_CONFIG.maker.enabled) {
+  if (mkBtn && $('#v-maker') && VD.Maker && VD_CONFIG.maker && VD_CONFIG.maker.enabled) {
     mkBtn.hidden = false;
     const tb = mkBtn.parentNode.querySelector('.theme-btn'); if (tb) tb.after(mkBtn);   // rechts neben den Design-Knopf
     mkBtn.addEventListener('click', () => { show('maker'); VD.Packs.init && VD.Packs.init(); VD.Maker.open($('#v-maker'), () => show('home')); window.scrollTo(0, 0); });

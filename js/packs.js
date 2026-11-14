@@ -157,7 +157,7 @@
       return new Promise((res, rej) => { const t = db.transaction('packs', mode); const r = fn(t.objectStore('packs')); t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error); });
     },
     put(pack) {
-      const clean = { ...pack, _backBuf: undefined, iconUrl: undefined };
+      const clean = { ...pack, iconUrl: undefined };
       return idb.tx('readwrite', (s) => s.put(clean));
     },
     all() { return idb.tx('readonly', (s) => s.getAll()); },
@@ -174,6 +174,7 @@
     selId: VD.store.get('packSel', null),
 
     async init() {
+      this.list.forEach((p) => { if (p.iconUrl) URL.revokeObjectURL(p.iconUrl); });   // erneuter Aufruf: alte Vorschaubilder freigeben
       this.list = [];
       try {
         const saved = await idb.all();
@@ -223,29 +224,22 @@
       const p = this.list.find((x) => x.id === id);
       if (!p) return;
       this.list = this.list.filter((x) => x.id !== id);
-      if (p.iconUrl) URL.revokeObjectURL(p.iconUrl);   // Vorschaubild und dekodierte Hintergrundspur freigeben
-      p._backBuf = null;
-      p.lines.forEach((l) => this._cache.delete(l.id));
+      if (p.iconUrl) URL.revokeObjectURL(p.iconUrl);   // Vorschaubild freigeben
       try { await idb.del(id); } catch { /* ignore */ }
       this.emit('change');
     },
 
-    _cache: new Map(),
+    /* Dekodierter Ton einer Zeile bzw. der Hintergrundspur. Nichts wird hier aufbewahrt: Scene.build merkt sich das
+       fertig umgerechnete Ergebnis pro Pack, die großen Roh-Puffer (oft zig MB) werden danach sofort wieder frei. */
     async getBuffer(line) {
-      if (this._cache.has(line.id)) return this._cache.get(line.id);
       await VD.audio.ensure();
-      const buf = await VD.audio.decode(await line.blob.arrayBuffer());
-      this._cache.set(line.id, buf);
-      if (this._cache.size > 40) this._cache.delete(this._cache.keys().next().value);
-      return buf;
+      return VD.audio.decode(await line.blob.arrayBuffer());
     },
 
     async getBacking(pack) {
       if (!pack.backing) return null;
-      if (pack._backBuf) return pack._backBuf;
-      try { await VD.audio.ensure(); pack._backBuf = await VD.audio.decode(await pack.backing.arrayBuffer()); }
-      catch { pack.backing = null; }
-      return pack._backBuf || null;
+      try { await VD.audio.ensure(); return await VD.audio.decode(await pack.backing.arrayBuffer()); }
+      catch { pack.backing = null; return null; }
     }
   });
 })();
