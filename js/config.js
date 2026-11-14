@@ -30,6 +30,9 @@ window.VD_CONFIG = {
     enabled: true
   },
 
+  // Bewegter Hintergrund. Auf false setzen, dann steht der Hintergrund still (sieht gleich aus, bewegt sich nur nicht).
+  animatedBackground: true,
+
   limits: {
     maxPlayers: 8,
     maxNameLength: 14,

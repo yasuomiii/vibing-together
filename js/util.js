@@ -118,6 +118,39 @@
     if (ctx && ctx.state !== 'running' && ctx.state !== 'closed') { try { ctx.resume().catch(() => {}); } catch { /* ignore */ } }
   });
 
+  /* Hintergrund-Ebenen (Aussehen und Bewegung stehen in css/style.css unter BG-START) */
+  (function () {
+    const cfg = window.VD_CONFIG || {};
+    if (cfg.animatedBackground === false) document.documentElement.classList.add('bg-still');
+    const box = VD.h('div', { class: 'bg-fx', 'aria-hidden': 'true' },
+      ...['bg-glow', 'bg-rings-a', 'bg-rings-b', 'bg-eq', 'bg-dots', 'bg-spark-a', 'bg-spark-b'].map((c) => VD.h('i', { class: c })));
+    // Schallwellen: acht Ringe je Ecke, gleichmäßig versetzt, die Bewegung steht im CSS
+    box.querySelectorAll('.bg-rings-a, .bg-rings-b').forEach((r) => { for (let k = 0; k < 8; k++) { const b = document.createElement('b'); b.style.setProperty('--k', k); r.appendChild(b); } });
+    // Pegelbalken: so viele, wie in die Breite passen. Jeder Balken bekommt eigene, aber feste Werte, die Reihe sieht bei jedem Laden gleich aus.
+    const eq = box.querySelector('.bg-eq');
+    let eqN = 0;
+    const buildEq = () => {
+      const M = 20; // Muster wiederholt sich alle 20 Balken (480 px), so läuft die Reihe nahtlos im Kreis
+      const n = Math.ceil(window.innerWidth / 24) + M + 1;
+      if (n === eqN) return;
+      eqN = n; eq.textContent = '';
+      for (let i = 0; i < n; i++) {
+        const j = i % M;
+        const r = (k) => { const x = Math.sin(j * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); };
+        const hill = 0.55 + 0.45 * Math.sin((j / M) * Math.PI * 2 + 0.6) ** 2; // sanfte Hügel statt Zufallsrauschen
+        const hi = Math.min(1, hill * (0.7 + r(1) * 0.45));
+        const lo = hi * (0.18 + r(2) * 0.3);
+        const bar = document.createElement('b');
+        bar.style.cssText = '--hi:' + hi.toFixed(2) + ';--lo:' + lo.toFixed(2) + ';--d:' + (1.1 + r(3) * 2.6).toFixed(2) + 's;--dl:-' + (r(4) * 6).toFixed(2) + 's';
+        eq.appendChild(bar);
+      }
+    };
+    buildEq();
+    let eqT = 0;
+    window.addEventListener('resize', () => { clearTimeout(eqT); eqT = setTimeout(buildEq, 200); });
+    document.body.prepend(box);
+  })();
+
   VD.vibrate = (p) => { try { navigator.vibrate && navigator.vibrate(p); } catch { /* ignore */ } };
 
   VD.AVATARS = ['🎤', '🦊', '🐙', '🦄', '🐸', '🤖', '👻', '🐯', '🦖', '🍕', '🚀', '🎸'];
