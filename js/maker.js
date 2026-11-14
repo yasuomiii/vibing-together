@@ -1,9 +1,6 @@
-/* Dub-Pack-Ersteller: baut aus einem Video einen Pack im selben Format wie die Community-Packs (siehe js/packs.js).
-   Alles läuft im Browser, nichts wird hochgeladen. Nur die Texterkennung lädt beim ersten Mal ein Modell aus dem Internet.
-
-   Zwei Wege, beide führen zum gleichen Pack:
-     Weg 1  Lokal: Texterkennung (Whisper) im Browser, Hintergrund = Original ohne Sprechstellen. Einfach, aber langsamer und weniger genau.
-     Weg 2  Selbst mit externen Seiten/Programmen: Untertitel (.srt/.vtt), Stimmenspur und Hintergrundspur selbst erzeugen und hier laden.
+/* Dub-Pack-Ersteller: baut aus einem Video, Untertiteln (.srt/.vtt) und zwei Tonspuren einen Pack im selben Format wie die
+   Community-Packs (siehe js/packs.js). Text und Ton bereitest du vorher mit kostenlosen Webseiten vor (Anleitung und Links
+   stehen im Ersteller). Alles Weitere läuft im Browser, nichts wird hochgeladen.
 
    Entfernen: js/maker.js löschen, die Zeile <script src="js/maker.js"> und den Knopf #btn-maker samt <section id="v-maker"> in index.html
    entfernen (oder in js/config.js maker.enabled auf false setzen). Das Spiel selbst braucht diese Datei nicht. */
@@ -15,6 +12,62 @@
 
   /* Englische Texte. Andere Sprachen zeigen für diesen Bereich Englisch. */
   VD.addLang('en', {
+    'Selbst prüfen': 'Check it yourself',
+    'Unabhängige Prüfseiten zeigen dir live, ob eine Webseite vertrauenswürdig ist. Tippe bei einer Seite auf einen Namen, dann siehst du dort die aktuelle Einschätzung zu genau dieser Adresse.': 'Independent checking sites show you live whether a website is trustworthy. Tap a name under a site and you see the current rating for exactly that address.',
+    'Bewertungen von echten Nutzern.': 'Reviews from real users.',
+    'Prüft Betrugs-Anzeichen und Alter der Seite.': 'Checks signs of fraud and the age of the site.',
+    'Googles Liste gefährlicher Seiten.': 'Google’s list of dangerous sites.',
+    'Fragt viele Virenscanner auf einmal.': 'Asks many virus scanners at once.',
+    'Ich selbst konnte die Seiten nicht prüfen und gebe keine Garantie. Auf diesen Seiten werden deine Dateien hochgeladen. Lade dort nur fertige Dateien herunter und installiere nichts.': 'I could not check the sites myself and give no guarantee. Your files are uploaded to those sites. Only download finished files there and install nothing.',
+    'Alles läuft über Webseiten, du musst nichts installieren. Du bereitest Text und Ton dort vor und lädst es hier hoch. Daraus wird ein Dub-Pack.': 'Everything runs on websites, you install nothing. You prepare text and sound there and load it here. It becomes a dub pack.',
+    'Kostenlose Webseiten': 'Free websites',
+    'Alles im Browser, ohne Programm zum Herunterladen. Tippe oben rechts auf das i, dort steht, worauf du achten solltest.': 'All in the browser, no program to download. Tap the i at the top right to see what to watch out for.',
+    'Die Szene als Videodatei bereitlegen (mp4 oder webm, am besten 20 bis 90 Sekunden). Passt das Format nicht, wandle es mit einer Umwandel-Seite um.': 'Have the scene ready as a video file (mp4 or webm, ideally 20 to 90 seconds). If the format does not fit, convert it with a converter site.',
+    'Den Ton der Szene als mp3 oder wav herausziehen, ebenfalls mit einer Umwandel-Seite.': 'Extract the scene’s sound as mp3 or wav, also with a converter site.',
+    'Die Tondatei bei einer Stimmentrenner-Seite hochladen. Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).': 'Upload the audio file to a stem splitter site. You get two files: voices only and background only (music and noises).',
+    'Bei einer Untertitel-Seite das Video hochladen, Untertitel erzeugen lassen und als .srt-Datei herunterladen. Die Zeiten dürfen danach hier noch korrigiert werden.': 'Upload the video to a subtitle site, have subtitles generated and download them as an .srt file. You can still fix the times here afterwards.',
+    'Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.': 'Services change. Check for yourself whether they are still free and what happens to your files. Only use material you are allowed to use.',
+    'Trennt Stimmen und Hintergrund in zwei Dateien.': 'Splits voices and background into two files.',
+    'Erzeugt Untertitel automatisch, Download als .srt. Die kostenlose Version ist begrenzt.': 'Creates subtitles automatically, download as .srt. The free version is limited.',
+    'Ebenfalls automatische Untertitel mit .srt-Download. Auch hier ist die kostenlose Version begrenzt.': 'Also automatic subtitles with .srt download. The free version is limited here too.',
+    'Wandelt Video und Ton um, zum Beispiel mp4 zu mp3. Die kostenlose Menge ist begrenzt.': 'Converts video and sound, for example mp4 to mp3. The free amount is limited.',
+    'Quellen und Sicherheit': 'Sources and safety',
+    'Das sind alle Seiten, auf die der Ersteller verweist. Jede Adresse steht genau so da, es gibt keine Umleitung.': 'These are all the sites the creator points to. Each address is shown exactly as it is, there is no redirect.',
+    'Stimmen und Hintergrund trennen': 'Split voices and background',
+    'Untertitel erzeugen': 'Create subtitles',
+    'Video und Ton umwandeln': 'Convert video and sound',
+    'Ehrlich gesagt:': 'To be honest:',
+    'Ich kann nicht garantieren, dass diese Seiten sicher sind oder es bleiben. Ich konnte sie nicht prüfen, es sind bekannte Anbieter.': 'I cannot guarantee that these sites are or will stay safe. I could not check them, they are well-known providers.',
+    'Auf diesen Seiten werden deine Dateien hochgeladen. Hier im Spiel bleibt alles auf deinem Gerät.': 'Your files are uploaded to those sites. Here in the game everything stays on your device.',
+    'Lade dort nichts herunter außer deinen fertigen Dateien (mp3, wav, mp4, srt). Installiere nichts und bezahle nichts.': 'Download nothing there except your finished files (mp3, wav, mp4, srt). Install nothing and pay for nothing.',
+    'Schau in der Adresszeile nach, dass wirklich die oben genannte Adresse mit https dasteht.': 'Check the address bar to see that the address listed above really shows, with https.',
+    'Nutze dort kein Passwort, das du woanders brauchst.': 'Do not use a password there that you need elsewhere.',
+    'Schließen': 'Close',
+    'So geht es': 'How it works',
+    'Du bereitest Text und Ton mit kostenlosen Seiten und Programmen vor und lädst alles hier hoch. Daraus wird ein Dub-Pack.': 'You prepare text and sound with free sites and programs and load everything here. It becomes a dub pack.',
+    'Anleitung zeigen': 'Show instructions',
+    'Links zeigen': 'Show links',
+    'Kostenlose Seiten und Programme': 'Free sites and programs',
+    'Alles, was du für die Vorbereitung brauchst. Die Links führen auf die Seiten der Anbieter.': 'Everything you need to prepare. The links go to the providers’ own sites.',
+    'Die Szene als Videodatei bereitlegen (mp4 oder webm, am besten 20 bis 90 Sekunden). Passt das Format nicht, wandle es mit HandBrake oder einem Online-Konverter um.': 'Have the scene ready as a video file (mp4 or webm, ideally 20 to 90 seconds). If the format does not fit, convert it with HandBrake or an online converter.',
+    'Den Ton der Szene als Audiodatei herausziehen (mp3 oder wav), zum Beispiel mit VLC, Audacity oder einem Online-Konverter.': 'Extract the scene’s sound as an audio file (mp3 or wav), for example with VLC, Audacity or an online converter.',
+    'Die Tondatei in einen Stimmentrenner geben. Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).': 'Put the audio file into a stem splitter. You get two files: voices only and background only (music and noises).',
+    'Untertitel erzeugen lassen und als .srt-Datei speichern. Die Zeiten dürfen danach hier noch korrigiert werden.': 'Have subtitles generated and save them as an .srt file. You can still fix the times here afterwards.',
+    'Hier das Video laden, die .srt-Datei importieren, die Stimmenspur und die Hintergrundspur laden, Charaktere vergeben und den Pack bauen.': 'Load the video here, import the .srt file, load the voices file and the background file, assign characters and build the pack.',
+    'Alle Dateien müssen gleich lang sein und im selben Moment beginnen wie das Video.': 'All files must be the same length and start at the same moment as the video.',
+    'Stimmen und Hintergrund trennen': 'Split voices and background',
+    'Untertitel erzeugen': 'Create subtitles',
+    'Ton herausziehen und Video umwandeln': 'Extract sound and convert video',
+    'Seite im Browser, ohne Installation. Gibt Stimmen und Hintergrund als zwei Dateien.': 'Site in the browser, no install. Gives voices and background as two files.',
+    'Programm für den PC, kostenlos und meist besser. Zum Download dort auf „Releases“ gehen.': 'Program for your PC, free and usually better. For the download, go to “Releases” there.',
+    'Programm für den PC, erkennt Sprache und speichert als .srt.': 'Program for your PC, recognises speech and saves as .srt.',
+    'Programm für Windows. Erkennt Sprache und lässt Untertitel von Hand verbessern.': 'Program for Windows. Recognises speech and lets you fix subtitles by hand.',
+    'Spielt fast alles ab und wandelt unter „Konvertieren“ in mp3 oder mp4 um.': 'Plays almost anything and converts to mp3 or mp4 under “Convert”.',
+    'Schneidet und speichert Ton als wav oder mp3.': 'Cuts and saves sound as wav or mp3.',
+    'Wandelt Videos in mp4 um.': 'Converts videos to mp4.',
+    'Seite im Browser zum Umwandeln von Video und Ton. Die kostenlose Menge ist begrenzt.': 'Site in the browser to convert video and sound. The free amount is limited.',
+    'Ich konnte die Seiten beim Bauen nicht live prüfen. Falls ein Link nicht mehr geht, suche den Namen im Netz.': 'I could not check the sites live when building this. If a link no longer works, search for the name.',
+    'Noch keine Zeilen. Importiere eine Untertitel-Datei oder füge Zeilen von Hand hinzu.': 'No lines yet. Import a subtitle file or add lines by hand.',
     'Dub-Pack erstellen': 'Create a dub pack',
     'Zurück': 'Back',
     'Baue aus einem Video deinen eigenen Dub-Pack. Alles bleibt auf deinem Gerät.': 'Turn a video into your own dub pack. Everything stays on your device.',
@@ -57,7 +110,7 @@
     'Untertitel importieren (.srt, .vtt)': 'Import subtitles (.srt, .vtt)',
     'Zeile bei {s} s hinzufügen': 'Add line at {s} s',
     'Nach Zeit sortieren': 'Sort by time',
-    'Noch keine Zeilen. Erkenne sie automatisch, importiere Untertitel oder füge sie von Hand hinzu.': 'No lines yet. Detect them automatically, import subtitles or add them by hand.',
+    'Noch keine Zeilen. Importiere eine Untertitel-Datei oder füge Zeilen von Hand hinzu.': 'No lines yet. Detect them automatically, import subtitles or add them by hand.',
     'Lade Modell … {p} %': 'Loading model … {p} %',
     'Erkenne Sprache … das kann einige Minuten dauern.': 'Recognising speech … this can take a few minutes.',
     'Bereite Ton vor …': 'Preparing the sound …',
@@ -87,7 +140,7 @@
     'Original ohne Sprechstellen': 'Original without speech',
     'Eigene Hintergrundspur': 'My own background file',
     'Keiner': 'None',
-    'Das Original wird an den Stellen stummgeschaltet, an denen gesprochen wird. Dort fehlt auch die Musik. Mit einer eigenen Hintergrundspur (Weg 2) klingt es besser.': 'The original is muted wherever people speak. Music is missing there too. A background file of your own (Way 2) sounds better.',
+    'Das Original wird an den Stellen stummgeschaltet, an denen gesprochen wird. Dort fehlt auch die Musik. Mit einer eigenen Hintergrundspur klingt es besser.': 'The original is muted wherever people speak. Music is missing there too. A background file of your own sounds better.',
     'Die Szene hat dann nur die Stimmen der Spieler.': 'The scene then has only the players’ voices.',
     'Nur Stimmen, ohne Musik. Dann sind die Original-Zeilen sauberer. Die Datei muss gleich lang sein wie das Video und gleich beginnen.': 'Voices only, no music. The original lines are cleaner then. The file must be as long as the video and start at the same moment.',
     'Nur Musik und Geräusche, ohne Stimmen. Die Datei muss gleich lang sein wie das Video und gleich beginnen.': 'Music and noises only, no voices. The file must be as long as the video and start at the same moment.',
@@ -178,93 +231,62 @@
     return lines;
   }
 
-  /* Texterkennung. Läuft in einem Worker, damit die Seite bedienbar bleibt. Das Modell kommt beim ersten Mal aus dem Internet. */
-  let worker = null;
-  function runWorker(msg, transfer, onProgress) {
-    if (!worker) {
-      const code = `let asr = null, key = '';
-self.onmessage = async (e) => {
-  const m = e.data;
-  try {
-    const lib = await import(m.url);
-    lib.env.allowLocalModels = false;
-    if (!asr || key !== m.model) {
-      asr = await lib.pipeline('automatic-speech-recognition', m.model, { progress_callback: (p) => self.postMessage({ t: 'progress', p }) });
-      key = m.model;
-    }
-    const opt = { return_timestamps: true, chunk_length_s: 30, stride_length_s: 5, task: 'transcribe' };
-    if (m.lang) opt.language = m.lang;
-    const out = await asr(m.audio, opt);
-    self.postMessage({ t: 'done', chunks: out.chunks || [], text: out.text || '' });
-  } catch (err) { self.postMessage({ t: 'error', msg: String((err && err.message) || err) }); }
-};`;
-      worker = new Worker(URL.createObjectURL(new Blob([code], { type: 'text/javascript' })), { type: 'module' });
-    }
-    return new Promise((resolve, reject) => {
-      worker.onmessage = (e) => {
-        const d = e.data;
-        if (d.t === 'progress') { onProgress && onProgress(d.p); }
-        else if (d.t === 'done') resolve(d);
-        else if (d.t === 'error') reject(new Error(d.msg));
-      };
-      worker.onerror = (e) => reject(new Error(e.message || 'worker'));
-      worker.postMessage(msg, transfer);
-    });
-  }
-
-  async function to16k(buf) {
-    const mono = monoOf(buf, 0, buf.duration);
-    return VD.audio.resample(mono, buf.sampleRate, 16000);
-  }
-
-  async function transcribe(buf, model, lang, onProgress) {
-    const a16 = await to16k(buf);
-    if (typeof window.__makerFakeAsr === 'function') return window.__makerFakeAsr(a16, { model, lang });   // nur für Tests
-    const res = await runWorker({ url: CFG.transformersUrl, model, lang: lang || '', audio: a16 }, [a16.buffer], onProgress);
-    return res.chunks;
-  }
-
   /* ------------------------------------------------------------------ Oberfläche */
-  const MODELS = CFG.models || [
-    { id: 'Xenova/whisper-tiny', label: 'Schnell, ca. 40 MB' },
-    { id: 'Xenova/whisper-base', label: 'Ausgewogen, ca. 80 MB' },
-    { id: 'Xenova/whisper-small', label: 'Genau, ca. 250 MB, langsam' }
-  ];
-  const LANGS = [['', 'Automatisch'], ['german', 'Deutsch'], ['english', 'English'], ['spanish', 'Español'], ['french', 'Français'], ['portuguese', 'Português'], ['russian', 'Русский'], ['hindi', 'हिन्दी']];
-
   VD.Maker = {
     open(root, onBack) {
       const S = {
         file: null, url: '', dur: 0, ext: 'mp4', buf: null, voiceBuf: null, backBuf: null,
         title: '', author: VD.store.get('makerAuthor', ''), chars: [t('Sprecher {n}', { n: 1 }), t('Sprecher {n}', { n: 2 })],
-        lines: [], voiceMode: 'video', backMode: 'mute', zip: null, busy: false
+        lines: [], voiceMode: 'file', backMode: 'file', zip: null, busy: false
       };
       let stopAt = null;
       const R = {};   // Verweise auf Elemente
 
-      const panel = (title, ...kids) => h('section', { class: 'panel mk-panel' }, h('h2', { text: title }), ...kids);
+      const panel = (title, ...kids) => {
+        const m = String(title).match(/^(\d+)\s+(.*)$/);
+        return h('section', { class: 'panel mk-panel' }, h('h2', {}, ...(m ? [h('span', { class: 'mk-badge', text: m[1] }), h('span', { text: m[2] })] : [title])), ...kids);
+      };
       const note = (s) => h('p', { class: 'muted mk-note', text: s });
       const warn = (box, msg) => { box.textContent = msg || ''; box.hidden = !msg; };
       const field = (label, input) => h('label', { class: 'field' }, h('span', { class: 'field-l', text: label }), input);
       const steps = (arr) => h('ol', { class: 'mk-steps' }, ...arr.map((s) => h('li', { text: t(s) })));
 
+      /* Aufklappbarer Bereich mit weichem Ein- und Ausfahren (nur die eigene Karte wird größer) */
+      const fold = (label, ...kids) => {
+        const body = h('div', { class: 'mk-fold-in' }, ...kids);
+        const box = h('div', { class: 'mk-fold', 'aria-hidden': 'true' }, body);
+        const btn = h('button', { class: 'mk-fold-btn', type: 'button', 'aria-expanded': 'false', onclick: () => {
+          const open = btn.getAttribute('aria-expanded') !== 'true';
+          btn.setAttribute('aria-expanded', String(open)); box.setAttribute('aria-hidden', String(!open)); box.classList.toggle('open', open);
+        } }, h('span', { class: 'mk-chev', 'aria-hidden': 'true', text: '▸' }), h('span', { text: label }));
+        return h('div', {}, btn, box);
+      };
+
       /* --- Kopf und Einleitung --- */
       R.back = h('button', { class: 'btn link', type: 'button', onclick: () => { cleanup(); onBack && onBack(); } }, '◀ ' + t('Zurück'));
+      const li = (...k) => h('li', {}, ...k);
+      const tool = (name, url, what) => li(h('a', { href: url, target: '_blank', rel: 'noopener noreferrer', text: name }), h('span', { text: ' – ' + t(what) }));
       const intro = h('div', { class: 'mk-intro' },
         h('div', { class: 'mk-way' },
-          h('h2', { text: t('Weg 1: Alles im Browser') }), h('p', { class: 'muted', text: t('Einfach und privat, aber langsamer und weniger genau. Am PC empfohlen.') }),
-          h('details', {}, h('summary', { text: t('So geht Weg 1') }), steps(['Video wählen: am besten eine kurze Szene (20 bis 90 Sekunden) als mp4 oder webm.',
-            'Bei „Zeilen“ auf „Automatisch erkennen“ drücken. Beim ersten Mal lädt der Browser ein Modell (40 bis 250 MB, danach gespeichert). Das dauert, besonders am Handy.',
-            'Text und Zeiten prüfen und korrigieren. Mit ▶ hörst du jede Zeile an.', 'Jeder Zeile einen Charakter geben.',
-            'Beim Hintergrund bleibt „Original ohne Sprechstellen“. Die Stimmen werden hier nicht per KI entfernt, sondern an den Sprechstellen stummgeschaltet. Dort fehlt dann auch die Musik.',
-            'Pack bauen und entweder gleich im Spiel verwenden oder als ZIP speichern.']))),
+          h('h2', { text: t('So geht es') }), h('p', { class: 'muted', text: t('Alles läuft über Webseiten, du musst nichts installieren. Du bereitest Text und Ton dort vor und lädst es hier hoch. Daraus wird ein Dub-Pack.') }),
+          fold(t('Anleitung zeigen'), steps(['Die Szene als Videodatei bereitlegen (mp4 oder webm, am besten 20 bis 90 Sekunden). Passt das Format nicht, wandle es mit einer Umwandel-Seite um.',
+            'Den Ton der Szene als mp3 oder wav herausziehen, ebenfalls mit einer Umwandel-Seite.',
+            'Die Tondatei bei einer Stimmentrenner-Seite hochladen. Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).',
+            'Bei einer Untertitel-Seite das Video hochladen, Untertitel erzeugen lassen und als .srt-Datei herunterladen. Die Zeiten dürfen danach hier noch korrigiert werden.',
+            'Hier das Video laden, die .srt-Datei importieren, die Stimmenspur und die Hintergrundspur laden, Charaktere vergeben und den Pack bauen.',
+            'Alle Dateien müssen gleich lang sein und im selben Moment beginnen wie das Video.']),
+          h('p', { class: 'muted mk-note', text: t('Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.') }))),
         h('div', { class: 'mk-way' },
-          h('h2', { text: t('Weg 2: Mit externen Seiten') }), h('p', { class: 'muted', text: t('Schneller und meist besser. Du bereitest Text und Ton selbst vor und lädst sie hier hoch.') }),
-          h('details', {}, h('summary', { text: t('So geht Weg 2') }), steps(['Die Szene als Videodatei bereitlegen (mp4 oder webm).',
-            'Den Ton der Szene als Audiodatei herausziehen (zum Beispiel mit VLC oder Audacity) und in einen Stimmentrenner geben. Das ist ein Programm oder eine Seite, die Stimmen und Musik trennt, zum Beispiel Ultimate Vocal Remover (läuft kostenlos auf deinem PC) oder ein Online-Vocal-Remover. Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund.',
-            'Untertitel erzeugen lassen, zum Beispiel mit einem Whisper-Programm wie Buzz (kostenlos, läuft auf deinem PC) oder Subtitle Edit. Ergebnis: eine .srt-Datei.',
-            'Hier das Video laden, bei „Zeilen“ die .srt-Datei importieren, bei „Ton“ Stimmenspur und Hintergrundspur laden.']),
-          h('p', { class: 'muted mk-note', text: t('Dienste und Programme ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.') }))));
+          h('h2', { text: t('Kostenlose Webseiten') }), h('p', { class: 'muted', text: t('Alles im Browser, ohne Programm zum Herunterladen. Tippe oben rechts auf das i, dort steht, worauf du achten solltest.') }),
+          fold(t('Links zeigen'), h('h3', { class: 'mk-h3', text: t('Stimmen und Hintergrund trennen') }),
+            h('ul', { class: 'mk-links' }, tool('vocalremover.org', 'https://vocalremover.org/', 'Trennt Stimmen und Hintergrund in zwei Dateien.')),
+            h('h3', { class: 'mk-h3', text: t('Untertitel erzeugen') }),
+            h('ul', { class: 'mk-links' },
+              tool('veed.io', 'https://www.veed.io/', 'Erzeugt Untertitel automatisch, Download als .srt. Die kostenlose Version ist begrenzt.'),
+              tool('kapwing.com', 'https://www.kapwing.com/', 'Ebenfalls automatische Untertitel mit .srt-Download. Auch hier ist die kostenlose Version begrenzt.')),
+            h('h3', { class: 'mk-h3', text: t('Ton herausziehen und Video umwandeln') }),
+            h('ul', { class: 'mk-links' }, tool('cloudconvert.com', 'https://cloudconvert.com/', 'Wandelt Video und Ton um, zum Beispiel mp4 zu mp3. Die kostenlose Menge ist begrenzt.')),
+            h('p', { class: 'muted mk-note', text: t('Ich konnte die Seiten beim Bauen nicht live prüfen. Falls ein Link nicht mehr geht, suche den Namen im Netz.') }))));
 
       /* --- 1 Video --- */
       R.vWarn = h('p', { class: 'warn', role: 'alert', hidden: true });
@@ -281,18 +303,13 @@ self.onmessage = async (e) => {
       /* --- 2 Zeilen --- */
       R.status2 = h('p', { class: 'status' });
       R.warn2 = h('p', { class: 'warn', role: 'alert', hidden: true });
-      R.model = h('select', { class: 'inp mk-sel' }, ...MODELS.map((m, i) => h('option', { value: m.id, selected: i === 0, text: t(m.label) })));
-      R.lang = h('select', { class: 'inp mk-sel' }, ...LANGS.map(([v, l]) => h('option', { value: v, text: v ? l : t(l) })));
-      R.detect = h('button', { class: 'btn primary', type: 'button', onclick: () => onDetect() }, t('Automatisch erkennen'));
       R.subFile = h('input', { type: 'file', accept: '.srt,.vtt,.txt,text/vtt', hidden: true, onchange: (e) => e.target.files[0] && importSubs(e.target.files[0]) });
-      R.subBtn = h('button', { class: 'btn', type: 'button', onclick: () => R.subFile.click() }, t('Untertitel importieren (.srt, .vtt)'));
+      R.subBtn = h('button', { class: 'btn primary', type: 'button', onclick: () => R.subFile.click() }, t('Untertitel importieren (.srt, .vtt)'));
       R.addBtn = h('button', { class: 'btn', type: 'button', onclick: () => addLine() }, '');
       R.sortBtn = h('button', { class: 'btn ghost sm', type: 'button', onclick: () => { sortLines(); renderLines(); } }, t('Nach Zeit sortieren'));
       R.list = h('div', { class: 'mk-lines' });
       const p2 = panel(t('2  Zeilen'), note(t('Jede Zeile ist ein Satz, den die Spieler einsprechen. Start und Ende in Sekunden.')),
-        h('div', { class: 'mk-tools' }, field(t('Genauigkeit'), R.model), field(t('Sprache im Video'), R.lang)),
-        h('div', { class: 'row' }, R.detect, R.subBtn, R.subFile, R.addBtn, R.sortBtn),
-        note(t('Die Texterkennung braucht Internet für das Modell und darf Dateien von cdn.jsdelivr.net und huggingface.co laden.')),
+        h('div', { class: 'row' }, R.subBtn, R.subFile, R.addBtn, R.sortBtn),
         R.status2, R.warn2, R.list);
 
       /* --- 3 Charaktere --- */
@@ -329,14 +346,44 @@ self.onmessage = async (e) => {
 
       R.steps = h('div', { class: 'mk-steps-wrap', hidden: true }, p2, p3, p4, p5);
       root.replaceChildren(h('div', { class: 'mk-wrap' },
-        h('header', { class: 'mk-top' }, R.back, h('h1', { text: t('Dub-Pack erstellen') }), h('div', { class: 'lang-slot' }, VD.ui.themeBtn())),
+        h('header', { class: 'mk-top' }, R.back, h('h1', { text: t('Dub-Pack erstellen') }), h('div', { class: 'lang-slot' }, h('button', { class: 'icon-btn mk-info', type: 'button', title: t('Quellen und Sicherheit'), 'aria-label': t('Quellen und Sicherheit'), onclick: () => openInfo() }, 'i'), VD.ui.themeBtn())),
         h('p', { class: 'lead mk-lead', text: t('Baue aus einem Video deinen eigenen Dub-Pack. Alles bleibt auf deinem Gerät.') }), intro, p1, R.steps));
       renderChars(); renderLines(); renderAudioHints();
+
+      function openInfo() {
+        const prev = document.activeElement;
+        const close = () => { box.remove(); document.removeEventListener('keydown', onKey); prev && prev.focus && prev.focus(); };
+        const onKey = (e) => { if (e.key === 'Escape') close(); };
+        const a = (url, label) => h('a', { class: 'mk-chip', href: url, target: '_blank', rel: 'noopener noreferrer', text: label });
+        const site = (dom, what) => h('div', { class: 'mk-site' },
+          h('div', { class: 'mk-site-h' }, h('b', { text: dom }), h('span', { class: 'muted', text: t(what) })),
+          h('div', { class: 'mk-chips' },
+            a('https://www.trustpilot.com/review/' + dom, 'Trustpilot'),
+            a('https://www.scamadviser.com/check-website/' + dom, 'ScamAdviser'),
+            a('https://transparencyreport.google.com/safe-browsing/search?url=' + dom, 'Google Safe Browsing'),
+            a('https://www.virustotal.com/gui/domain/' + dom, 'VirusTotal')));
+        const box = h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'mk-info-t', onclick: (e) => { if (e.target === box) close(); } },
+          h('div', { class: 'modal-card mk-info-card' },
+            h('h2', { id: 'mk-info-t', text: t('Selbst prüfen') }),
+            h('p', { text: t('Unabhängige Prüfseiten zeigen dir live, ob eine Webseite vertrauenswürdig ist. Tippe bei einer Seite auf einen Namen, dann siehst du dort die aktuelle Einschätzung zu genau dieser Adresse.') }),
+            site('vocalremover.org', 'Stimmen und Hintergrund trennen'),
+            site('veed.io', 'Untertitel erzeugen'),
+            site('kapwing.com', 'Untertitel erzeugen'),
+            site('cloudconvert.com', 'Video und Ton umwandeln'),
+            h('ul', { class: 'mk-links mk-legend' },
+              h('li', {}, h('b', { text: 'Trustpilot' }), h('span', { text: ' – ' + t('Bewertungen von echten Nutzern.') })),
+              h('li', {}, h('b', { text: 'ScamAdviser' }), h('span', { text: ' – ' + t('Prüft Betrugs-Anzeichen und Alter der Seite.') })),
+              h('li', {}, h('b', { text: 'Google Safe Browsing' }), h('span', { text: ' – ' + t('Googles Liste gefährlicher Seiten.') })),
+              h('li', {}, h('b', { text: 'VirusTotal' }), h('span', { text: ' – ' + t('Fragt viele Virenscanner auf einmal.') }))),
+            h('p', { class: 'muted mk-note', text: t('Ich selbst konnte die Seiten nicht prüfen und gebe keine Garantie. Auf diesen Seiten werden deine Dateien hochgeladen. Lade dort nur fertige Dateien herunter und installiere nichts.') }),
+            h('div', { class: 'modal-btns' }, h('button', { class: 'btn primary', type: 'button', onclick: close }, t('Schließen')))));
+        document.addEventListener('keydown', onKey);
+        document.body.append(box);
+      }
 
       function cleanup() {
         try { R.video.pause(); } catch { /* ignore */ }
         if (S.url) URL.revokeObjectURL(S.url);
-        if (worker) { worker.terminate(); worker = null; }
       }
 
       /* ---------- Video laden ---------- */
@@ -372,7 +419,7 @@ self.onmessage = async (e) => {
       function playLine(l) { R.video.currentTime = l.start; stopAt = l.end + TAIL; R.video.play().catch(() => {}); }
 
       function renderLines() {
-        if (!S.lines.length) { R.list.replaceChildren(h('p', { class: 'muted', text: t('Noch keine Zeilen. Erkenne sie automatisch, importiere Untertitel oder füge sie von Hand hinzu.') })); return; }
+        if (!S.lines.length) { R.list.replaceChildren(h('p', { class: 'muted', text: t('Noch keine Zeilen. Importiere eine Untertitel-Datei oder füge Zeilen von Hand hinzu.') })); return; }
         const num = (val, label, onset) => {
           const inp = h('input', { class: 'inp mk-num', type: 'number', step: '0.01', min: '0', value: fmt(val), 'aria-label': label, oninput: (e) => { const v = parseFloat(e.target.value); if (isFinite(v)) onset(Math.max(0, v)); } });
           const now = h('button', { class: 'icon-btn mk-now', type: 'button', title: t('Auf die aktuelle Position im Video setzen'), 'aria-label': t('Auf die aktuelle Position im Video setzen'), onclick: () => { const v = Math.round((R.video.currentTime || 0) * 100) / 100; inp.value = fmt(v); onset(v); } }, '⏱');
@@ -403,51 +450,6 @@ self.onmessage = async (e) => {
           } }, '✕'))));
       }
 
-      /* ---------- Automatisch erkennen ---------- */
-      async function onDetect() {
-        if (!S.file) return;
-        const b = R.detect;
-        if (S.lines.length && !b.dataset.sure) {
-          b.dataset.sure = '1'; b.textContent = t('Vorhandene Zeilen ersetzen?');
-          setTimeout(() => { delete b.dataset.sure; if (!S.busy) b.textContent = t('Automatisch erkennen'); }, 3000); return;
-        }
-        delete b.dataset.sure;
-        warn(R.warn2, '');
-        if (!S.buf) return warn(R.warn2, t('Kein Ton vorhanden. Lade bei „Ton“ eine Stimmenspur.'));
-        S.busy = true; b.disabled = true; b.classList.add('busy'); b.textContent = t('Automatisch erkennen');
-        try {
-          R.status2.textContent = t('Bereite Ton vor …');
-          const src = S.voiceMode === 'file' && S.voiceBuf ? S.voiceBuf : S.buf;
-          let last = -1;
-          const chunks = await transcribe(src, R.model.value, R.lang.value, (p) => {
-            if (p && p.status === 'progress' && isFinite(p.progress)) { const v = Math.round(p.progress); if (v !== last) { last = v; R.status2.textContent = t('Lade Modell … {p} %', { p: v }); } }
-            else if (p && (p.status === 'done' || p.status === 'ready')) R.status2.textContent = t('Erkenne Sprache … das kann einige Minuten dauern.');
-          });
-          R.status2.textContent = '';
-          const ls = chunksToLines(chunks);
-          if (!ls.length) return warn(R.warn2, t('In der Datei wurden keine Zeilen gefunden.'));
-          S.lines = ls; renderLines();
-          R.status2.textContent = t('{n} Zeilen erkannt. Bitte prüfen.', { n: ls.length });
-        } catch (e) {
-          console.error(e); R.status2.textContent = ''; warn(R.warn2, t('Erkennung fehlgeschlagen: {e}', { e: e.message || e }));
-        } finally { S.busy = false; b.disabled = false; b.classList.remove('busy'); }
-      }
-      function chunksToLines(chunks) {
-        const out = [];
-        const arr = (chunks || []).filter((c) => c && String(c.text || '').trim());
-        arr.forEach((c, i) => {
-          const ts = c.timestamp || [0, null];
-          let s = +ts[0], e = ts[1] == null ? null : +ts[1];
-          if (!isFinite(s)) return;
-          if (e == null || !isFinite(e)) { const nx = arr[i + 1] && arr[i + 1].timestamp && +arr[i + 1].timestamp[0]; e = isFinite(nx) && nx > s ? nx : s + 3; }
-          s = clamp(s, 0, S.dur); e = clamp(e, 0, S.dur);
-          if (e - s < MIN_LEN) e = Math.min(S.dur, s + MIN_LEN);
-          const txt = String(c.text).replace(/\s+/g, ' ').trim();
-          if (txt) out.push(newLine(Math.round(s * 100) / 100, Math.round(e * 100) / 100, txt, S.chars[0]));
-        });
-        return out;
-      }
-
       async function importSubs(file) {
         warn(R.warn2, '');
         try {
@@ -463,7 +465,7 @@ self.onmessage = async (e) => {
       function renderAudioHints() {
         R.voiceRow.hidden = S.voiceMode !== 'file'; R.backRow.hidden = S.backMode !== 'file';
         R.voiceHint.textContent = S.voiceMode === 'file' ? t('Nur Stimmen, ohne Musik. Dann sind die Original-Zeilen sauberer. Die Datei muss gleich lang sein wie das Video und gleich beginnen.') : '';
-        R.backHint.textContent = S.backMode === 'mute' ? t('Das Original wird an den Stellen stummgeschaltet, an denen gesprochen wird. Dort fehlt auch die Musik. Mit einer eigenen Hintergrundspur (Weg 2) klingt es besser.')
+        R.backHint.textContent = S.backMode === 'mute' ? t('Das Original wird an den Stellen stummgeschaltet, an denen gesprochen wird. Dort fehlt auch die Musik. Mit einer eigenen Hintergrundspur klingt es besser.')
           : S.backMode === 'file' ? t('Nur Musik und Geräusche, ohne Stimmen. Die Datei muss gleich lang sein wie das Video und gleich beginnen.') : t('Die Szene hat dann nur die Stimmen der Spieler.');
       }
       async function loadAudioFile(file, which) {

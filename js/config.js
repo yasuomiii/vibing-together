@@ -25,6 +25,11 @@ window.VD_CONFIG = {
     { urls: 'stun:global.stun.twilio.com:3478' }
   ],
 
+  // Dub-Pack-Ersteller. Auf false setzen, dann verschwindet der Knopf.
+  maker: {
+    enabled: true
+  },
+
   limits: {
     maxPlayers: 8,
     maxNameLength: 14,
