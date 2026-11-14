@@ -253,6 +253,10 @@ canvas { display: block; width: 100%; }
 /* Beim Laden: Inhalt erst zeigen, wenn Sprache und Design fertig sind (main.js nimmt die Klasse weg) */
 html.booting .screen { visibility: hidden; }
 .view-in { animation: viewIn .5s var(--spring) backwards; }
+/* Der Ersteller blendet nur ein, ohne sich zu bewegen: Verschiebt sich die Seite beim Einblenden (auch nur um Pixel, z. B. durch eine Scrollleiste), wirkt das wie ein Springen zur Seite. */
+.maker.view-in { animation: makerIn .4s ease-out backwards; }
+@keyframes makerIn { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .view-in, .maker.view-in { animation: none; } }
 @keyframes viewIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
 
 /* ----- Karten: die eine Fläche, aus der alles gebaut ist. Weich gerundet, mit einer Kante unten ----- */

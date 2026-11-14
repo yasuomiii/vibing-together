@@ -27,7 +27,9 @@
   if (mkBtn && $('#v-maker') && VD.Maker && VD_CONFIG.maker && VD_CONFIG.maker.enabled) {
     mkBtn.hidden = false;
     const tb = mkBtn.parentNode.querySelector('.theme-btn'); if (tb) tb.after(mkBtn);   // rechts neben den Design-Knopf
-    mkBtn.addEventListener('click', () => { show('maker'); VD.Packs.init && VD.Packs.init(); VD.Maker.open($('#v-maker'), () => show('home')); window.scrollTo(0, 0); });
+    const mk = $('#v-maker');
+    const slideIn = () => { mk.classList.remove('view-in'); void mk.offsetWidth; mk.classList.add('view-in'); };   // kurze Einblend-Animation
+    mkBtn.addEventListener('click', () => { show('maker'); VD.Packs.init && VD.Packs.init(); VD.Maker.open(mk, () => show('home')); window.scrollTo(0, 0); slideIn(); });
   }
 
   $('#btn-host').addEventListener('click', async () => {
