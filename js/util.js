@@ -123,7 +123,7 @@
     const cfg = window.VD_CONFIG || {};
     if (cfg.animatedBackground === false) document.documentElement.classList.add('bg-still');
     const box = VD.h('div', { class: 'bg-fx', 'aria-hidden': 'true' },
-      ...['bg-glow', 'bg-rings-a', 'bg-rings-b', 'bg-eq', 'bg-dots', 'bg-spark-a', 'bg-spark-b'].map((c) => VD.h('i', { class: c })));
+      ...['bg-glow', 'bg-rings-a', 'bg-rings-b', 'bg-eq', 'bg-dots'].map((c) => VD.h('i', { class: c })));
     // Schallwellen: acht Ringe je Ecke, gleichmäßig versetzt, die Bewegung steht im CSS
     box.querySelectorAll('.bg-rings-a, .bg-rings-b').forEach((r) => { for (let k = 0; k < 8; k++) { const b = document.createElement('b'); b.style.setProperty('--k', k); r.appendChild(b); } });
     // Pegelbalken: so viele, wie in die Breite passen. Jeder Balken bekommt eigene, aber feste Werte, die Reihe sieht bei jedem Laden gleich aus.
