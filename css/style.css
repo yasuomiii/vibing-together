@@ -935,7 +935,7 @@ html.theme-fade, html.theme-fade *, html.theme-fade *::before, html.theme-fade *
 html[data-theme="light"] .mk-launch { color: #fff; }
 html[data-theme="light"] .mk-launch::before { background: linear-gradient(var(--teal-deep), var(--teal-deep)) center / .8rem .18rem no-repeat, linear-gradient(var(--teal-deep), var(--teal-deep)) center / .18rem .8rem no-repeat, #fff; }
 @media (max-width: 30rem) { .home > .lang-slot { left: .75rem; right: .75rem; flex-wrap: wrap; } .mk-launch { font-size: .85rem; padding-right: .75rem; } }
-@media (min-width: 52rem) { .mk-line { grid-template-columns: auto auto 6.5rem 6.5rem minmax(0,1fr) 10rem auto; } .mk-line .mk-text, .mk-line .mk-char { grid-column: auto; } }
+@media (min-width: 52rem) { .mk-line { grid-template-columns: auto auto 9rem 9rem minmax(0,1fr) 10rem auto; } .mk-line .mk-text, .mk-line .mk-char { grid-column: auto; } }
 
 .mk-h3 { font-size: 1rem; margin-top: .4rem; }
 .mk-links { margin: 0; padding-left: 1.2rem; display: grid; gap: .45rem; }
@@ -959,9 +959,9 @@ html[data-theme="light"] .mk-launch::before { background: linear-gradient(var(--
 .mk-tabs { justify-self: start; max-width: 100%; }
 .mk-mode, .mk-subs { display: grid; gap: 1rem; min-width: 0; }
 .mk-prog { max-width: 28rem; }
-.mk-sub-line { grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; }
-.mk-sub-t { font-variant-numeric: tabular-nums; color: var(--tx-2); font-size: .88rem; white-space: nowrap; }
-.mk-sub-in { min-width: 0; }
-@media (max-width: 36rem) { .mk-sub-line { grid-template-columns: auto minmax(0, 1fr) auto; } .mk-sub-t { grid-column: 2 / -1; } .mk-sub-in { grid-column: 1 / -1; } }
-@media (min-width: 52rem) { .mk-sub-line { grid-template-columns: auto auto minmax(0, 1fr) auto; } }
 .mk-subs .mk-lead { max-width: none; }
+.mk-sub-media:empty { display: none; }
+.mk-sub-media .mk-video { display: block; }
+.mk-sub-line { transition: border-color .2s, background .2s; }
+.mk-sub-line.mk-line-on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+@media (min-width: 52rem) { .mk-sub-line { grid-template-columns: auto auto 9rem 9rem minmax(0, 1fr) auto; } }

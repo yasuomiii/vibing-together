@@ -7,6 +7,7 @@
   const WORKER_URL = new URL('whisper-worker.js', (document.currentScript && document.currentScript.src) || document.baseURI).href;
 
   VD.addLang('en', {
+    'Spiele jede Zeile ab, prüfe den Text und passe Start und Ende an. Fehlt etwas oder ist etwas falsch, ändere die Zeile oder füge eine hinzu. Zeilen, die nicht stimmen, kannst du löschen.': 'Play each line, check the text and adjust start and end. If something is missing or wrong, change the line or add one. You can delete lines that are wrong.',
     'Untertitel erstellen': 'Create subtitles',
     'Dub-Pack bauen': 'Build dub pack',
     'Erzeuge Untertitel aus der Sprache in einem Video oder einer Audiodatei. Die Erkennung läuft mit dem Whisper-Modell von OpenAI direkt in deinem Browser, deine Datei wird nicht hochgeladen.': 'Create subtitles from the speech in a video or an audio file. Recognition runs with OpenAI’s Whisper model right in your browser, your file is not uploaded.',
@@ -44,6 +45,7 @@
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper by OpenAI, MIT licence. Run with Transformers.js and ONNX Runtime.'
   });
   VD.addLang('es', {
+    'Spiele jede Zeile ab, prüfe den Text und passe Start und Ende an. Fehlt etwas oder ist etwas falsch, ändere die Zeile oder füge eine hinzu. Zeilen, die nicht stimmen, kannst du löschen.': 'Reproduce cada línea, revisa el texto y ajusta el inicio y el final. Si falta algo o está mal, cambia la línea o añade una. Puedes borrar las líneas incorrectas.',
     'Untertitel erstellen': 'Crear subtítulos',
     'Dub-Pack bauen': 'Crear el pack',
     'Erzeuge Untertitel aus der Sprache in einem Video oder einer Audiodatei. Die Erkennung läuft mit dem Whisper-Modell von OpenAI direkt in deinem Browser, deine Datei wird nicht hochgeladen.': 'Crea subtítulos a partir de la voz de un vídeo o un archivo de audio. El reconocimiento usa el modelo Whisper de OpenAI directamente en tu navegador, tu archivo no se sube.',
@@ -81,6 +83,7 @@
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper de OpenAI, licencia MIT. Ejecutado con Transformers.js y ONNX Runtime.'
   });
   VD.addLang('fr', {
+    'Spiele jede Zeile ab, prüfe den Text und passe Start und Ende an. Fehlt etwas oder ist etwas falsch, ändere die Zeile oder füge eine hinzu. Zeilen, die nicht stimmen, kannst du löschen.': 'Écoute chaque ligne, vérifie le texte et ajuste le début et la fin. S’il manque quelque chose ou si c’est faux, modifie la ligne ou ajoutes-en une. Tu peux supprimer les lignes incorrectes.',
     'Untertitel erstellen': 'Créer des sous-titres',
     'Dub-Pack bauen': 'Créer le pack',
     'Erzeuge Untertitel aus der Sprache in einem Video oder einer Audiodatei. Die Erkennung läuft mit dem Whisper-Modell von OpenAI direkt in deinem Browser, deine Datei wird nicht hochgeladen.': 'Crée des sous-titres à partir de la voix d’une vidéo ou d’un fichier audio. La reconnaissance utilise le modèle Whisper d’OpenAI directement dans ton navigateur, ton fichier n’est pas envoyé.',
@@ -118,6 +121,7 @@
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper d’OpenAI, licence MIT. Exécuté avec Transformers.js et ONNX Runtime.'
   });
   VD.addLang('pt', {
+    'Spiele jede Zeile ab, prüfe den Text und passe Start und Ende an. Fehlt etwas oder ist etwas falsch, ändere die Zeile oder füge eine hinzu. Zeilen, die nicht stimmen, kannst du löschen.': 'Reproduza cada linha, confira o texto e ajuste o início e o fim. Se faltar algo ou estiver errado, altere a linha ou adicione uma. Você pode apagar as linhas erradas.',
     'Untertitel erstellen': 'Criar legendas',
     'Dub-Pack bauen': 'Criar o pack',
     'Erzeuge Untertitel aus der Sprache in einem Video oder einer Audiodatei. Die Erkennung läuft mit dem Whisper-Modell von OpenAI direkt in deinem Browser, deine Datei wird nicht hochgeladen.': 'Crie legendas a partir da fala de um vídeo ou arquivo de áudio. O reconhecimento usa o modelo Whisper da OpenAI direto no seu navegador, seu arquivo não é enviado.',
@@ -155,6 +159,7 @@
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper da OpenAI, licença MIT. Executado com Transformers.js e ONNX Runtime.'
   });
   VD.addLang('ru', {
+    'Spiele jede Zeile ab, prüfe den Text und passe Start und Ende an. Fehlt etwas oder ist etwas falsch, ändere die Zeile oder füge eine hinzu. Zeilen, die nicht stimmen, kannst du löschen.': 'Прослушайте каждую строку, проверьте текст и поправьте начало и конец. Если чего-то не хватает или что-то неверно, измените строку или добавьте новую. Неверные строки можно удалить.',
     'Untertitel erstellen': 'Создать субтитры',
     'Dub-Pack bauen': 'Собрать пак',
     'Erzeuge Untertitel aus der Sprache in einem Video oder einer Audiodatei. Die Erkennung läuft mit dem Whisper-Modell von OpenAI direkt in deinem Browser, deine Datei wird nicht hochgeladen.': 'Создайте субтитры по речи из видео или аудиофайла. Распознавание выполняет модель Whisper от OpenAI прямо в вашем браузере, файл никуда не загружается.',
@@ -192,6 +197,7 @@
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper от OpenAI, лицензия MIT. Работает на Transformers.js и ONNX Runtime.'
   });
   VD.addLang('hi', {
+    'Spiele jede Zeile ab, prüfe den Text und passe Start und Ende an. Fehlt etwas oder ist etwas falsch, ändere die Zeile oder füge eine hinzu. Zeilen, die nicht stimmen, kannst du löschen.': 'हर पंक्ति को चलाकर सुनें, टेक्स्ट जाँचें और शुरुआत व अंत ठीक करें। कुछ छूटा या गलत हो तो पंक्ति बदलें या नई जोड़ें। गलत पंक्तियाँ हटा सकते हैं।',
     'Untertitel erstellen': 'सबटाइटल बनाएँ',
     'Dub-Pack bauen': 'पैक बनाएँ',
     'Erzeuge Untertitel aus der Sprache in einem Video oder einer Audiodatei. Die Erkennung läuft mit dem Whisper-Modell von OpenAI direkt in deinem Browser, deine Datei wird nicht hochgeladen.': 'किसी वीडियो या ऑडियो फ़ाइल की आवाज़ से सबटाइटल बनाएँ। पहचान OpenAI के Whisper मॉडल से सीधे आपके ब्राउज़र में होती है, आपकी फ़ाइल अपलोड नहीं होती।',
@@ -257,7 +263,7 @@
       const { h, t, panel, note, field, warn } = ui;
       const cfg = (window.VD_CONFIG && window.VD_CONFIG.whisper) || {};
       const models = cfg.models || [];
-      const S = { file: null, segs: [], worker: null, workerModel: '', running: false, t0: 0 };
+      const S = { file: null, url: '', media: null, dur: 0, stopAt: null, rows: [], focusId: null, ran: false, segs: [], worker: null, workerModel: '', running: false, t0: 0 };
       const R = {};
 
       R.warn = h('p', { class: 'warn', role: 'alert', hidden: true });
@@ -279,11 +285,14 @@
 
       R.list = h('div', { class: 'mk-lines mk-sub-lines' });
       R.msg = h('p', { class: 'status' });
+      R.media = h('div', { class: 'mk-sub-media' });
+      R.addBtn = h('button', { class: 'btn', type: 'button', onclick: () => addLine() }, '');
+      R.sortBtn = h('button', { class: 'btn ghost sm', type: 'button', onclick: () => { sortSegs(); renderResult(); } }, t('Nach Zeit sortieren'));
       R.dlSrt = h('button', { class: 'btn', type: 'button', onclick: () => save('srt') }, t('.srt speichern'));
       R.dlVtt = h('button', { class: 'btn', type: 'button', onclick: () => save('vtt') }, t('.vtt speichern'));
       R.use = h('button', { class: 'btn primary', type: 'button', onclick: () => useInBuilder() }, t('In den Ersteller übernehmen'));
-      R.result = panel(t('3  Ergebnis'), note(t('Der erkannte Text kann vom Gesprochenen abweichen. Prüfe ihn und korrigiere ihn hier. Zeilen, die nicht stimmen, kannst du löschen.')),
-        R.list, h('div', { class: 'row' }, R.dlSrt, R.dlVtt, R.use), R.msg);
+      R.result = panel(t('3  Ergebnis'), note(t('Spiele jede Zeile ab, prüfe den Text und passe Start und Ende an. Fehlt etwas oder ist etwas falsch, ändere die Zeile oder füge eine hinzu. Zeilen, die nicht stimmen, kannst du löschen.')),
+        R.media, h('div', { class: 'row' }, R.addBtn, R.sortBtn), R.list, h('div', { class: 'row' }, R.dlSrt, R.dlVtt, R.use), R.msg);
       R.result.hidden = true;
 
       const root = h('div', { class: 'mk-subs' },
@@ -297,14 +306,19 @@
         h('p', { class: 'muted mk-note', text: t('Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.') }));
 
       function pickFile(f) {
-        S.file = f; S.segs = []; R.result.hidden = true; warn(R.warn, ''); R.status.textContent = '';
+        if (S.url) URL.revokeObjectURL(S.url);
+        S.file = f; S.segs = []; S.ran = false; R.result.hidden = true; warn(R.warn, ''); R.status.textContent = '';
         R.fileInfo.textContent = f.name;
         R.file.value = '';
-        // Dauer anzeigen, soweit der Browser sie nennt
-        const m = document.createElement(f.type.startsWith('video') ? 'video' : 'audio');
-        const u = URL.createObjectURL(f); m.preload = 'metadata'; m.src = u;
-        m.onloadedmetadata = () => { if (isFinite(m.duration) && S.file === f) R.fileInfo.textContent = f.name + ' · ' + t('Dauer {d} s', { d: Math.round(m.duration * 10) / 10 }); URL.revokeObjectURL(u); };
-        m.onerror = () => URL.revokeObjectURL(u);
+        // Abspielbare Vorschau (Video oder Audio): Dauer anzeigen und später die Zeilen anhören
+        S.url = URL.createObjectURL(f);
+        const m = document.createElement(f.type.startsWith('video') || /\.(mp4|m4v|webm|ogv)$/i.test(f.name) ? 'video' : 'audio');
+        m.className = 'mk-video'; m.controls = true; m.preload = 'metadata'; m.playsInline = true; m.src = S.url;
+        m.onloadedmetadata = () => { if (isFinite(m.duration) && S.file === f) { S.dur = m.duration; R.fileInfo.textContent = f.name + ' · ' + t('Dauer {d} s', { d: Math.round(m.duration * 10) / 10 }); } };
+        m.ontimeupdate = () => { updateAddLabel(); markActive(); if (S.stopAt != null && m.currentTime >= S.stopAt) { m.pause(); S.stopAt = null; } };
+        m.onerror = () => { m.hidden = true; };
+        S.media = m; S.dur = 0; S.stopAt = null;
+        R.media.replaceChildren(m);
       }
 
       const setBusy = (b) => {
@@ -372,22 +386,58 @@
         } catch (e) {
           R.status.textContent = '';
           warn(R.warn, e.plain ? e.message : t('Die Erkennung ist fehlgeschlagen: {e}', { e: e.message }));
-        } finally { setBusy(false); renderResult(); }
+        } finally { S.ran = true; setBusy(false); renderResult(); }
       }
 
       function stop() { if (S.worker) S.worker.postMessage({ type: 'cancel' }); R.stop.disabled = true; setTimeout(() => { R.stop.disabled = false; }, 1500); }
 
-      function renderResult() {
-        R.result.hidden = !S.segs.length;
-        if (!S.segs.length) return;
-        R.list.replaceChildren(...S.segs.map((sg, i) => h('div', { class: 'mk-line mk-sub-line' },
-          h('span', { class: 'mk-n', text: String(i + 1) }),
-          h('span', { class: 'mk-sub-t', text: shortTime(sg.start) + ' – ' + shortTime(sg.end) }),
-          h('input', { class: 'inp mk-sub-in', value: sg.text, maxlength: 240, 'aria-label': t('Text der Zeile {n}', { n: i + 1 }), oninput: (e) => { sg.text = e.target.value; } }),
-          h('button', { class: 'btn sm', type: 'button', 'aria-label': t('Zeile löschen'), title: t('Zeile löschen'), onclick: () => { S.segs.splice(i, 1); renderResult(); } }, '×'))));
+      /* ---------- Zeilen bearbeiten ---------- */
+      const rnd = (x) => Math.round(x * 100) / 100;
+      const fmt = (x) => String(rnd(x));
+      const sortSegs = () => S.segs.sort((a, b) => a.start - b.start);
+      const curTime = () => (S.media && S.media.currentTime) || 0;
+      function updateAddLabel() { R.addBtn.textContent = '+ ' + t('Zeile bei {s} s hinzufügen', { s: fmt(curTime()) }); }
+      function playSeg(sg) { const m = S.media; if (!m) return; m.currentTime = sg.start; S.stopAt = sg.end + 0.15; m.play().catch(() => {}); }
+      function addLine() {
+        const s0 = Math.max(0, curTime()), end = S.dur ? Math.min(S.dur, s0 + 2.5) : s0 + 2.5;
+        const sg = { id: VD.uid(), start: rnd(s0), end: rnd(Math.max(end, s0 + 0.5)), text: '' };
+        S.segs.push(sg); sortSegs(); S.focusId = sg.id; renderResult();
+      }
+      /* Die Zeile hervorheben, die gerade im Player läuft */
+      function markActive() {
+        const t0 = curTime();
+        for (const [sg, el] of S.rows) el.classList.toggle('mk-line-on', t0 >= sg.start && t0 < sg.end);
       }
 
-      const clean = () => S.segs.map((s) => ({ start: s.start, end: s.end, text: String(s.text || '').trim() })).filter((s) => s.text);
+      function renderResult() {
+        R.result.hidden = !S.segs.length && !S.running && !S.ran;
+        S.rows = [];
+        updateAddLabel();
+        const busy = S.running;   // Während der Erkennung nur ansehen, sonst würden Änderungen überschrieben
+        R.addBtn.disabled = R.sortBtn.disabled = R.dlSrt.disabled = R.dlVtt.disabled = R.use.disabled = busy;
+        S.segs.forEach((sg) => { if (!sg.id) sg.id = VD.uid(); });
+        if (!S.segs.length) { R.list.replaceChildren(h('p', { class: 'muted', text: t('Noch keine Zeilen. Importiere eine Untertitel-Datei oder füge Zeilen von Hand hinzu.') })); return; }
+        const num = (val, label, onset) => {
+          const inp = h('input', { class: 'inp mk-num', type: 'number', step: '0.01', min: '0', value: fmt(val), disabled: busy, 'aria-label': label, oninput: (e) => { const v = parseFloat(e.target.value); if (isFinite(v)) onset(Math.max(0, v)); } });
+          const now = h('button', { class: 'icon-btn mk-now', type: 'button', disabled: busy, title: t('Auf die aktuelle Position im Video setzen'), 'aria-label': t('Auf die aktuelle Position im Video setzen'), onclick: () => { const v = rnd(curTime()); inp.value = fmt(v); onset(v); } }, '⏱');
+          return h('div', { class: 'mk-numwrap' }, h('span', { class: 'field-l', text: label }), h('div', { class: 'mk-numrow' }, inp, now));
+        };
+        const rows = S.segs.map((sg, i) => {
+          const row = h('div', { class: 'mk-line mk-sub-line' },
+            h('span', { class: 'mk-n', text: String(i + 1) }),
+            h('button', { class: 'icon-btn', type: 'button', disabled: busy, title: t('Zeile anhören'), 'aria-label': t('Zeile anhören'), onclick: () => playSeg(sg) }, '▶'),
+            num(sg.start, t('Start'), (v) => { sg.start = v; markActive(); }), num(sg.end, t('Ende'), (v) => { sg.end = v; markActive(); }),
+            h('label', { class: 'mk-text' }, h('span', { class: 'field-l', text: t('Text') }), h('input', { class: 'inp', value: sg.text, maxlength: 240, disabled: busy, 'data-id': sg.id, oninput: (e) => { sg.text = e.target.value; } })),
+            h('button', { class: 'icon-btn', type: 'button', disabled: busy, title: t('Zeile löschen'), 'aria-label': t('Zeile löschen'), onclick: () => { S.segs = S.segs.filter((x) => x !== sg); renderResult(); } }, '✕'));
+          S.rows.push([sg, row]);
+          return row;
+        });
+        R.list.replaceChildren(...rows);
+        markActive();
+        if (S.focusId) { const inp = R.list.querySelector('input[data-id="' + S.focusId + '"]'); S.focusId = null; if (inp) { inp.focus(); inp.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }
+      }
+
+      const clean = () => S.segs.map((s) => ({ start: s.start, end: s.end > s.start ? s.end : s.start + 0.5, text: String(s.text || '').trim() })).filter((s) => s.text).sort((a, b) => a.start - b.start);
       function save(kind) {
         const segs = clean(); if (!segs.length) return;
         const name = ((S.file && S.file.name) || 'untertitel').replace(/\.[^.]+$/, '') + '.' + kind;
@@ -398,7 +448,7 @@
         R.msg.textContent = (await hooks.use(S.file, segs)) || '';
       }
 
-      root._cleanup = killWorker;
+      root._cleanup = () => { killWorker(); try { S.media && S.media.pause(); } catch { /* ignore */ } if (S.url) URL.revokeObjectURL(S.url); };
       return root;
     }
   };
