@@ -29,7 +29,6 @@
     'Alles im Browser, ohne Programm zum Herunterladen. Tippe oben rechts auf das i, dort steht, worauf du achten solltest.': 'All in the browser, no program to download. Tap the i at the top right to see what to watch out for.',
     'Bei einer Untertitel-Seite die Datei laden, Untertitel erzeugen lassen und als .srt- oder .vtt-Datei herunterladen. Der erkannte Text kann teilweise falsch sein, du musst ihn danach hier selbst korrigieren.': 'Load the file on a subtitle site, have subtitles generated and download them as an .srt or .vtt file. The recognised text can be partly wrong, so you have to correct it yourself here afterwards.',
     'Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.': 'Services change. Check for yourself whether they are still free and what happens to your files. Only use material you are allowed to use.',
-    'Trennt Stimmen und Hintergrund in zwei Dateien. Ein mp4-Video lässt sich dort nicht über „Datei wählen“ auswählen, du musst es in die Seite hineinziehen (Drag and Drop).': 'Splits voices and background into two files.',
     'Quellen und Sicherheit': 'Sources and safety',
     'Stimmen und Hintergrund trennen': 'Split voices and background',
     'YouTube-Video als mp4': 'YouTube video as mp4',
@@ -773,9 +772,25 @@
       const p5 = panel(t('5  Pack'), R.warn5, R.status5, h('div', { class: 'row' }, R.build, R.use, R.save));
 
       R.steps = h('div', { class: 'mk-steps-wrap', hidden: true }, p2, p3, p4, p5);
+      /* Zwei Bereiche: den Pack bauen und (eigene Kategorie) Untertitel erstellen. Letzteres kommt aus js/subtitles.js und fehlt einfach, wenn die Datei nicht eingebunden ist. */
+      const buildMode = h('div', { class: 'mk-mode' },
+        h('p', { class: 'lead mk-lead', text: t('Baue aus einem Video deinen eigenen Dub-Pack. Alles bleibt auf deinem Gerät.') }), intro, p1, R.steps);
+      let subsMode = null, tabs = null;
+      if (VD.Subtitles) {
+        subsMode = VD.Subtitles.create({ h, t, panel, note, field, warn }, { use: applySubs });
+        subsMode.hidden = true;
+        const tab = (id, label) => h('button', { class: 'seg-b' + (id === 'build' ? ' on' : ''), type: 'button', role: 'tab', 'aria-selected': String(id === 'build'), dataset: { mode: id }, onclick: () => setMode(id) }, label);
+        tabs = h('div', { class: 'seg mk-tabs', role: 'tablist' }, tab('build', t('Dub-Pack bauen')), tab('subs', t('Untertitel erstellen')));
+      }
+      function setMode(id) {
+        if (!subsMode) return;
+        buildMode.hidden = id !== 'build'; subsMode.hidden = id !== 'subs';
+        tabs.querySelectorAll('.seg-b').forEach((b) => { const on = b.dataset.mode === id; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
+        [buildMode, subsMode].forEach((el) => { if (!el.hidden) { el.classList.remove('view-in'); void el.offsetWidth; el.classList.add('view-in'); } });
+      }
       root.replaceChildren(h('div', { class: 'mk-wrap' },
         h('header', { class: 'mk-top' }, R.back, h('h1', { text: t('Dub-Pack erstellen') }), h('div', { class: 'lang-slot' }, h('button', { class: 'icon-btn mk-info', type: 'button', title: t('Quellen und Sicherheit'), 'aria-label': t('Quellen und Sicherheit'), onclick: () => openInfo() }, 'i'), VD.ui.themeBtn())),
-        h('p', { class: 'lead mk-lead', text: t('Baue aus einem Video deinen eigenen Dub-Pack. Alles bleibt auf deinem Gerät.') }), intro, p1, R.steps));
+        ...(tabs ? [tabs] : []), buildMode, ...(subsMode ? [subsMode] : [])));
       renderChars(); renderLines(); renderAudioHints();
 
       function openInfo() {
@@ -808,7 +823,19 @@
         document.body.append(box);
       }
 
+      /* Zeilen aus dem Reiter Untertitel erstellen übernehmen (lädt das Video mit, falls noch keines da ist) */
+      async function applySubs(file, lines) {
+        const isVideo = file && (/^video\//.test(file.type) || /\.(mp4|m4v|webm|ogv)$/i.test(file.name));
+        if (!S.file && isVideo) await loadVideo(file);
+        if (!S.file || !S.dur) return t('Zum Übernehmen zuerst im Reiter „Dub-Pack bauen“ ein Video laden.');
+        S.lines = lines.filter((l) => l.start < S.dur + 0.5).map((l) => newLine(Math.round(l.start * 100) / 100, Math.round(Math.min(S.dur, l.end) * 100) / 100, l.text, S.chars[0]));
+        renderLines(); R.status2.textContent = t('{n} Zeilen importiert.', { n: S.lines.length });
+        setMode('build'); window.scrollTo(0, 0);
+        return t('{n} Zeilen in den Ersteller übernommen.', { n: S.lines.length });
+      }
+
       function cleanup() {
+        if (subsMode && subsMode._cleanup) subsMode._cleanup();
         try { R.video.pause(); } catch { /* ignore */ }
         if (S.url) URL.revokeObjectURL(S.url);
       }

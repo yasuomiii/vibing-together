@@ -1,0 +1,4 @@
+Dateien in diesem Ordner:
+- transformers.min.js: Transformers.js (Hugging Face), Lizenz Apache 2.0, siehe transformers.LICENSE
+- ort-wasm-simd-threaded.mjs und .wasm: ONNX Runtime Web (Microsoft), Lizenz MIT
+Das Whisper-Modell (OpenAI, MIT-Lizenz) wird erst beim Benutzen von Hugging Face geladen und im Browser zwischengespeichert.

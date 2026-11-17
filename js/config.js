@@ -30,6 +30,16 @@ window.VD_CONFIG = {
     enabled: true
   },
 
+  // Untertitel erstellen (Whisper von OpenAI, läuft im Browser). Das Modell wird beim ersten Benutzen von Hugging Face geladen.
+  // repos: zuerst der erste Eintrag, bei einem Fehler der nächste. dtype q8 heißt: verkleinerte Fassung. mb: ungefähre Größe des Downloads.
+  whisper: {
+    models: [
+      { id: 'tiny', label: 'Schnell', repos: ['onnx-community/whisper-tiny', 'Xenova/whisper-tiny'], dtype: 'q8', mb: 45 },
+      { id: 'base', label: 'Ausgewogen', repos: ['onnx-community/whisper-base', 'Xenova/whisper-base'], dtype: 'q8', mb: 81, default: true },
+      { id: 'small', label: 'Genau', repos: ['onnx-community/whisper-small', 'Xenova/whisper-small'], dtype: 'q8', mb: 255 }
+    ]
+  },
+
   // Bewegter Hintergrund. Auf false setzen, dann steht der Hintergrund still (sieht gleich aus, bewegt sich nur nicht).
   animatedBackground: true,
 
