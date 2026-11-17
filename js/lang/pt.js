@@ -38,7 +38,7 @@
   "bereit ✓": "pronto ✓",
   "lädt …": "carregando …",
   "fertig ✓": "concluído ✓",
-  "Line {c}/{t}": "Fala {c}/{t}",
+  "Zeile {c}/{t}": "Fala {c}/{t}",
   "bereit": "pronto",
   "Spieler entfernen": "Remover jogador",
   "{name} entfernen": "Remover {name}",

@@ -38,7 +38,7 @@
   "bereit ✓": "ready ✓",
   "lädt …": "loading …",
   "fertig ✓": "done ✓",
-  "Line {c}/{t}": "Line {c}/{t}",
+  "Zeile {c}/{t}": "Zeile {c}/{t}",
   "bereit": "ready",
   "Spieler entfernen": "Remove player",
   "{name} entfernen": "Remove {name}",

@@ -38,7 +38,7 @@
   "bereit ✓": "prêt ✓",
   "lädt …": "chargement …",
   "fertig ✓": "terminé ✓",
-  "Line {c}/{t}": "Réplique {c}/{t}",
+  "Zeile {c}/{t}": "Réplique {c}/{t}",
   "bereit": "prêt",
   "Spieler entfernen": "Retirer le joueur",
   "{name} entfernen": "Retirer {name}",

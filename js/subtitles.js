@@ -243,7 +243,6 @@
   };
   const toSrt = (segs) => segs.map((s, i) => (i + 1) + '\n' + stamp(s.start, true) + ' --> ' + stamp(s.end, true) + '\n' + s.text + '\n').join('\n');
   const toVtt = (segs) => 'WEBVTT\n\n' + segs.map((s) => stamp(s.start) + ' --> ' + stamp(s.end) + '\n' + s.text + '\n').join('\n');
-  const shortTime = (s) => pad(s / 60) + ':' + (s % 60).toFixed(1).padStart(4, '0');
 
   /* Ton in 16000 Hz, ein Kanal (so erwartet es Whisper) */
   async function prepareAudio(file) {
@@ -316,7 +315,7 @@
         m.className = 'mk-video'; m.controls = true; m.preload = 'metadata'; m.playsInline = true; m.src = S.url;
         m.onloadedmetadata = () => { if (isFinite(m.duration) && S.file === f) { S.dur = m.duration; R.fileInfo.textContent = f.name + ' · ' + t('Dauer {d} s', { d: Math.round(m.duration * 10) / 10 }); } };
         m.ontimeupdate = () => { updateAddLabel(); markActive(); if (S.stopAt != null && m.currentTime >= S.stopAt) { m.pause(); S.stopAt = null; } };
-        m.onerror = () => { m.hidden = true; };
+        m.onerror = () => { m.hidden = true; if (S.media === m) warn(R.warn, m.tagName === 'VIDEO' ? t('Dieses Video kann der Browser nicht abspielen. Nimm mp4 (H.264) oder webm.') : t('Der Ton dieser Datei kann nicht gelesen werden.')); };
         S.media = m; S.dur = 0; S.stopAt = null;
         R.media.replaceChildren(m);
       }
@@ -327,6 +326,7 @@
       };
       const setProg = (frac) => { R.meter.hidden = false; R.bar.style.transform = 'scaleX(' + Math.max(0, Math.min(1, frac)) + ')'; R.meter.setAttribute('aria-valuenow', String(Math.round(frac * 100))); };
 
+      const CANCEL = { cancelled: true };
       function killWorker() { if (S.worker) { try { S.worker.terminate(); } catch { /* ignore */ } } S.worker = null; S.workerModel = ''; }
 
       /* Wartet auf Nachrichten des Arbeiters, bis fn true liefert (Fertig) oder ein Fehler kommt */
@@ -337,11 +337,12 @@
           let w;
           try { w = new Worker(WORKER_URL, { type: 'module' }); } catch (e) { return reject(new Error(t('Dein Browser kann das nicht ausführen.'))); }
           S.worker = w; S.workerModel = m.id;
+          S.abort = () => { killWorker(); reject(CANCEL); };
           w.onerror = (e) => { killWorker(); reject(new Error((e && e.message) || 'Worker')); };
           w.onmessage = (ev) => {
             const d = ev.data || {};
             if (d.type === 'progress') { setProg(d.pct / 100); R.status.textContent = t('Modell wird geladen … {p} %', { p: d.pct }); }
-            else if (d.type === 'ready') { w.onmessage = null; resolve(); }
+            else if (d.type === 'ready') { w.onmessage = null; S.abort = null; resolve(); }
             else if (d.type === 'error') { killWorker(); reject(new Error(d.message)); }
           };
           R.status.textContent = t('Modell wird geladen … {p} %', { p: 0 });
@@ -352,12 +353,13 @@
       function runRecognition(audio, language) {
         return new Promise((resolve, reject) => {
           const w = S.worker;
+          S.abort = () => { killWorker(); resolve(true); };
           w.onerror = (e) => { killWorker(); reject(new Error((e && e.message) || 'Worker')); };
           w.onmessage = (ev) => {
             const d = ev.data || {};
             if (d.type === 'step') { const f = d.total ? d.done / d.total : 0; setProg(f); R.status.textContent = t('Sprache wird erkannt … {p} %', { p: Math.round(f * 100) }); }
             else if (d.type === 'segments') { S.segs = d.segments; renderResult(); }
-            else if (d.type === 'done') { w.onmessage = null; resolve(!!d.cancelled); }
+            else if (d.type === 'done') { w.onmessage = null; S.abort = null; resolve(!!d.cancelled); }
             else if (d.type === 'error') { killWorker(); reject(new Error(d.message)); }
           };
           w.postMessage({ type: 'run', audio, language }, [audio.buffer]);
@@ -370,13 +372,16 @@
         if (!S.file) return warn(R.warn, t('Bitte zuerst eine Datei wählen.'));
         const m = models.find((x) => x.id === R.model.value) || models[0];
         if (!m) return warn(R.warn, t('Dein Browser kann das nicht ausführen.'));
+        S.cancelled = false; S.abort = null;
         setBusy(true); S.segs = []; R.result.hidden = true; R.msg.textContent = '';
         S.t0 = performance.now();
         let audio;
         try {
           R.status.textContent = t('Ton wird vorbereitet …'); setProg(0);
           try { audio = await prepareAudio(S.file); } catch (e) { throw Object.assign(new Error(t('Der Ton dieser Datei kann nicht gelesen werden.')), { plain: true }); }
-          try { await ensureModel(m); } catch (e) { throw Object.assign(new Error(t('Das Modell konnte nicht geladen werden. Prüfe die Internetverbindung. Technische Meldung: {e}', { e: e.message })), { plain: true }); }
+          if (S.cancelled) throw CANCEL;
+          try { await ensureModel(m); } catch (e) { if (e === CANCEL) throw e; throw Object.assign(new Error(t('Das Modell konnte nicht geladen werden. Prüfe die Internetverbindung. Technische Meldung: {e}', { e: e.message })), { plain: true }); }
+          if (S.cancelled) throw CANCEL;
           setProg(0); R.status.textContent = t('Sprache wird erkannt … {p} %', { p: 0 });
           const cancelled = await runRecognition(audio, R.lang.value);
           const secs = Math.round((performance.now() - S.t0) / 100) / 10;
@@ -384,12 +389,15 @@
           else if (!S.segs.length) { R.status.textContent = ''; warn(R.warn, t('Es wurde keine Sprache erkannt.')); }
           else R.status.textContent = t('Fertig: {n} Zeilen in {s} Sekunden.', { n: S.segs.length, s: secs });
         } catch (e) {
+          if (e === CANCEL) { R.status.textContent = t('Abgebrochen.'); return; }
           R.status.textContent = '';
           warn(R.warn, e.plain ? e.message : t('Die Erkennung ist fehlgeschlagen: {e}', { e: e.message }));
         } finally { S.ran = true; setBusy(false); renderResult(); }
       }
 
-      function stop() { if (S.worker) S.worker.postMessage({ type: 'cancel' }); R.stop.disabled = true; setTimeout(() => { R.stop.disabled = false; }, 1500); }
+      /* Der Arbeiter ist während der Berechnung blockiert und könnte „Abbrechen“ erst nach dem Abschnitt lesen.
+         Darum wird er sofort beendet; bereits erkannte Zeilen bleiben, das Modell lädt beim nächsten Start aus dem Browser-Speicher. */
+      function stop() { if (!S.running) return; S.cancelled = true; if (S.abort) { const a = S.abort; S.abort = null; a(); } }
 
       /* ---------- Zeilen bearbeiten ---------- */
       const rnd = (x) => Math.round(x * 100) / 100;
@@ -399,7 +407,10 @@
       function updateAddLabel() { R.addBtn.textContent = '+ ' + t('Zeile bei {s} s hinzufügen', { s: fmt(curTime()) }); }
       function playSeg(sg) { const m = S.media; if (!m) return; m.currentTime = sg.start; S.stopAt = sg.end + 0.15; m.play().catch(() => {}); }
       function addLine() {
-        const s0 = Math.max(0, curTime()), end = S.dur ? Math.min(S.dur, s0 + 2.5) : s0 + 2.5;
+        const s0 = Math.max(0, curTime());
+        let end = S.dur ? Math.min(S.dur, s0 + 2.5) : s0 + 2.5;
+        const nxt = S.segs.filter((x) => x.start > s0).sort((a, b) => a.start - b.start)[0];
+        if (nxt) end = Math.min(end, nxt.start);   // nicht in die nächste Zeile hineinragen
         const sg = { id: VD.uid(), start: rnd(s0), end: rnd(Math.max(end, s0 + 0.5)), text: '' };
         S.segs.push(sg); sortSegs(); S.focusId = sg.id; renderResult();
       }

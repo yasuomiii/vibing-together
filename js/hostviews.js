@@ -87,7 +87,7 @@
         if (!p.assign) return this.phase === 'load' ? '' : VD.t('schaut zu');
         if (this.phase === 'load') return p.loaded ? VD.t('bereit ✓') : VD.t('lädt …');
         if (this.phase === 'final') return '';
-        return p.done ? VD.t('fertig ✓') : p.prog ? VD.t('Line {c}/{t}', { c: p.prog.cur, t: p.assign.lineIdx.length }) : VD.t('bereit');
+        return p.done ? VD.t('fertig ✓') : p.prog ? VD.t('Zeile {c}/{t}', { c: p.prog.cur, t: p.assign.lineIdx.length }) : VD.t('bereit');
       };
       this.list().forEach((p) => {
         ids.add(p.pid);
@@ -454,7 +454,7 @@
         fill.style.transform = `scaleX(${f})`;
         card.classList.toggle('done', !!p.done);
         card.classList.toggle('live', !p.done && p.prog && p.prog.st === 'rec');
-        st.textContent = !p.connected ? VD.t('offline') : p.done ? VD.t('Fertig ✓') : VD.t('Line {c}/{t}', { c: cur, t: total }) + (p.prog && p.prog.st === 'rec' ? ' · ' + VD.t('nimmt auf') : '');
+        st.textContent = !p.connected ? VD.t('offline') : p.done ? VD.t('Fertig ✓') : VD.t('Zeile {c}/{t}', { c: cur, t: total }) + (p.prog && p.prog.st === 'rec' ? ' · ' + VD.t('nimmt auf') : '');
       }
       this.updateBar();
     },

@@ -38,7 +38,7 @@
   "bereit ✓": "готов ✓",
   "lädt …": "загрузка …",
   "fertig ✓": "готово ✓",
-  "Line {c}/{t}": "Реплика {c}/{t}",
+  "Zeile {c}/{t}": "Реплика {c}/{t}",
   "bereit": "готов",
   "Spieler entfernen": "Удалить игрока",
   "{name} entfernen": "Удалить: {name}",

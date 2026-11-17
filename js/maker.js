@@ -8,15 +8,12 @@
   const VD = (window.VD = window.VD || {});
   const h = VD.h;
   const t = (k, p) => VD.t(k, p);
-  const CFG = (window.VD_CONFIG && window.VD_CONFIG.maker) || {};
 
   /* Englische Texte. Texte gibt es auf Deutsch, Englisch, Spanisch, Französisch, Portugiesisch, Russisch und Hindi. */
   VD.addLang('en', {
     'Das Video bei vocalremover.org in die Seite hineinziehen (Drag and Drop, siehe Hinweis bei den Links). Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).': 'Drag the video into the page at vocalremover.org (drag and drop, see the note at the links). You get two files: voices only and background only (music and noises).',
     'Trennt Stimmen und Hintergrund in zwei Dateien. Ein mp4-Video lässt sich dort nicht über „Datei wählen“ auswählen, du musst es in die Seite hineinziehen (Drag and Drop).': 'Splits voices and background into two files. An mp4 video cannot be picked there with “Choose file”, you have to drag it into the page (drag and drop).',
-    'Erzeugt Untertitel direkt auf deinem Gerät, es wird nichts hochgeladen. Das dauert länger, besonders am Handy. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.': 'Creates subtitles right on your device, nothing is uploaded. It takes longer, especially on a phone. Export as .srt or .vtt. The text can differ from what is spoken.',
     'Erzeugt Untertitel online, du lädst die Datei dort hoch. Die Nutzung ist nur teilweise kostenlos. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.': 'Creates subtitles online, you upload the file there. Only partly free to use. Export as .srt or .vtt. The text can differ from what is spoken.',
-    'Läuft im Browser': 'Runs in the browser',
     'Datei wird hochgeladen': 'File is uploaded',
     'Selbst prüfen': 'Check it yourself',
     'Unabhängige Prüfseiten zeigen dir live, ob eine Webseite vertrauenswürdig ist. Tippe bei einer Seite auf einen Namen, dann siehst du dort die aktuelle Einschätzung zu genau dieser Adresse.': 'Independent checking sites show you live whether a website is trustworthy. Tap a name under a site and you see the current rating for exactly that address.',
@@ -27,7 +24,7 @@
     'Alles läuft über Webseiten, du musst nichts installieren. Du bereitest Text und Ton dort vor und lädst es hier hoch. Daraus wird ein Dub-Pack.': 'Everything runs on websites, you install nothing. You prepare text and sound there and load it here. It becomes a dub pack.',
     'Webseiten für die Vorbereitung': 'Websites for preparing',
     'Alles im Browser, ohne Programm zum Herunterladen. Tippe oben rechts auf das i, dort steht, worauf du achten solltest.': 'All in the browser, no program to download. Tap the i at the top right to see what to watch out for.',
-    'Bei einer Untertitel-Seite die Datei laden, Untertitel erzeugen lassen und als .srt- oder .vtt-Datei herunterladen. Der erkannte Text kann teilweise falsch sein, du musst ihn danach hier selbst korrigieren.': 'Load the file on a subtitle site, have subtitles generated and download them as an .srt or .vtt file. The recognised text can be partly wrong, so you have to correct it yourself here afterwards.',
+    'Empfohlen: Erstelle die Untertitel direkt hier im Reiter „Untertitel erstellen“, das läuft lokal auf deinem Gerät. Wenn es auf deinem Handy oder PC ruckelt, nutze stattdessen wave.co (siehe Links). Der erkannte Text kann vom Gesprochenen abweichen, du musst ihn danach prüfen und korrigieren.': 'Recommended: create the subtitles right here in the “Create subtitles” tab, it runs locally on your device. If it lags on your phone or PC, use wave.co instead (see the links). The recognised text can differ from what was said, so check and correct it afterwards.',
     'Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.': 'Services change. Check for yourself whether they are still free and what happens to your files. Only use material you are allowed to use.',
     'Quellen und Sicherheit': 'Sources and safety',
     'Stimmen und Hintergrund trennen': 'Split voices and background',
@@ -41,8 +38,6 @@
     'Links zeigen': 'Show links',
     'Hier das Video laden, die .srt-Datei importieren, die Stimmenspur und die Hintergrundspur laden, Charaktere vergeben und den Pack bauen.': 'Load the video here, import the .srt file, load the voices file and the background file, assign characters and build the pack.',
     'Alle Dateien müssen gleich lang sein und im selben Moment beginnen wie das Video.': 'All files must be the same length and start at the same moment as the video.',
-    'Stimmen und Hintergrund trennen': 'Split voices and background',
-    'Untertitel erzeugen': 'Create subtitles',
     'Falls ein Link nicht mehr geht, suche den Namen im Netz.': 'If a link no longer works, search for the name.',
     'Noch keine Zeilen. Importiere eine Untertitel-Datei oder füge Zeilen von Hand hinzu.': 'No lines yet. Import a subtitle file or add lines by hand.',
     'Dub-Pack erstellen': 'Create a dub pack',
@@ -62,7 +57,6 @@
     'Untertitel importieren (.srt, .vtt)': 'Import subtitles (.srt, .vtt)',
     'Zeile bei {s} s hinzufügen': 'Add line at {s} s',
     'Nach Zeit sortieren': 'Sort by time',
-    'Noch keine Zeilen. Importiere eine Untertitel-Datei oder füge Zeilen von Hand hinzu.': 'No lines yet. Detect them automatically, import subtitles or add them by hand.',
     '{n} Zeilen importiert.': '{n} lines imported.',
     'In der Datei wurden keine Zeilen gefunden.': 'No lines were found in the file.',
     'Zeile anhören': 'Listen to line',
@@ -115,9 +109,7 @@
   VD.addLang('es', {
  "Das Video bei vocalremover.org in die Seite hineinziehen (Drag and Drop, siehe Hinweis bei den Links). Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).": "Arrastra el vídeo a la página de vocalremover.org (arrastrar y soltar, mira la nota en los enlaces). Obtienes dos archivos: solo voces y solo fondo (música y ruidos).",
  "Trennt Stimmen und Hintergrund in zwei Dateien. Ein mp4-Video lässt sich dort nicht über „Datei wählen“ auswählen, du musst es in die Seite hineinziehen (Drag and Drop).": "Separa voces y fondo en dos archivos. Un vídeo mp4 no se puede elegir allí con «Elegir archivo»; tienes que arrastrarlo a la página (arrastrar y soltar).",
- "Erzeugt Untertitel direkt auf deinem Gerät, es wird nichts hochgeladen. Das dauert länger, besonders am Handy. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "Crea subtítulos directamente en tu dispositivo, no se sube nada. Tarda más, sobre todo en el móvil. Exporta como .srt o .vtt. El texto puede diferir de lo hablado.",
  "Erzeugt Untertitel online, du lädst die Datei dort hoch. Die Nutzung ist nur teilweise kostenlos. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "Crea subtítulos en línea, tú subes allí el archivo. El uso solo es gratuito en parte. Exporta como .srt o .vtt. El texto puede diferir de lo hablado.",
- "Läuft im Browser": "Funciona en el navegador",
  "Datei wird hochgeladen": "El archivo se sube",
  "Selbst prüfen": "Compruébalo tú mismo",
  "Unabhängige Prüfseiten zeigen dir live, ob eine Webseite vertrauenswürdig ist. Tippe bei einer Seite auf einen Namen, dann siehst du dort die aktuelle Einschätzung zu genau dieser Adresse.": "Sitios de comprobación independientes te muestran en directo si una página web es de fiar. Toca un nombre bajo una página y verás la valoración actual de esa dirección exacta.",
@@ -128,7 +120,7 @@
  "Alles läuft über Webseiten, du musst nichts installieren. Du bereitest Text und Ton dort vor und lädst es hier hoch. Daraus wird ein Dub-Pack.": "Todo funciona con páginas web, no tienes que instalar nada. Preparas allí el texto y el sonido y lo subes aquí. Con ello se crea un pack de doblaje.",
  "Webseiten für die Vorbereitung": "Páginas web para la preparación",
  "Alles im Browser, ohne Programm zum Herunterladen. Tippe oben rechts auf das i, dort steht, worauf du achten solltest.": "Todo en el navegador, sin programas que descargar. Toca la i arriba a la derecha para ver a qué debes prestar atención.",
- "Bei einer Untertitel-Seite die Datei laden, Untertitel erzeugen lassen und als .srt- oder .vtt-Datei herunterladen. Der erkannte Text kann teilweise falsch sein, du musst ihn danach hier selbst korrigieren.": "En un sitio de subtítulos, carga el archivo, deja que genere los subtítulos y descárgalos como archivo .srt o .vtt. El texto reconocido puede ser en parte incorrecto; después tienes que corregirlo tú aquí.",
+ "Empfohlen: Erstelle die Untertitel direkt hier im Reiter „Untertitel erstellen“, das läuft lokal auf deinem Gerät. Wenn es auf deinem Handy oder PC ruckelt, nutze stattdessen wave.co (siehe Links). Der erkannte Text kann vom Gesprochenen abweichen, du musst ihn danach prüfen und korrigieren.": "Recomendado: crea los subtítulos aquí mismo, en la pestaña «Crear subtítulos»; se ejecuta localmente en tu dispositivo. Si va a trompicones en tu móvil o PC, usa wave.co (mira los enlaces). El texto reconocido puede diferir de lo dicho, así que revísalo y corrígelo después.",
  "Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.": "Los servicios cambian. Comprueba tú mismo si siguen siendo gratis y qué pasa con tus archivos. Usa solo material que puedas usar.",
  "Quellen und Sicherheit": "Fuentes y seguridad",
  "Stimmen und Hintergrund trennen": "Separar voces y fondo",
@@ -211,9 +203,7 @@
   VD.addLang('fr', {
  "Das Video bei vocalremover.org in die Seite hineinziehen (Drag and Drop, siehe Hinweis bei den Links). Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).": "Faites glisser la vidéo dans la page de vocalremover.org (glisser-déposer, voir la remarque près des liens). Vous obtenez deux fichiers : voix seules et fond seul (musique et bruits).",
  "Trennt Stimmen und Hintergrund in zwei Dateien. Ein mp4-Video lässt sich dort nicht über „Datei wählen“ auswählen, du musst es in die Seite hineinziehen (Drag and Drop).": "Sépare les voix et le fond en deux fichiers. Une vidéo mp4 ne peut pas y être choisie avec « Choisir un fichier » ; il faut la faire glisser dans la page (glisser-déposer).",
- "Erzeugt Untertitel direkt auf deinem Gerät, es wird nichts hochgeladen. Das dauert länger, besonders am Handy. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "Crée des sous-titres directement sur votre appareil, rien n’est envoyé. C’est plus long, surtout sur mobile. Export en .srt ou .vtt. Le texte peut différer de ce qui est dit.",
  "Erzeugt Untertitel online, du lädst die Datei dort hoch. Die Nutzung ist nur teilweise kostenlos. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "Crée des sous-titres en ligne, vous y envoyez le fichier. L’utilisation n’est que partiellement gratuite. Export en .srt ou .vtt. Le texte peut différer de ce qui est dit.",
- "Läuft im Browser": "Fonctionne dans le navigateur",
  "Datei wird hochgeladen": "Le fichier est envoyé",
  "Selbst prüfen": "Vérifiez vous-même",
  "Unabhängige Prüfseiten zeigen dir live, ob eine Webseite vertrauenswürdig ist. Tippe bei einer Seite auf einen Namen, dann siehst du dort die aktuelle Einschätzung zu genau dieser Adresse.": "Des sites de vérification indépendants montrent en direct si un site web est digne de confiance. Touchez un nom sous un site pour voir l’évaluation actuelle de cette adresse précise.",
@@ -224,7 +214,7 @@
  "Alles läuft über Webseiten, du musst nichts installieren. Du bereitest Text und Ton dort vor und lädst es hier hoch. Daraus wird ein Dub-Pack.": "Tout passe par des sites web, vous n’avez rien à installer. Vous y préparez le texte et le son, puis vous les chargez ici. Cela devient un pack de doublage.",
  "Webseiten für die Vorbereitung": "Sites web pour la préparation",
  "Alles im Browser, ohne Programm zum Herunterladen. Tippe oben rechts auf das i, dort steht, worauf du achten solltest.": "Tout dans le navigateur, sans programme à télécharger. Touchez le i en haut à droite pour voir à quoi faire attention.",
- "Bei einer Untertitel-Seite die Datei laden, Untertitel erzeugen lassen und als .srt- oder .vtt-Datei herunterladen. Der erkannte Text kann teilweise falsch sein, du musst ihn danach hier selbst korrigieren.": "Sur un site de sous-titres, chargez le fichier, faites générer les sous-titres et téléchargez-les en fichier .srt ou .vtt. Le texte reconnu peut être en partie faux, vous devez ensuite le corriger vous-même ici.",
+ "Empfohlen: Erstelle die Untertitel direkt hier im Reiter „Untertitel erstellen“, das läuft lokal auf deinem Gerät. Wenn es auf deinem Handy oder PC ruckelt, nutze stattdessen wave.co (siehe Links). Der erkannte Text kann vom Gesprochenen abweichen, du musst ihn danach prüfen und korrigieren.": "Recommandé : crée les sous-titres directement ici, dans l’onglet « Créer des sous-titres », cela s’exécute localement sur ton appareil. Si ça rame sur ton téléphone ou ton PC, utilise plutôt wave.co (voir les liens). Le texte reconnu peut différer de ce qui a été dit, vérifie-le et corrige-le ensuite.",
  "Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.": "Les services changent. Vérifiez vous-même s’ils sont toujours gratuits et ce qu’il advient de vos fichiers. N’utilisez que du matériel que vous avez le droit d’utiliser.",
  "Quellen und Sicherheit": "Sources et sécurité",
  "Stimmen und Hintergrund trennen": "Séparer voix et fond",
@@ -307,9 +297,7 @@
   VD.addLang('pt', {
  "Das Video bei vocalremover.org in die Seite hineinziehen (Drag and Drop, siehe Hinweis bei den Links). Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).": "Arraste o vídeo para a página do vocalremover.org (arrastar e soltar, veja a nota nos links). Você recebe dois arquivos: só vozes e só fundo (música e ruídos).",
  "Trennt Stimmen und Hintergrund in zwei Dateien. Ein mp4-Video lässt sich dort nicht über „Datei wählen“ auswählen, du musst es in die Seite hineinziehen (Drag and Drop).": "Separa vozes e fundo em dois arquivos. Um vídeo mp4 não pode ser escolhido lá com “Escolher arquivo”; é preciso arrastá-lo para a página (arrastar e soltar).",
- "Erzeugt Untertitel direkt auf deinem Gerät, es wird nichts hochgeladen. Das dauert länger, besonders am Handy. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "Cria legendas direto no seu aparelho, nada é enviado. Demora mais, principalmente no celular. Exporta como .srt ou .vtt. O texto pode diferir do que foi falado.",
  "Erzeugt Untertitel online, du lädst die Datei dort hoch. Die Nutzung ist nur teilweise kostenlos. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "Cria legendas online, você envia o arquivo para lá. O uso só é gratuito em parte. Exporta como .srt ou .vtt. O texto pode diferir do que foi falado.",
- "Läuft im Browser": "Roda no navegador",
  "Datei wird hochgeladen": "O arquivo é enviado",
  "Selbst prüfen": "Confira você mesmo",
  "Unabhängige Prüfseiten zeigen dir live, ob eine Webseite vertrauenswürdig ist. Tippe bei einer Seite auf einen Namen, dann siehst du dort die aktuelle Einschätzung zu genau dieser Adresse.": "Sites de verificação independentes mostram ao vivo se um site é confiável. Toque em um nome sob um site e você verá a avaliação atual desse endereço exato.",
@@ -320,7 +308,7 @@
  "Alles läuft über Webseiten, du musst nichts installieren. Du bereitest Text und Ton dort vor und lädst es hier hoch. Daraus wird ein Dub-Pack.": "Tudo funciona por sites, você não precisa instalar nada. Você prepara o texto e o som lá e envia aqui. Disso sai um pack de dublagem.",
  "Webseiten für die Vorbereitung": "Sites para a preparação",
  "Alles im Browser, ohne Programm zum Herunterladen. Tippe oben rechts auf das i, dort steht, worauf du achten solltest.": "Tudo no navegador, sem programa para baixar. Toque no i no canto superior direito para ver no que prestar atenção.",
- "Bei einer Untertitel-Seite die Datei laden, Untertitel erzeugen lassen und als .srt- oder .vtt-Datei herunterladen. Der erkannte Text kann teilweise falsch sein, du musst ihn danach hier selbst korrigieren.": "Em um site de legendas, carregue o arquivo, deixe gerar as legendas e baixe como arquivo .srt ou .vtt. O texto reconhecido pode estar em parte errado; depois você precisa corrigi-lo aqui.",
+ "Empfohlen: Erstelle die Untertitel direkt hier im Reiter „Untertitel erstellen“, das läuft lokal auf deinem Gerät. Wenn es auf deinem Handy oder PC ruckelt, nutze stattdessen wave.co (siehe Links). Der erkannte Text kann vom Gesprochenen abweichen, du musst ihn danach prüfen und korrigieren.": "Recomendado: crie as legendas aqui mesmo, na aba “Criar legendas”; ela roda localmente no seu dispositivo. Se travar no celular ou no PC, use o wave.co (veja os links). O texto reconhecido pode diferir do que foi dito, então confira e corrija depois.",
  "Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.": "Os serviços mudam. Confira você mesmo se ainda são gratuitos e o que acontece com seus arquivos. Use só material que você pode usar.",
  "Quellen und Sicherheit": "Fontes e segurança",
  "Stimmen und Hintergrund trennen": "Separar vozes e fundo",
@@ -403,9 +391,7 @@
   VD.addLang('ru', {
  "Das Video bei vocalremover.org in die Seite hineinziehen (Drag and Drop, siehe Hinweis bei den Links). Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).": "Перетащите видео на страницу vocalremover.org (drag and drop, см. примечание у ссылок). Вы получите два файла: только голоса и только фон (музыка и шумы).",
  "Trennt Stimmen und Hintergrund in zwei Dateien. Ein mp4-Video lässt sich dort nicht über „Datei wählen“ auswählen, du musst es in die Seite hineinziehen (Drag and Drop).": "Разделяет голоса и фон на два файла. Видео mp4 там нельзя выбрать кнопкой «Выбрать файл», его нужно перетащить на страницу (drag and drop).",
- "Erzeugt Untertitel direkt auf deinem Gerät, es wird nichts hochgeladen. Das dauert länger, besonders am Handy. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "Создаёт субтитры прямо на вашем устройстве, ничего не загружается. Это дольше, особенно на телефоне. Экспорт в .srt или .vtt. Текст может отличаться от сказанного.",
  "Erzeugt Untertitel online, du lädst die Datei dort hoch. Die Nutzung ist nur teilweise kostenlos. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "Создаёт субтитры онлайн, файл вы загружаете туда. Использование бесплатно только частично. Экспорт в .srt или .vtt. Текст может отличаться от сказанного.",
- "Läuft im Browser": "Работает в браузере",
  "Datei wird hochgeladen": "Файл загружается",
  "Selbst prüfen": "Проверьте сами",
  "Unabhängige Prüfseiten zeigen dir live, ob eine Webseite vertrauenswürdig ist. Tippe bei einer Seite auf einen Namen, dann siehst du dort die aktuelle Einschätzung zu genau dieser Adresse.": "Независимые сайты проверки показывают в реальном времени, можно ли доверять сайту. Нажмите на название под сайтом, и вы увидите текущую оценку именно этого адреса.",
@@ -416,7 +402,7 @@
  "Alles läuft über Webseiten, du musst nichts installieren. Du bereitest Text und Ton dort vor und lädst es hier hoch. Daraus wird ein Dub-Pack.": "Всё работает через сайты, ничего устанавливать не нужно. Вы готовите там текст и звук и загружаете их сюда. Из этого получится пак дубляжа.",
  "Webseiten für die Vorbereitung": "Сайты для подготовки",
  "Alles im Browser, ohne Programm zum Herunterladen. Tippe oben rechts auf das i, dort steht, worauf du achten solltest.": "Всё в браузере, без программ для скачивания. Нажмите на i вверху справа, там написано, на что обратить внимание.",
- "Bei einer Untertitel-Seite die Datei laden, Untertitel erzeugen lassen und als .srt- oder .vtt-Datei herunterladen. Der erkannte Text kann teilweise falsch sein, du musst ihn danach hier selbst korrigieren.": "На сайте субтитров загрузите файл, дождитесь создания субтитров и скачайте их как файл .srt или .vtt. Распознанный текст может быть частично неверным, потом вам нужно исправить его самим здесь.",
+ "Empfohlen: Erstelle die Untertitel direkt hier im Reiter „Untertitel erstellen“, das läuft lokal auf deinem Gerät. Wenn es auf deinem Handy oder PC ruckelt, nutze stattdessen wave.co (siehe Links). Der erkannte Text kann vom Gesprochenen abweichen, du musst ihn danach prüfen und korrigieren.": "Рекомендуем: создайте субтитры прямо здесь, на вкладке «Создать субтитры», она работает локально на вашем устройстве. Если на телефоне или компьютере всё тормозит, воспользуйтесь wave.co (см. ссылки). Распознанный текст может отличаться от сказанного, поэтому проверьте и исправьте его.",
  "Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.": "Сервисы меняются. Проверьте сами, остаются ли они бесплатными и что происходит с вашими файлами. Используйте только тот материал, который вам можно использовать.",
  "Quellen und Sicherheit": "Источники и безопасность",
  "Stimmen und Hintergrund trennen": "Разделить голоса и фон",
@@ -499,9 +485,7 @@
   VD.addLang('hi', {
  "Das Video bei vocalremover.org in die Seite hineinziehen (Drag and Drop, siehe Hinweis bei den Links). Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).": "वीडियो को vocalremover.org के पेज पर खींचकर छोड़ें (ड्रैग एंड ड्रॉप, लिंक के पास का नोट देखें)। आपको दो फ़ाइलें मिलती हैं: सिर्फ़ आवाज़ें और सिर्फ़ बैकग्राउंड (संगीत और शोर)।",
  "Trennt Stimmen und Hintergrund in zwei Dateien. Ein mp4-Video lässt sich dort nicht über „Datei wählen“ auswählen, du musst es in die Seite hineinziehen (Drag and Drop).": "आवाज़ और बैकग्राउंड को दो फ़ाइलों में अलग करता है। वहाँ mp4 वीडियो “फ़ाइल चुनें” से नहीं चुना जा सकता, उसे पेज पर खींचकर छोड़ना होगा (ड्रैग एंड ड्रॉप)।",
- "Erzeugt Untertitel direkt auf deinem Gerät, es wird nichts hochgeladen. Das dauert länger, besonders am Handy. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "सबटाइटल सीधे आपके डिवाइस पर बनाता है, कुछ भी अपलोड नहीं होता। इसमें ज़्यादा समय लगता है, ख़ासकर फ़ोन पर। .srt या .vtt में एक्सपोर्ट। टेक्स्ट बोले गए से अलग हो सकता है।",
  "Erzeugt Untertitel online, du lädst die Datei dort hoch. Die Nutzung ist nur teilweise kostenlos. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.": "सबटाइटल ऑनलाइन बनाता है, फ़ाइल आप वहाँ अपलोड करते हैं। इस्तेमाल सिर्फ़ आंशिक रूप से मुफ़्त है। .srt या .vtt में एक्सपोर्ट। टेक्स्ट बोले गए से अलग हो सकता है।",
- "Läuft im Browser": "ब्राउज़र में चलता है",
  "Datei wird hochgeladen": "फ़ाइल अपलोड होती है",
  "Selbst prüfen": "ख़ुद जाँचें",
  "Unabhängige Prüfseiten zeigen dir live, ob eine Webseite vertrauenswürdig ist. Tippe bei einer Seite auf einen Namen, dann siehst du dort die aktuelle Einschätzung zu genau dieser Adresse.": "स्वतंत्र जाँच-साइटें लाइव दिखाती हैं कि कोई वेबसाइट भरोसेमंद है या नहीं। किसी साइट के नीचे एक नाम पर टैप करें, तो आपको उसी पते की मौजूदा रेटिंग दिखेगी।",
@@ -512,7 +496,7 @@
  "Alles läuft über Webseiten, du musst nichts installieren. Du bereitest Text und Ton dort vor und lädst es hier hoch. Daraus wird ein Dub-Pack.": "सब कुछ वेबसाइटों से होता है, आपको कुछ इंस्टॉल नहीं करना है। आप वहाँ टेक्स्ट और आवाज़ तैयार करते हैं और यहाँ अपलोड करते हैं। इससे एक डब पैक बनता है।",
  "Webseiten für die Vorbereitung": "तैयारी के लिए वेबसाइटें",
  "Alles im Browser, ohne Programm zum Herunterladen. Tippe oben rechts auf das i, dort steht, worauf du achten solltest.": "सब कुछ ब्राउज़र में, डाउनलोड करने के लिए कोई प्रोग्राम नहीं। ऊपर दाईं ओर i पर टैप करें, वहाँ लिखा है कि किस बात का ध्यान रखें।",
- "Bei einer Untertitel-Seite die Datei laden, Untertitel erzeugen lassen und als .srt- oder .vtt-Datei herunterladen. Der erkannte Text kann teilweise falsch sein, du musst ihn danach hier selbst korrigieren.": "किसी सबटाइटल साइट पर फ़ाइल लोड करें, सबटाइटल बनवाएँ और .srt या .vtt फ़ाइल के रूप में डाउनलोड करें। पहचाना गया टेक्स्ट कुछ जगह ग़लत हो सकता है, उसे बाद में आपको यहाँ ख़ुद ठीक करना होगा।",
+ "Empfohlen: Erstelle die Untertitel direkt hier im Reiter „Untertitel erstellen“, das läuft lokal auf deinem Gerät. Wenn es auf deinem Handy oder PC ruckelt, nutze stattdessen wave.co (siehe Links). Der erkannte Text kann vom Gesprochenen abweichen, du musst ihn danach prüfen und korrigieren.": "सुझाव: सबटाइटल यहीं “सबटाइटल बनाएँ” टैब में बनाएँ, यह आपके डिवाइस पर ही चलता है। अगर फ़ोन या PC पर अटके, तो इसके बजाय wave.co इस्तेमाल करें (लिंक देखें)। पहचाना गया टेक्स्ट बोले गए से अलग हो सकता है, इसलिए बाद में उसे जाँचें और सुधारें।",
  "Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.": "सेवाएँ बदलती रहती हैं। ख़ुद जाँचें कि वे अब भी मुफ़्त हैं या नहीं और आपकी फ़ाइलों का क्या होता है। सिर्फ़ वही सामग्री इस्तेमाल करें जिसका आपको इस्तेमाल करने का अधिकार है।",
  "Quellen und Sicherheit": "स्रोत और सुरक्षा",
  "Stimmen und Hintergrund trennen": "आवाज़ और बैकग्राउंड अलग करें",
@@ -596,7 +580,6 @@
   /* ------------------------------------------------------------------ Helfer */
   const TAIL = 0.15;                 // so viel Ton läuft nach dem Ende einer Zeile mit (Ausklang)
   const CLIP_SR = 32000;             // Abtastrate der Zeilen und der Hintergrundspur im Pack
-  const MIN_LEN = 0.3;
   const fmt = (s) => (Math.round(s * 100) / 100).toString();
   const slug = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '');
   const safeName = (s) => (String(s || '').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').replace(/\s+/g, ' ').trim().slice(0, 60)) || 'Dub-Pack';
@@ -699,7 +682,7 @@
           h('h2', { text: t('So geht es') }), h('p', { class: 'muted', text: t('Alles läuft über Webseiten, du musst nichts installieren. Du bereitest Text und Ton dort vor und lädst es hier hoch. Daraus wird ein Dub-Pack.') }),
           fold(t('Anleitung zeigen'), steps(['Die Szene als Videodatei bereitlegen (mp4 oder webm, am besten 20 bis 90 Sekunden). Bei einem YouTube-Video hilft notube.cc bei den Links.',
             'Das Video bei vocalremover.org in die Seite hineinziehen (Drag and Drop, siehe Hinweis bei den Links). Du bekommst zwei Dateien: nur Stimmen und nur Hintergrund (Musik und Geräusche).',
-            'Bei einer Untertitel-Seite die Datei laden, Untertitel erzeugen lassen und als .srt- oder .vtt-Datei herunterladen. Der erkannte Text kann teilweise falsch sein, du musst ihn danach hier selbst korrigieren.',
+            'Empfohlen: Erstelle die Untertitel direkt hier im Reiter „Untertitel erstellen“, das läuft lokal auf deinem Gerät. Wenn es auf deinem Handy oder PC ruckelt, nutze stattdessen wave.co (siehe Links). Der erkannte Text kann vom Gesprochenen abweichen, du musst ihn danach prüfen und korrigieren.',
             'Hier das Video laden, die .srt-Datei importieren, die Stimmenspur und die Hintergrundspur laden, Charaktere vergeben und den Pack bauen.',
             'Alle Dateien müssen gleich lang sein und im selben Moment beginnen wie das Video.']),
           h('p', { class: 'muted mk-note', text: t('Dienste ändern sich. Prüfe selbst, ob sie noch kostenlos sind und was mit deinen Dateien passiert. Nutze nur Material, das du verwenden darfst.') }))),
@@ -711,7 +694,6 @@
             h('ul', { class: 'mk-links' }, tool('vocalremover.org', 'https://vocalremover.org/', 'Trennt Stimmen und Hintergrund in zwei Dateien. Ein mp4-Video lässt sich dort nicht über „Datei wählen“ auswählen, du musst es in die Seite hineinziehen (Drag and Drop).')),
             h('h3', { class: 'mk-h3', text: t('Untertitel erzeugen') }),
             h('ul', { class: 'mk-links' },
-              tool('snipsound.com', 'https://snipsound.com/tools/srt-generator/', 'Erzeugt Untertitel direkt auf deinem Gerät, es wird nichts hochgeladen. Das dauert länger, besonders am Handy. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.'),
               tool('wave.co', 'https://wave.co/tools/subtitle-generator', 'Erzeugt Untertitel online, du lädst die Datei dort hoch. Die Nutzung ist nur teilweise kostenlos. Export als .srt oder .vtt. Der Text kann vom Gesprochenen abweichen.')),
             h('p', { class: 'muted mk-note', text: t('Falls ein Link nicht mehr geht, suche den Namen im Netz.') }))));
 
@@ -811,7 +793,6 @@
             h('p', { text: t('Unabhängige Prüfseiten zeigen dir live, ob eine Webseite vertrauenswürdig ist. Tippe bei einer Seite auf einen Namen, dann siehst du dort die aktuelle Einschätzung zu genau dieser Adresse.') }),
             site('notube.cc', 'YouTube-Video als mp4'),
             site('vocalremover.org', 'Stimmen und Hintergrund trennen'),
-            site('snipsound.com', 'Untertitel erzeugen', 'Läuft im Browser'),
             site('wave.co', 'Untertitel erzeugen', 'Datei wird hochgeladen'),
             h('ul', { class: 'mk-links mk-legend' },
               h('li', {}, h('b', { text: 'Trustpilot' }), h('span', { text: ' – ' + t('Bewertungen von echten Nutzern.') })),

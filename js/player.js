@@ -302,7 +302,7 @@
       const trEl = h('p', { class: 'dp-tr', text: line.tr || '', hidden: !line.tr, 'data-cap': line.caption || '' });
       this._trEl = trEl;
       const el = h('section', { class: 'pc-view dub-play' },
-        h('div', { class: 'dp-head' }, h('b', { class: 'dp-title', text: this.scene.title }), h('span', { class: 'dp-n', text: VD.t('Line {c}/{t}', { c: idx + 1, t: total }).toUpperCase() })),
+        h('div', { class: 'dp-head' }, h('b', { class: 'dp-title', text: this.scene.title }), h('span', { class: 'dp-n', text: VD.t('Zeile {c}/{t}', { c: idx + 1, t: total }).toUpperCase() })),
         dots,
         screen,
         h('p', { class: 'dp-who' }, h('b', { style: { '--c': this.profile.color }, text: line.char.toUpperCase() }), ' · ' + VD.t('Du bist dran')),
@@ -633,7 +633,7 @@
       const w = VD.$('#wait-n', this.body); if (w) w.textContent = this.roster.length ? (open ? VD.t('Warte noch auf {n} Spieler …', { n: open }) : VD.t('Alle sind fertig!')) : VD.t('Warte auf die anderen …');
       this._roster.replaceChildren(...this.roster.map((p) => h('div', { class: 'ro-card' + (p.done ? ' done' : ''), style: { '--c': p.color } },
         VD.ui.avatar(p, 'lg'), h('b', { text: p.pid === this.profile.pid ? VD.t('{name} (du)', { name: p.name }) : p.name }),
-        h('small', { text: p.done ? VD.t('✓ Fertig') : VD.t('Line {c}/{t}', { c: p.cur, t: p.total }) }))));
+        h('small', { text: p.done ? VD.t('✓ Fertig') : VD.t('Zeile {c}/{t}', { c: p.cur, t: p.total }) }))));
     }
 
     sendProg(st) {

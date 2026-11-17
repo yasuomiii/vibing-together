@@ -38,7 +38,7 @@
   "bereit ✓": "तैयार ✓",
   "lädt …": "लोड हो रहा है …",
   "fertig ✓": "पूरा ✓",
-  "Line {c}/{t}": "पंक्ति {c}/{t}",
+  "Zeile {c}/{t}": "पंक्ति {c}/{t}",
   "bereit": "तैयार",
   "Spieler entfernen": "खिलाड़ी हटाएँ",
   "{name} entfernen": "{name} को हटाएँ",
