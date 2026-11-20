@@ -1,6 +1,6 @@
 # Vibing Together
 
-A browser party game for dubbing movie scenes together, based on the principle of *Choicer Voicer*. It runs entirely in the browser, is free, and supports mixed PC and mobile play (crossplay).
+A browser party game for dubbing movie scenes together, based on the principle of *Choicer Voicer* and *Dub Together*. It runs entirely in the browser, is free, and supports mixed PC and mobile play (crossplay).
 
 ## How a game works
 
