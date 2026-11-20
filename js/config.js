@@ -1,0 +1,90 @@
+/* ------------------------------------------------------------------
+   VIBING TOGETHER – Konfiguration
+   Hier kannst du Server und Grenzwerte anpassen.
+------------------------------------------------------------------- */
+window.VD_CONFIG = {
+  // Name des Spiels (Kopfzeile, Browser-Tab, Dateinamen beim Export)
+  appName: 'Vibing Together',
+
+  // Seite, auf die der Knopf "Dub-Packs herunterladen" führt
+  packSiteUrl: 'https://gamebanana.com/games/20674',
+
+  // Präfix für die Raum-IDs im Signalisierungs-Server
+  roomPrefix: 'vibingtogether-',
+
+  // Signalisierung (nur zum Verbindungsaufbau, Audio läuft direkt P2P).
+  // Leer lassen = kostenloser öffentlicher PeerJS-Cloud-Server.
+  // Eigener Server (siehe README): host:'meinserver.de', port:443, path:'/', secure:true
+  peer: { host: '', port: 443, path: '/', secure: true, key: 'peerjs' },
+
+  // STUN reicht in den meisten Heimnetzen. Wenn Handys im Mobilfunknetz
+  // sich nicht verbinden, trage hier einen TURN-Server ein, z. B.:
+  // { urls: 'turn:turn.example.com:3478', username: 'user', credential: 'pass' }
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:global.stun.twilio.com:3478' }
+  ],
+
+  // Hintergrundmusik (Startseite, Beitritt, Lobby). Dateien liegen in audio/music/ (mp3, ogg oder m4a), z. B.
+  //   tracks: [{ name: 'Mein Stück', file: 'mein-stueck.mp3' }]
+  // Nur Musik mit passender Lizenz verwenden (CC0, gemeinfrei oder selbst gemacht). Ohne Dateien spielt das Spiel
+  // seine selbst erzeugte Musik (js/music.js).
+  music: {
+    enabled: true,
+    volume: 0.25,          // Standard-Lautstärke (0 bis 1), pro Gerät einstellbar
+    fadeSec: 1.2,          // Ein-/Ausblenden beim Wechsel zwischen Lobby und Spiel
+    crossfadeSec: 2,       // Überblenden zwischen zwei Stücken
+    folder: 'audio/music/',
+    tracks: []
+  },
+
+  // Dub-Pack-Ersteller. Auf false setzen, dann verschwindet der Knopf.
+  maker: {
+    enabled: true
+  },
+
+  // Untertitel erstellen (Whisper von OpenAI, läuft im Browser). Das Modell wird beim ersten Benutzen von Hugging Face geladen.
+  // repos: zuerst der erste Eintrag, bei einem Fehler der nächste. dtype q8 heißt: verkleinerte Fassung. mb: ungefähre Größe des Downloads.
+  whisper: {
+    models: [
+      { id: 'tiny', label: 'Schnell', repos: ['onnx-community/whisper-tiny', 'Xenova/whisper-tiny'], dtype: 'q8', mb: 45 },
+      { id: 'base', label: 'Ausgewogen', repos: ['onnx-community/whisper-base', 'Xenova/whisper-base'], dtype: 'q8', mb: 81, default: true },
+      { id: 'small', label: 'Genau', repos: ['onnx-community/whisper-small', 'Xenova/whisper-small'], dtype: 'q8', mb: 255 }
+    ]
+  },
+
+  // Wiederverbinden auf dem Handy (Funkloch, Bildschirm gesperrt, Seite neu geladen)
+  reconnect: {
+    stepsMs: [1000, 2000, 4000, 8000],   // Abstände der ersten Versuche
+    everyMs: 10000,                      // danach alle so viele Millisekunden
+    giveUpMs: 5 * 60 * 1000,             // so lange versucht das Handy es von selbst, dann kommt "Erneut versuchen"
+    pongWaitMs: 2500,                    // beim Zurückkehren in den Vordergrund: so lange auf eine Antwort des Hosts warten
+    sessionHours: 12                     // so lange merkt sich das Handy den Raum für "Wieder einsteigen?"
+  },
+
+  // Bewegter Hintergrund. Auf false setzen, dann steht der Hintergrund still (sieht gleich aus, bewegt sich nur nicht).
+  animatedBackground: true,
+
+  limits: {
+    maxPlayers: 8,
+    maxNameLength: 14,
+    maxBlobBytes: 80 * 1024 * 1024, // größte Datei Host→Handy (Video)
+    maxTakeBytes: 6 * 1024 * 1024,   // größte erlaubte Aufnahme vom Handy
+    maxZipBytes: 400 * 1024 * 1024,  // größte Pack-Datei
+    maxClipBytes: 40 * 1024 * 1024,  // größter einzelner Sprach-Clip im Pack
+    maxVideoBytes: 400 * 1024 * 1024, // größte einzelne Videodatei
+    maxClipsPerPack: 1500            // mehr Zeilen pro Pack werden ignoriert
+  },
+
+  // Spielablauf: Zeiten und Werte, an denen man das Spielgefühl einstellen kann
+  game: {
+    leadSec: 0.6,          // so viele Sekunden Video laufen vor einer Zeile (Anlauf)
+    trailSec: 0.6,         // so viele Sekunden laufen nach dem Ende der Originalzeile weiter
+    recTailMs: 350,        // die Aufnahme läuft so lange über das Ende der Zeile hinaus
+    voiceTargetDb: -20,    // Ziel-Lautstärke der Aufnahmen (dBFS); höher = lauter
+    backingInMix: 0.4,     // Lautstärke von Musik/Geräuschen im fertigen Ergebnis (0 = aus, 1 = voll)
+    backingInOriginal: 0.55, // Lautstärke von Musik/Geräuschen beim Knopf "Original"
+    loadTimeoutMs: 90000,  // so lange wartet der Host höchstens, bis alle Geräte die Szene geladen haben
+    replayDelayMs: 2500    // Vorlauf, damit bei "Nochmal ansehen" alle Geräte gleichzeitig starten
+  }
+};
