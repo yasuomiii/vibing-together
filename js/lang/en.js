@@ -242,6 +242,7 @@
   "Untertitel": "Subtitles",
   "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Subtitles: the film line is shown at the bottom of the picture.",
   "Sprache": "Language",
+  "Eine Zeile im Pack ist zu lang.": "A line in the pack is too long.",
   "Gilt sofort. Schon offene Spielbildschirme wechseln beim nächsten Schritt.": "Applies immediately. Screens that are already open switch at the next step.",
   "Schließen": "Close",
   "Nur Favoriten": "Only favorites",

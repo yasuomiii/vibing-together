@@ -69,12 +69,13 @@
         if (this.players.size >= L.maxPlayers) { link.send({ t: 'reject', reason: 'Der Raum ist voll.' }); link.close(); return; }
         const used = new Set(this.list().map((x) => x.color));
         const want = VD.COLORS.includes(m.color) && !used.has(m.color) ? m.color : VD.COLORS.find((c) => !used.has(c)) || VD.COLORS[0];
-        p = { pid, color: want, ready: false, isLocal: false };
+        p = { pid, pub: VD.uid(), color: want, ready: false, isLocal: false };   // pid ist geheim (nur dieses Gerät und der Host), pub geht an die anderen
         this.players.set(pid, p);
         p.active = this.state === 'lobby' || this.state === 'final';
         VD.sfx.play('join');
       } else if (p.link && p.link !== link) { try { p.link.close(); } catch { /* ignore */ } }
-      p.name = String(m.name || VD.t('Spieler')).replace(/[\u0000-\u001f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, L.maxNameLength) || VD.t('Spieler');
+      // Namen: keine Steuer-, unsichtbaren und Richtungs-Zeichen, höchstens 4 Akzentzeichen in Folge (sonst sprengt es das Layout)
+      p.name = Array.from(String(m.name || '').replace(/[\u0000-\u001f\u007f-\u009f<>\u00ad\u061c\u115f\u1160\u17b4\u17b5\u180e\u200b\u200e\u200f\u2028-\u202e\u2060-\u2064\u2066-\u206f\u2800\u3164\ufeff\uffa0\ufff9-\ufffc]/g, '').replace(/[\u{e0000}-\u{e007f}]/gu, '').replace(/(\p{M}{4})\p{M}+/gu, '$1').replace(/\s+/g, ' ').trim()).slice(0, L.maxNameLength).join('').trim() || VD.t('Spieler');
       p.emoji = VD.AVATARS.includes(m.emoji) ? m.emoji : '🎤';
       p.canRecord = !!m.canRecord;
       p.link = link; p.connected = true; p.lvl = 0; p.skipped = false;
@@ -84,7 +85,7 @@
       link.on('blob', (k, meta, bytes) => this.onPlayerBlob(p, k, meta, bytes));
       link.on('close', () => { if (p.link === link) { p.connected = false; if (this.pv) this.pvMemberLost(p); this.onRosterChanged(); this.progress(); if (this.updatePlay) this.updatePlay(); } });
       const snap = p.active ? this.lastPhase : this.lateJoinPhase();
-      link.send({ t: 'welcome', pid, color: p.color, snap: snap.phase === 'lobby' || (p.assign && p.active && this.state === 'playing') ? null : snap });
+      link.send({ t: 'welcome', pub: p.pub, color: p.color, snap: snap.phase === 'lobby' || (p.assign && p.active && this.state === 'playing') ? null : snap });
       if (this.state === 'lobby') link.send({ t: 'phase', phase: 'lobby' });
       this.onRosterChanged();
       if (this.updatePlay) this.updatePlay();
@@ -140,8 +141,18 @@
       const i = Number(meta.i);
       if (!Number.isInteger(i) || !p.assign.lineIdx.includes(i)) return;
       if (bytes.byteLength % 2 || bytes.byteLength > CFG.limits.maxTakeBytes) return;
+      if (!bytes.byteLength) return;
       const i16 = new Int16Array(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
-      p.takes.set(i, { raw: VD.i16ToF32(i16), at: Date.now() });
+      let raw = VD.i16ToF32(i16);
+      // Eine Aufnahme darf nicht weit über ihre Zeile hinausragen und nicht lauter sein als eine normale (sonst übertönt sie das Ergebnis)
+      const ln = this.scene && this.scene.lines[i];
+      if (ln) { const max = Math.ceil((ln.s1 - ln.s0 + 3) * SR); if (raw.length > max) raw = raw.slice(0, max); }
+      let pk = 0, en = 0;
+      for (let k = 0; k < raw.length; k++) { const a = Math.abs(raw[k]); if (a > pk) pk = a; en += a * a; }
+      const rms = Math.sqrt(en / raw.length);
+      const g = Math.min(1, pk > 0.98 ? 0.98 / pk : 1, rms > 0.3 ? 0.3 / rms : 1);
+      if (g < 1) for (let k = 0; k < raw.length; k++) raw[k] *= g;
+      p.takes.set(i, { raw, at: Date.now() });
       this.checkDone(p);
     }
     checkDone(p) {
@@ -171,7 +182,7 @@
     onRosterChanged() {
       const pk = VD.Packs.current();
       const chars = pk ? pk.chars.map((c) => ({ n: c, k: pk.lines.filter((l) => l.char === c).length })) : [];
-      const msg = { t: 'lobby', chars, wishOn: this.wishOn(), fxOn: this.fxOn(), players: this.list().map((p) => ({ pid: p.pid, name: p.name, emoji: p.emoji, color: p.color, ready: !!p.ready, connected: p.connected, wish: p.wish || null })) };
+      const msg = { t: 'lobby', chars, wishOn: this.wishOn(), fxOn: this.fxOn(), players: this.list().map((p) => ({ pid: p.pub, name: p.name, emoji: p.emoji, color: p.color, ready: !!p.ready, connected: p.connected, wish: p.wish || null })) };
       this.list().forEach((p) => p.connected && p.link.send(msg));
       this.refreshStrip();
       if (this.state === 'lobby') this.renderLobbyPlayers();
@@ -460,7 +471,7 @@
       if (!this.scene || this.state !== 'playing') return;
       clearTimeout(this._progT);
       this._progT = setTimeout(() => {
-        const list = this.list().filter((p) => p.assign && p.active).map((p) => ({ pid: p.pid, name: p.name, emoji: p.emoji, color: p.color, done: !!p.done, cur: p.prog ? p.prog.cur : 1, total: p.assign.lineIdx.length, chars: p.assign.chars }));
+        const list = this.list().filter((p) => p.assign && p.active).map((p) => ({ pid: p.pub, name: p.name, emoji: p.emoji, color: p.color, done: !!p.done, cur: p.prog ? p.prog.cur : 1, total: p.assign.lineIdx.length, chars: p.assign.chars }));
         this.bcast({ t: 'prog_all', list });
       }, 120);
     }

@@ -242,6 +242,7 @@
   "Untertitel": "उपशीर्षक",
   "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "उपशीर्षक: फ़िल्म की लाइन तस्वीर के नीचे दिखाई जाती है।",
   "Sprache": "भाषा",
+  "Eine Zeile im Pack ist zu lang.": "पैक की एक लाइन बहुत लंबी है।",
   "Gilt sofort. Schon offene Spielbildschirme wechseln beim nächsten Schritt.": "तुरंत लागू होता है। पहले से खुली स्क्रीन अगले चरण में बदलेंगी।",
   "Schließen": "बंद करें",
   "Nur Favoriten": "सिर्फ़ पसंदीदा",

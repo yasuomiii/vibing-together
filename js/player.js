@@ -111,7 +111,7 @@
 
     onMsg(m) {
       switch (m.t) {
-        case 'welcome': this.profile.color = m.color || this.profile.color; this.renderTop(); if (m.snap) this.onPhase(m.snap, true); break;
+        case 'welcome': this.pub = typeof m.pub === 'string' ? m.pub : this.pub; this.profile.color = m.color || this.profile.color; this.renderTop(); if (m.snap) this.onPhase(m.snap, true); break;
         case 'reject': this.onKicked(VD.t(m.reason || 'Beitritt nicht möglich.')); break;
         case 'kicked': this.onKicked(VD.t('Der Host hat dich aus dem Raum entfernt.')); break;
         case 'closed': this.onKicked(VD.t('Der Host hat den Raum geschlossen.')); break;
@@ -131,7 +131,8 @@
       this.pvc.close();
       this.resetScene();
       this.scene = m; this.sceneId = m.id;
-      this.lines = (m.lines || []).map((l) => Object.assign({ img: null, orig: null }, l));
+      // Zeilen vom Host: nur erwartete Felder, Texte als Text, Anzahl begrenzt
+      this.lines = (Array.isArray(m.lines) ? m.lines : []).slice(0, window.VD_CONFIG.limits.maxClipsPerPack).filter((l) => l && typeof l === 'object' && Number.isInteger(l.i)).map((l) => Object.assign({ img: null, orig: null }, l, { caption: typeof l.caption === 'string' ? l.caption.slice(0, 500) : '', char: typeof l.char === 'string' ? l.char.slice(0, 60) : '' }));
       this.videoMime = m.videoMime || '';
       if (!m.watch) this.translateLines();
       // Zuschauer bleiben bei der Fortschrittsanzeige; die Medien laden im Hintergrund
@@ -264,7 +265,7 @@
       if (!box) return;
       const chars = this.lobbyChars || [];
       box.hidden = !chars.length || this.wishOn === false;
-      const me = this.players.find((p) => p.pid === this.profile.pid);
+      const me = this.players.find((p) => p.pid === this.pub);
       const mine = me ? me.wish : null;
       box.lastChild.replaceChildren(...chars.map((c) => {
         const who = this.players.filter((p) => p.wish === c.n);
@@ -889,7 +890,7 @@
       const open = this.roster.filter((p) => !p.done).length;
       const w = VD.$('#wait-n', this.body); if (w) w.textContent = this.roster.length ? (open ? VD.t('Warte noch auf {n} Spieler …', { n: open }) : VD.t('Alle sind fertig!')) : VD.t('Warte auf die anderen …');
       this._roster.replaceChildren(...this.roster.map((p) => h('div', { class: 'ro-card' + (p.done ? ' done' : ''), style: { '--c': p.color } },
-        VD.ui.avatar(p, 'lg'), h('b', { text: p.pid === this.profile.pid ? VD.t('{name} (du)', { name: p.name }) : p.name }),
+        VD.ui.avatar(p, 'lg'), h('b', { text: p.pid === this.pub ? VD.t('{name} (du)', { name: p.name }) : p.name }),
         h('small', { text: p.done ? VD.t('✓ Fertig') : VD.t('Zeile {c}/{t}', { c: p.cur, t: p.total }) }))));
     }
 

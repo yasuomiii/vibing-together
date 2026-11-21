@@ -242,6 +242,7 @@
   "Untertitel": "Subtítulos",
   "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Subtítulos: la frase de la película se muestra abajo en la imagen.",
   "Sprache": "Idioma",
+  "Eine Zeile im Pack ist zu lang.": "Una línea del pack es demasiado larga.",
   "Gilt sofort. Schon offene Spielbildschirme wechseln beim nächsten Schritt.": "Se aplica al instante. Las pantallas ya abiertas cambian en el siguiente paso.",
   "Schließen": "Cerrar",
   "Nur Favoriten": "Solo favoritos",

@@ -13,7 +13,10 @@
         if (v == null || v === false) continue;
         if (k === 'class') el.className = v;
         else if (k === 'style' && typeof v === 'object') {
-          for (const [sk, sv] of Object.entries(v)) { if (sk.startsWith('--')) el.style.setProperty(sk, sv); else el.style[sk] = sv; }
+          for (const [sk, sv] of Object.entries(v)) {
+            if (sk === '--c') { if (/^#[0-9a-fA-F]{3,8}$/.test(String(sv))) el.style.setProperty(sk, sv); }   // Farben kommen auch von anderen Geräten: nur #-Farben
+            else if (sk.startsWith('--')) el.style.setProperty(sk, sv); else el.style[sk] = sv;
+          }
         }
         else if (k === 'text') el.textContent = v;
         else if (k === 'dataset') Object.assign(el.dataset, v);

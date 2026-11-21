@@ -242,6 +242,7 @@
   "Untertitel": "Sous-titres",
   "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Sous-titres : la réplique du film s'affiche en bas de l'image.",
   "Sprache": "Langue",
+  "Eine Zeile im Pack ist zu lang.": "Une réplique du pack est trop longue.",
   "Gilt sofort. Schon offene Spielbildschirme wechseln beim nächsten Schritt.": "S\'applique tout de suite. Les écrans déjà ouverts changent à l\'étape suivante.",
   "Schließen": "Fermer",
   "Nur Favoriten": "Favoris uniquement",

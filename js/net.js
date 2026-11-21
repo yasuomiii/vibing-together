@@ -42,9 +42,9 @@
   }
 
   class RemoteLink extends Link {
-    constructor(conn, { autoPong = false, maxBlob = MAX_TO_CLIENT } = {}) {
+    constructor(conn, { autoPong = false, maxBlob = MAX_TO_CLIENT, maxRate = 0 } = {}) {
       super();
-      this.conn = conn; this.autoPong = autoPong; this.maxBlob = maxBlob; this.rx = new Map();
+      this.conn = conn; this.autoPong = autoPong; this.maxBlob = maxBlob; this.maxRate = maxRate; this.rateAt = 0; this.rateN = 0; this.rx = new Map();
       conn.on('data', (d) => this._onData(d));
       conn.on('close', () => this._closed());
       conn.on('error', () => this._closed());
@@ -53,6 +53,12 @@
     _onData(m) {
       this.lastSeen = Date.now();
       if (!m || typeof m !== 'object') return;
+      // Host-Seite: Steuernachrichten (ohne Datenstücke) pro Sekunde begrenzen. Wer weit darüber liegt, spamt und wird getrennt.
+      if (this.maxRate && m.t !== 'bc') {
+        const now = Date.now();
+        if (now - this.rateAt > 1000) { this.rateAt = now; this.rateN = 0; }
+        if (++this.rateN > this.maxRate) { this.close(); return; }
+      }
       switch (m.t) {
         case 'ping': if (this.autoPong) this.send({ t: 'pong', ts: m.ts }); return;
         case 'pong':
@@ -164,7 +170,8 @@
       });
     }
     _onConn(conn) {
-      const link = new RemoteLink(conn, { autoPong: true, maxBlob: MAX_TO_HOST });
+      if (this.links.size >= 24) { try { conn.close(); } catch { /* ignore */ } return; }   // weit mehr als Spieler + Wiederverbinden: Rest abweisen
+      const link = new RemoteLink(conn, { autoPong: true, maxBlob: MAX_TO_HOST, maxRate: 100 });
       this.links.add(link);
       let first = true;
       link.on('msg', (m) => { if (first) { first = false; if (m.t === 'hello') this.emit('hello', link, m); else link.close(); } });

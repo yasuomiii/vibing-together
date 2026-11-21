@@ -49,8 +49,34 @@
 
   const probeVideo = (blob) => VD.Video.probe(blob);
 
+  /* Entpackt einen ZIP-Eintrag und bricht ab, sobald mehr als cap Bytes herauskommen. Die Größe im ZIP-Kopf kann gelogen sein
+     (ZIP-Bombe), deshalb zählt nur, was wirklich entpackt wird. */
+  function readCapped(file, cap) {
+    return new Promise((res, rej) => {
+      const parts = []; let n = 0, done = false;
+      const s = file.internalStream('uint8array');
+      s.on('data', (d) => { if (done) return; n += d.length; if (n > cap) { done = true; s.pause(); rej(new Error('too large')); return; } parts.push(d); })
+        .on('error', (e) => { if (!done) { done = true; rej(e); } })
+        .on('end', () => { if (!done) { done = true; res(new Blob(parts)); } });
+      s.resume();
+    });
+  }
+  const MAX_TS = 7200;          // Zeitstempel über 2 Stunden gelten als ungültig (passt zur Vorschau-Grenze)
+  const MAX_TOTAL = 2.5e9;      // Summe aller gelesenen Bytes pro Import
+
   async function buildPacks(rawEntries, fallbackName, onStatus) {
     const entries = rawEntries.map(normEntry).filter(Boolean);
+    let budget = 0;
+    /* Datei lesen, aber nie mehr als cap Bytes (und insgesamt nicht mehr als MAX_TOTAL) */
+    const rd = async (e, cap) => {
+      if (e.size && e.size > cap) throw new Error('too large');
+      const b = await e.read(cap);
+      if (b.size > cap) throw new Error('too large');
+      budget += b.size;
+      if (budget > MAX_TOTAL) throw new Error(VD.t('ZIP enthält zu viele oder zu große Dateien.'));
+      return b;
+    };
+    const optional = async (e, cap) => { try { return await rd(e, cap); } catch (err) { if (budget > MAX_TOTAL) throw err; return null; } };
     const videos = entries.filter((e) => VIDEO_RE.test(baseOf(e.path)));
     const anyIni = entries.some((e) => META_EXT.test(e.path) && !baseOf(e.path).startsWith('_'));
     if (!videos.length) {
@@ -62,7 +88,8 @@
       const D = dirOf(ve.path);
       const mine = entries.filter((e) => dirOf(e.path) === D);
       const info = mine.find((e) => /^_pack_info\.ini$/i.test(baseOf(e.path)));
-      const meta = info ? parseIni(await (await info.read()).text()) : {};
+      const infoBlob = info ? await optional(info, 1048576) : null;
+      const meta = infoBlob ? parseIni(await infoBlob.text()) : {};
       const byStem = new Map();
       for (const e of mine) {
         const b = baseOf(e.path);
@@ -83,16 +110,20 @@
         const g = byStem.get(k);
         if (!g.audio || !g.ini) continue;
         if (pack.lines.length >= LIM.maxClipsPerPack) break;
-        const ini = parseIni(await (await g.ini.read()).text());
+        const iniBlob = await optional(g.ini, 1048576);
+        if (!iniBlob) continue;
+        const ini = parseIni(await iniBlob.text());
         const ts = Array.isArray(ini.dub_timestamps) ? Number(ini.dub_timestamps[0]) : Number(ini.dub_timestamps);
-        if (!isFinite(ts) || ts < 0) continue;
+        if (!isFinite(ts) || ts < 0 || ts > MAX_TS) continue;
         if (g.audio.size && g.audio.size > LIM.maxClipBytes) continue;
+        const audioBlob = await optional(g.audio, LIM.maxClipBytes);
+        if (!audioBlob) continue;
         onStatus && onStatus(VD.t('Lese {name}: Zeile {n}/{total}', { name: pack.name, n: ++n, total: keys.length }));
         const chars = Array.isArray(ini.dub_characters) ? ini.dub_characters : ini.dub_characters ? [ini.dub_characters] : [];
         const ch = String(chars[0] || VD.t('Sprecher')).slice(0, 30);
         pack.lines.push({
           id: 'l_' + VD.uid(), file: baseOf(g.audio.path), caption: String(ini.caption || '').slice(0, 240), char: ch, ts,
-          blob: typed(await g.audio.read(), g.audio.path), imgBlob: g.img ? typed(await g.img.read(), g.img.path) : null
+          blob: typed(audioBlob, g.audio.path), imgBlob: g.img ? await (async () => { const b = await optional(g.img, 25 * 1048576); return b ? typed(b, g.img.path) : null; })() : null
         });
         if (n % 6 === 0) await VD.sleep(0);
       }
@@ -101,15 +132,20 @@
       pack.chars = Array.from(new Set(pack.lines.map((l) => l.char)));
       if (ve.size && ve.size > LIM.maxVideoBytes) throw new Error(VD.t('Das Video ist größer als {mb} MB.', { mb: Math.round(LIM.maxVideoBytes / 1048576) }));
       onStatus && onStatus(VD.t('Lese Video …'));
-      pack.video = typed(await ve.read(), ve.path);
+      try { pack.video = typed(await rd(ve, LIM.maxVideoBytes), ve.path); }
+      catch (err) { if (err && err.message === 'too large') throw new Error(VD.t('Das Video ist größer als {mb} MB.', { mb: Math.round(LIM.maxVideoBytes / 1048576) })); throw err; }
       pack.videoName = baseOf(ve.path);
       pack.videoDur = await probeVideo(pack.video);
       if (!pack.videoDur) throw new Error(VD.t('Dein Browser kann dieses Video nicht abspielen (Format nicht unterstützt).'));
+      // Zeilen weit hinter dem Ende des Videos sind ungültig (sonst würde die Szene riesig)
+      pack.lines = pack.lines.filter((l) => l.ts <= pack.videoDur * 1.5 + 30);
+      if (!pack.lines.length) throw new Error(VD.t('Im Pack gibt es keine Zeilen mit Zeitstempel (.ini oder .txt mit dub_timestamps).'));
+      pack.chars = Array.from(new Set(pack.lines.map((l) => l.char)));
       const be = mine.find((e) => BACK_RE.test(baseOf(e.path)));
-      if (be) pack.backing = typed(await be.read(), be.path);
+      if (be) { const b = await optional(be, LIM.maxVideoBytes); if (b) pack.backing = typed(b, be.path); }
       const iconName = String(meta.icon || 'icon.png').toLowerCase();
       const ie = mine.find((e) => baseOf(e.path).toLowerCase() === iconName) || mine.find((e) => /^icon\.(png|jpe?g|webp)$/i.test(baseOf(e.path)));
-      if (ie) pack.iconBlob = typed(await ie.read(), ie.path);
+      if (ie) { const b = await optional(ie, 5 * 1048576); if (b) pack.iconBlob = typed(b, ie.path); }
       out.push(pack);
     }
     return out;
@@ -124,13 +160,13 @@
       if (file.dir) return;
       const size = (file._data && file._data.uncompressedSize) || 0;
       total += size;
-      entries.push({ path, size, read: () => file.async('blob') });
+      entries.push({ path, size, read: (cap) => readCapped(file, cap || LIM.maxVideoBytes) });
     });
     if (entries.length > 20000 || total > 2.5e9) throw new Error(VD.t('ZIP enthält zu viele oder zu große Dateien.'));
     if (depth < 1) {
       for (const e of entries.slice()) {
         if (/\.zip$/i.test(e.path) && e.size < LIM.maxZipBytes) {
-          try { const inner = await entriesFromZip(await e.read(), depth + 1); const pre = dirOf(e.path); inner.forEach((i) => entries.push({ ...i, path: (pre ? pre + '/' : '') + stem(baseOf(e.path)) + '/' + i.path })); } catch { /* ignore */ }
+          try { const inner = await entriesFromZip(await e.read(LIM.maxZipBytes), depth + 1); const pre = dirOf(e.path); inner.forEach((i) => entries.push({ ...i, path: (pre ? pre + '/' : '') + stem(baseOf(e.path)) + '/' + i.path })); } catch { /* ignore */ }
         }
       }
     }

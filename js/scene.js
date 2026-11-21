@@ -23,6 +23,7 @@
     for (const l of pack.lines) {
       onStatus && onStatus(VD.t('Bereite Zeile {n}/{total} vor …', { n: ++n, total: pack.lines.length }));
       const buf = await VD.Packs.getBuffer(l);
+      if (!(buf.duration <= 600)) throw new Error(VD.t('Eine Zeile im Pack ist zu lang.'));   // Schutz vor riesigen Ton-Dateien im Pack
       const mono = VD.audio.toMono(buf);
       const v16 = await VD.audio.resample(mono, buf.sampleRate, 16000);
       lines.push({ idx: lines.length, id: l.id, caption: l.caption, char: l.char, ts: l.ts, dur: buf.duration, v16, imgBlob: l.imgBlob });

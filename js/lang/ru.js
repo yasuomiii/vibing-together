@@ -242,6 +242,7 @@
   "Untertitel": "Субтитры",
   "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Субтитры: реплика из фильма показывается внизу кадра.",
   "Sprache": "Язык",
+  "Eine Zeile im Pack ist zu lang.": "Одна из реплик в паке слишком длинная.",
   "Gilt sofort. Schon offene Spielbildschirme wechseln beim nächsten Schritt.": "Действует сразу. Уже открытые экраны сменятся на следующем шаге.",
   "Schließen": "Закрыть",
   "Nur Favoriten": "Только избранное",

@@ -242,6 +242,7 @@
   "Untertitel": "Legendas",
   "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Legendas: a fala do filme aparece na parte de baixo da imagem.",
   "Sprache": "Idioma",
+  "Eine Zeile im Pack ist zu lang.": "Uma fala do pack é longa demais.",
   "Gilt sofort. Schon offene Spielbildschirme wechseln beim nächsten Schritt.": "Vale na hora. Telas já abertas mudam no próximo passo.",
   "Schließen": "Fechar",
   "Nur Favoriten": "Só favoritos",
