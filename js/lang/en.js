@@ -239,6 +239,8 @@
   "Stimmeffekte erlauben": "Allow voice effects",
   "Einstellungen": "Settings",
   "Gilt nur für dieses Gerät.": "Applies to this device only.",
+  "Untertitel": "Subtitles",
+  "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Subtitles: the film line is shown at the bottom of the picture.",
   "Schließen": "Close",
   "Nur Favoriten": "Only favorites",
   "Markiere ein Pack mit dem Stern, um es hier zu filtern.": "Mark a pack with the star to filter it here.",

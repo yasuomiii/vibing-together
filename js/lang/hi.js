@@ -239,6 +239,8 @@
   "Stimmeffekte erlauben": "आवाज़ के इफ़ेक्ट की अनुमति दें",
   "Einstellungen": "सेटिंग्स",
   "Gilt nur für dieses Gerät.": "यह सिर्फ़ इसी डिवाइस पर लागू होता है।",
+  "Untertitel": "उपशीर्षक",
+  "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "उपशीर्षक: फ़िल्म की लाइन तस्वीर के नीचे दिखाई जाती है।",
   "Schließen": "बंद करें",
   "Nur Favoriten": "सिर्फ़ पसंदीदा",
   "Markiere ein Pack mit dem Stern, um es hier zu filtern.": "किसी पैक पर तारा लगाओ, फिर उसे यहाँ फ़िल्टर कर सकोगे।",

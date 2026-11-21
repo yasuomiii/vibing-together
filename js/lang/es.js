@@ -239,6 +239,8 @@
   "Stimmeffekte erlauben": "Permitir efectos de voz",
   "Einstellungen": "Ajustes",
   "Gilt nur für dieses Gerät.": "Solo vale para este dispositivo.",
+  "Untertitel": "Subtítulos",
+  "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Subtítulos: la frase de la película se muestra abajo en la imagen.",
   "Schließen": "Cerrar",
   "Nur Favoriten": "Solo favoritos",
   "Markiere ein Pack mit dem Stern, um es hier zu filtern.": "Marca un pack con la estrella para filtrarlo aquí.",

@@ -114,8 +114,9 @@
       this.box = h('div', { class: 'modal pv-modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'pvc-t' },
         h('div', { class: 'modal-card pv-card' },
           h('h2', { id: 'pvc-t', text: VD.t('Vorschau vom Host') + ': ' + this.pv.title }),
-          this.screen, this.status, h('div', { class: 'pv-ctl' }, this.track, this.time)));
+          this.screen, this.status, h('div', { class: 'pv-ctl' }, this.track, this.time, VD.ui.subsBtn())));
       document.body.append(this.box);
+      this.offSubs = VD.subsWatch(() => this.render());
     }
     say(t) { if (this.status) { this.status.hidden = !t; this.status.textContent = t || ''; } }
     lineAt(t) {
@@ -128,8 +129,9 @@
       this.time.textContent = fmt(pv.pos) + ' / ' + fmt(pv.dur);
       this.track.setAttribute('aria-valuenow', String(Math.round(pv.pos)));
       const l = this.lineAt(pv.pos);
-      this.sub.classList.toggle('on', !!l);
-      if (l) { this.subChar.textContent = l.char.toUpperCase() + ' '; this.subText.textContent = l.caption; }
+      const showSub = !!l && VD.subsOn();
+      this.sub.classList.toggle('on', showSub);
+      if (showSub) { this.subChar.textContent = l.char.toUpperCase() + ' '; this.subText.textContent = l.caption; }
       if (!pv.video || pv.video.hidden) {   // Standbild: zuletzt begonnene Zeile mit Bild, sonst das erste vorhandene
         let pick = null;
         for (const x of pv.lines) if (pv.stills.has(x.i) && x.ts - 0.5 <= pv.pos) pick = x;
@@ -203,6 +205,7 @@
       const pv = this.pv; if (!pv) return;
       this.stopPlay();
       this.pv = null;
+      if (this.offSubs) { this.offSubs(); this.offSubs = null; }
       clearTimeout(pv.dogT);
       if (pv.video) { VD.Video.dispose(pv.video); pv.video = null; }
       pv.urls.forEach((u) => URL.revokeObjectURL(u)); pv.urls.length = 0;

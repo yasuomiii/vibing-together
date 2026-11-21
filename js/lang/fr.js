@@ -239,6 +239,8 @@
   "Stimmeffekte erlauben": "Autoriser les effets de voix",
   "Einstellungen": "Réglages",
   "Gilt nur für dieses Gerät.": "Ne s'applique qu'à cet appareil.",
+  "Untertitel": "Sous-titres",
+  "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Sous-titres : la réplique du film s'affiche en bas de l'image.",
   "Schließen": "Fermer",
   "Nur Favoriten": "Favoris uniquement",
   "Markiere ein Pack mit dem Stern, um es hier zu filtern.": "Marque un pack avec l'étoile pour le filtrer ici.",

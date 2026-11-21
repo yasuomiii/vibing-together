@@ -239,6 +239,8 @@
   "Stimmeffekte erlauben": "Permitir efeitos de voz",
   "Einstellungen": "Configurações",
   "Gilt nur für dieses Gerät.": "Vale só para este dispositivo.",
+  "Untertitel": "Legendas",
+  "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Legendas: a fala do filme aparece na parte de baixo da imagem.",
   "Schließen": "Fechar",
   "Nur Favoriten": "Só favoritos",
   "Markiere ein Pack mit dem Stern, um es hier zu filtern.": "Marque um pack com a estrela para filtrá-lo aqui.",

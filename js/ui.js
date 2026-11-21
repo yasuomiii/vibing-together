@@ -43,6 +43,13 @@
       b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>';
       return b;
     },
+    /* Kleiner "CC"-Knopf für die Vorschau: schaltet VD.subsOn() um und folgt Änderungen von anderswo (Einstellungen, anderer Tab). */
+    subsBtn() {
+      const b = h('button', { class: 'btn sm pv-cc', type: 'button', title: VD.t('Untertitel'), 'aria-label': VD.t('Untertitel'), 'aria-pressed': String(VD.subsOn()), onclick: () => { VD.subsToggle(); VD.sfx.play('tap'); } },
+        h('b', { class: 'pv-cc-i', 'aria-hidden': 'true', text: 'CC' }), h('span', { class: 'pv-cc-t', text: VD.t('Untertitel') }));
+      const off = VD.subsWatch((on) => { if (!b.isConnected) { off(); return; } b.setAttribute('aria-pressed', String(on)); });
+      return b;
+    },
     /* getCtrl: liefert (falls vorhanden) den Spieler-Controller; dann erscheint auch die Wahl des Stimmeffekts. */
     openSettings(from, getCtrl) {
       if (document.querySelector('.modal.set-modal')) return;
@@ -69,9 +76,12 @@
         return h('div', { class: 'set-item' }, h('span', { class: 'field-l', text: label }), wrap);
       };
       const sync = mkSwitch(VD.t('Auto-Sync'), () => VD.store.get('autosync', true) !== false, (v) => VD.store.set('autosync', v));
+      const subs = mkSwitch(VD.t('Untertitel'), () => VD.subsOn(), (v) => VD.subsSet(v));
+      const offSubs = VD.subsWatch((on) => { if (!subs.isConnected) { offSubs(); return; } subs.classList.toggle('on', on); subs.setAttribute('aria-checked', String(on)); });
       const items = [
         h('div', { class: 'set-item' }, sync, h('p', { class: 'muted', text: VD.t('Auto-Sync: Der Sprachanfang wird an die Originalzeile angepasst.') })),
-        mkSeg(VD.t('Countdown'), [{ v: 0, t: VD.t('Aus') }, { v: 3, t: VD.t('3 Sekunden') }, { v: 5, t: VD.t('5 Sekunden') }], Number(VD.store.get('countdown', 0)) || 0, (v) => VD.store.set('countdown', v))
+        mkSeg(VD.t('Countdown'), [{ v: 0, t: VD.t('Aus') }, { v: 3, t: VD.t('3 Sekunden') }, { v: 5, t: VD.t('5 Sekunden') }], Number(VD.store.get('countdown', 0)) || 0, (v) => VD.store.set('countdown', v)),
+        h('div', { class: 'set-item' }, subs, h('p', { class: 'muted', text: VD.t('Untertitel: Die Filmzeile wird unten im Bild eingeblendet.') }))
       ];
       if (ctrl && ctrl.fxAllowed && ctrl.fxAllowed()) items.push(h('div', { class: 'set-item' }, mkSwitch(VD.t('Stimmeffekte'), () => ctrl.fxEnabled(), (v) => ctrl.fxToggle(v))));
       items.push(h('div', { class: 'set-item' }, mkSwitch(VD.t('Musik'), () => VD.music.isOn(), (v) => { if (v !== VD.music.isOn()) VD.music.toggle(); })));

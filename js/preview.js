@@ -40,12 +40,15 @@
       if (master) master.gain.value = pvVol;
     } });
     const volRow = h('label', { class: 'pv-volrow' }, h('span', { class: 'field-l' }, VD.t('Lautstärke') + ' ', pct), vol);
+    const ccBtn = VD.ui.subsBtn();
+    const optRow = h('div', { class: 'pv-opts' }, volRow, ccBtn);
+    const offSubs = VD.subsWatch(() => { if (!disposed) render(); });   // Umlegen wirkt sofort, auch bei Pause
     const closeBtn = h('button', { class: 'btn', type: 'button', onclick: () => close() }, VD.t('Schließen'));
     const box = h('div', { class: 'modal pv-modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'pv-t', onclick: (e) => { if (e.target === box) close(); } },
       h('div', { class: 'modal-card pv-card' },
         h('h2', { id: 'pv-t', text: VD.t('Vorschau') + ': ' + pack.name }),
         screen, status,
-        h('div', { class: 'pv-ctl' }, playBtn, track, time), volRow,
+        h('div', { class: 'pv-ctl' }, playBtn, track, time), optRow,
         h('div', { class: 'modal-btns' }, soloBtn, closeBtn)));
 
     /* ---------- Anzeige ---------- */
@@ -66,8 +69,9 @@
       time.textContent = fmt(pos) + ' / ' + fmt(total);
       track.setAttribute('aria-valuenow', String(Math.round(pos)));
       const l = lineAt(pos);
-      sub.classList.toggle('on', !!l);
-      if (l) { subChar.textContent = (l.char || '').toUpperCase() + ' '; subText.textContent = l.caption || ''; }
+      const showSub = !!l && VD.subsOn();
+      sub.classList.toggle('on', showSub);
+      if (showSub) { subChar.textContent = (l.char || '').toUpperCase() + ' '; subText.textContent = l.caption || ''; }
       if (!video || video.hidden) {
         const u = stillFor(pos);
         if (u && still.getAttribute('src') !== u) still.src = u;
@@ -190,7 +194,7 @@
 
     function close() {
       if (disposed) return;
-      disposed = true; token++; try { if (master) master.disconnect(); } catch { /* ignore */ }
+      disposed = true; token++; offSubs(); try { if (master) master.disconnect(); } catch { /* ignore */ }
       clearTimeout(hintT);
       if (pvs && ctl && ctl.pv === pvs) ctl.pvClose();   // alle Handys beenden die Vorschau
       pvs = null; shared = false;

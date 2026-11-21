@@ -239,6 +239,8 @@
   "Stimmeffekte erlauben": "Разрешить эффекты голоса",
   "Einstellungen": "Настройки",
   "Gilt nur für dieses Gerät.": "Действует только на этом устройстве.",
+  "Untertitel": "Субтитры",
+  "Untertitel: Die Filmzeile wird unten im Bild eingeblendet.": "Субтитры: реплика из фильма показывается внизу кадра.",
   "Schließen": "Закрыть",
   "Nur Favoriten": "Только избранное",
   "Markiere ein Pack mit dem Stern, um es hier zu filtern.": "Отметь пак звёздочкой, чтобы фильтровать его здесь.",

@@ -427,7 +427,9 @@
       const dur = line.s1 - line.s0;
       const token = (this.playToken = (this.playToken || 0) + 1);
       u.sub.classList.toggle('on', !!opt.subtitle);
-      if (opt.subtitle) u.sub.textContent = line.caption;
+      u.subLine = opt.subtitle ? line : null;
+      if (opt.subtitle && VD.subsOn()) u.sub.textContent = line.caption;
+      if (!u.subOff) u.subOff = VD.subsWatch((on) => { if (!u.sub.isConnected) { u.subOff(); u.subOff = null; return; } if (on && u.subLine && u.sub.classList.contains('on')) u.sub.textContent = u.subLine.caption; });
       let vt0 = line.s0, sync;
       if (u.video) {
         const v = u.video;
@@ -461,7 +463,7 @@
       if (u) {
         if (u.video) { try { u.video.pause(); } catch { /* ignore */ } u.video.hidden = true; }
         if (u.still && u.line.img) u.still.hidden = false;
-        u.sub.classList.remove('on');
+        u.sub.classList.remove('on'); u.subLine = null;
         u.bar.style.transition = 'none'; u.bar.style.transform = 'scaleX(0)';
       }
     }

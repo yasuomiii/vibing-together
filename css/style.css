@@ -1084,6 +1084,14 @@ html[data-theme="light"] .btn.mk-launch, html[data-theme="light"] .btn.mk-launch
 .pv-screen { --ar: 1.7778; aspect-ratio: var(--ar); width: min(100%, calc(52vh * var(--ar))); justify-self: center; }
 .pv-sub { opacity: 0; bottom: 8%; }
 .pv-sub.on { opacity: 1; }
+.subs-off .dp-sub { display: none; }
+.pv-opts { display: flex; align-items: flex-end; gap: .8rem; width: 100%; }
+.pv-opts .pv-volrow { flex: 1 1 auto; min-width: 0; width: auto; }
+.pv-cc { flex: none; display: inline-flex; align-items: center; gap: .45rem; white-space: nowrap; }
+.pv-cc-i { font-size: .72rem; line-height: 1; padding: .18rem .3rem; border-radius: 5px; border: 2px solid currentColor; letter-spacing: .02em; }
+.pv-cc[aria-pressed="true"] { background: var(--teal); border-color: var(--teal-deep); color: #fff; }
+.pv-cc:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+@media (max-width: 30rem) { .pv-cc-t { display: none; } .pv-ctl .pv-cc { order: 2; } }
 .pv-char { color: var(--accent-2); margin-right: .15em; }
 .pv-status { text-align: center; }
 .pv-ctl { display: flex; align-items: center; gap: .8rem; width: 100%; }

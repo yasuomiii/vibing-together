@@ -46,6 +46,18 @@
     set(k, v) { try { localStorage.setItem('vd.' + k, JSON.stringify(v)); } catch { /* ignore */ } }
   };
 
+  /* Untertitel über dem Bild (pro Gerät, Standard AN). Einzige Quelle: VD.subsOn(). Ungültige Werte zählen als AN.
+     Die Klasse "subs-off" an <html> blendet alle .dp-sub aus; VD.subsWatch meldet Änderungen (auch aus anderen Tabs). */
+  const subsCbs = new Set();
+  VD.subsOn = () => VD.store.get('subtitles', true) !== false;
+  const subsApply = () => { try { document.documentElement.classList.toggle('subs-off', !VD.subsOn()); } catch { /* ignore */ } };
+  const subsFire = () => { subsApply(); const on = VD.subsOn(); subsCbs.forEach((f) => { try { f(on); } catch (e) { console.warn('Untertitel', e); } }); };
+  VD.subsSet = (v) => { const on = v !== false; if (on === VD.subsOn() && VD.store.get('subtitles', true) === on) return; VD.store.set('subtitles', on); subsFire(); };
+  VD.subsToggle = () => { VD.subsSet(!VD.subsOn()); return VD.subsOn(); };
+  VD.subsWatch = (f) => { subsCbs.add(f); return () => subsCbs.delete(f); };
+  subsApply();
+  window.addEventListener('storage', (e) => { if (e.key === 'vd.subtitles' || e.key === null) subsFire(); });
+
   VD.f32ToI16 = (f) => {
     const o = new Int16Array(f.length);
     for (let i = 0; i < f.length; i++) { const v = Math.max(-1, Math.min(1, f[i])); o[i] = v < 0 ? v * 0x8000 : v * 0x7fff; }
