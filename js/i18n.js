@@ -19,6 +19,18 @@
   VD.lang = lang;
   VD.missing = new Set();
   VD.addLang = (code, words) => { dict[code] = Object.assign(dict[code] || {}, words); };
+  /* Sprache wechseln OHNE Neuladen (im Raum, damit niemand rausfliegt): Texte in index.html neu setzen, dann melden sich
+     die Ansichten über VD.onLang an und zeichnen sich neu. Gibt true zurück, wenn gewechselt wurde. */
+  const langCbs = new Set();
+  VD.onLang = (f) => { langCbs.add(f); return () => langCbs.delete(f); };
+  VD.setLangLive = (code) => {
+    if (!codes.includes(code) || code === lang) return false;
+    try { localStorage.setItem('vt-lang', code); } catch { /* ignore */ }
+    lang = code; VD.lang = code;
+    VD.applyI18n();
+    langCbs.forEach((f) => { try { f(code); } catch (e) { console.warn('Sprache', e); } });
+    return true;
+  };
   VD.setLang = (code) => { try { localStorage.setItem('vt-lang', code); } catch { /* ignore */ } location.reload(); };
 
   /* Text in der eingestellten Sprache; {name} im Text wird durch p.name ersetzt */

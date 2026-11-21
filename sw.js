@@ -1,7 +1,7 @@
 /* Service Worker: App-Dateien offline verfügbar machen. Spielen mit anderen braucht weiterhin Internet (WebRTC).
    WICHTIG: Bei jeder Änderung an den Dateien VERSION erhöhen, sonst sehen Geräte mit altem Cache die Änderung nicht
    (bzw. erst nach dem Neuladen im Hintergrund). Neue Dateien auch in APP_FILES eintragen. */
-const VERSION = 11;
+const VERSION = 12;
 const APP_CACHE = 'vibing-app-v' + VERSION;      // App-Dateien, wird bei jeder neuen Version ersetzt
 const BIG_CACHE = 'vibing-big-v1';               // große Bibliotheken (ogv, transformers, rnnoise.wasm): erst beim ersten Benutzen
 

@@ -89,18 +89,17 @@
       const rng = h('input', { type: 'range', class: 'set-range', min: '0', max: '100', step: '1', value: String(Math.round(VD.music.volume() * 100)), 'aria-label': VD.t('Musik-Lautstärke'), oninput: () => { VD.music.setVolume(Number(rng.value) / 100); pct.textContent = rng.value + ' %'; } });
       items.push(h('div', { class: 'set-item' }, mkSwitch(VD.t('Musik'), () => VD.music.isOn(), (v) => { if (v !== VD.music.isOn()) VD.music.toggle(); }),
         h('span', { class: 'field-l' }, VD.t('Musik-Lautstärke') + ' ', pct), rng));
-      if (opts && opts.lang) {   // im Raum: Sprache hier statt außen. Wechsel lädt die Seite neu; der Host schließt dabei seinen Raum, deshalb dort erst bestätigen.
-        const host = opts.lang === 'host';
-        const note = h('p', { class: 'muted', role: 'status', text: host ? VD.t('Beim Sprachwechsel wird die Seite neu geladen und der Raum geschlossen.') : VD.t('Beim Sprachwechsel wird die Seite neu geladen. Danach steigst du mit einem Tipp wieder in den Raum ein.') });
-        let ask = '';
+      if (opts && opts.lang) {   // im Raum: Sprache hier statt außen. Wechsel gilt sofort, ohne Neuladen (man bleibt im Raum).
         const wrap = h('div', { class: 'fx-chips', role: 'radiogroup', 'aria-label': VD.t('Sprache') }, ...VD.LANGS.map((l) => h('button', {
           type: 'button', role: 'radio', lang: l.c, 'aria-checked': String(l.c === VD.lang), class: 'fx-chip' + (l.c === VD.lang ? ' on' : ''),
           onclick: () => {
             if (l.c === VD.lang) return;
-            if (host && ask !== l.c) { ask = l.c; note.textContent = VD.t('Zum Bestätigen noch einmal tippen: Der Raum wird geschlossen und die Seite neu geladen.'); note.classList.add('warn'); click(); return; }
-            click(); VD.setLang(l.c);
+            click();
+            close();                 // Menü schließen und gleich in der neuen Sprache wieder öffnen
+            VD.setLangLive(l.c);
+            setTimeout(() => VD.ui.openSettings(null, getCtrl, opts), 0);
           } }, l.n)));
-        items.push(h('div', { class: 'set-item' }, h('span', { class: 'field-l', text: VD.t('Sprache') }), wrap, note));
+        items.push(h('div', { class: 'set-item' }, h('span', { class: 'field-l', text: VD.t('Sprache') }), wrap, h('p', { class: 'muted', text: VD.t('Gilt sofort. Schon offene Spielbildschirme wechseln beim nächsten Schritt.') })));
       }
       const box = h('div', { class: 'modal set-modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'set-t', onclick: (e) => { if (e.target === box) close(); } },
         h('div', { class: 'modal-card' },

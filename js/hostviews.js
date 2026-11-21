@@ -32,15 +32,29 @@
 
   const views = {
     /* ---------- Rahmen ---------- */
+    /* Kopfzeile (wird bei Sprachwechsel neu gebaut) */
+    buildHeader() {
+      const full = h('button', { class: 'icon-btn', title: VD.t('Vollbild'), 'aria-label': VD.t('Vollbild'), onclick: () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } }, '⛶');
+      this.dnBtn = VD.Denoise.iconEl(); this.dnBtn.hidden = true;
+      const header = h('header', { class: 'h-top' }, h('div', { class: 'brand', text: window.VD_CONFIG.appName }), this.roomChip, h('div', { class: 'h-tools' }, this.dnBtn, VD.ui.themeBtn(), VD.ui.settingsBtn(() => this.local && this.local.ctrl, { lang: 'host' }), full));
+      return header;
+    },
+    /* Sprachwechsel im Raum (ohne Neuladen): Kopfzeile, Leisten und die Lobby neu zeichnen. Andere Bildschirme (Aufnahme, Ergebnis) wechseln beim nächsten Schritt. */
+    relang() {
+      const old = this.root.querySelector('header.h-top');
+      if (old) old.replaceWith(this.buildHeader());
+      this.stripMap = new Map(); this.strip.replaceChildren(); this.barRefs = null;   // Leisten mit neuen Texten neu aufbauen
+      this.updateRoomChip(); this.refreshStrip(); this.updateBar();
+      if (this.state === 'lobby') { this.showStage('lobby', () => this.buildLobby()); this.renderLobbyPlayers(); this.renderPacks(); }
+    },
+
     buildFrame() {
       this.stage = h('main', { class: 'h-stage', id: 'stage' });
       this.strip = h('footer', { class: 'h-strip', id: 'strip' });
       this.bar = h('div', { class: 'h-bar', id: 'hbar', hidden: true });
       this.roomChip = h('div', { class: 'room-chip' });
-      const full = h('button', { class: 'icon-btn', title: VD.t('Vollbild'), 'aria-label': VD.t('Vollbild'), onclick: () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } }, '⛶');
-      this.dnBtn = VD.Denoise.iconEl(); this.dnBtn.hidden = true;
-      const header = h('header', { class: 'h-top' }, h('div', { class: 'brand', text: window.VD_CONFIG.appName }), this.roomChip, h('div', { class: 'h-tools' }, this.dnBtn, VD.ui.themeBtn(), VD.ui.settingsBtn(() => this.local && this.local.ctrl, { lang: 'host' }), full));
-      this.root.replaceChildren(header, this.stage, this.strip, this.bar);
+      this.root.replaceChildren(this.buildHeader(), this.stage, this.strip, this.bar);
+      if (!this.langOff) this.langOff = VD.onLang(() => this.relang());
       this.stripMap = new Map();
       this.barRefs = null;
       // Echte Höhe der Steuerleiste merken: Auf schmalen Bildschirmen ist sie zweizeilig und damit höher als der feste

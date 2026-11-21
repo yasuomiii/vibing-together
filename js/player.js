@@ -34,6 +34,7 @@
       this.viewKey = '';
       this.setView('wait', () => this.vWait(VD.t('Verbinde …')));
       // Wellenform passt sich sofort an, wenn das Design gewechselt oder das Fenster in der Größe geändert wird
+      this.langOff = VD.onLang(() => this.relang());
       this._onRedraw = () => this.waveRender();
       document.addEventListener('vt-theme', this._onRedraw);
       window.addEventListener('resize', this._onRedraw);
@@ -207,6 +208,11 @@
       // Im Spiel sitzt der Filter-Knopf oben; der Host hat ihn in seiner eigenen Kopfzeile
       const dn = this.canRecord && !this.local && this.phase !== 'lobby' ? VD.Denoise.iconEl() : null;
       this.top.replaceChildren(VD.ui.avatar(this.profile, 'sm'), h('span', { class: 'pc-name', text: this.profile.name }), ...(dn ? [dn] : []), ...(this.local ? [] : [VD.ui.themeBtn(), VD.ui.settingsBtn(() => this, { lang: 'player' })]));
+    }
+    /* Sprachwechsel im Raum (ohne Neuladen): Kopfzeile und Lobby neu zeichnen, andere Ansichten (Aufnahme, Ergebnis) wechseln beim nächsten Schritt */
+    relang() {
+      this.renderTop();
+      if (this.viewKey === 'lobby') this.setView('lobby', () => this.vLobby(), true);
     }
     setView(key, build, force) {
       if (this.viewKey === key && !force) return this.body.firstElementChild;
