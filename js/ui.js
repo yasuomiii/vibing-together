@@ -38,8 +38,8 @@
     },
 
     /* Einstellungen auf der Startseite (pro Gerät): Auto-Sync und Countdown. Die Werte liegen in VD.store (autosync, countdown). */
-    settingsBtn(getCtrl) {
-      const b = h('button', { class: 'icon-btn glass settings-btn', type: 'button', title: VD.t('Einstellungen'), 'aria-label': VD.t('Einstellungen'), 'aria-haspopup': 'dialog', onclick: () => VD.ui.openSettings(b, getCtrl) });
+    settingsBtn(getCtrl, opts) {
+      const b = h('button', { class: 'icon-btn glass settings-btn', type: 'button', title: VD.t('Einstellungen'), 'aria-label': VD.t('Einstellungen'), 'aria-haspopup': 'dialog', onclick: () => VD.ui.openSettings(b, getCtrl, opts) });
       b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>';
       return b;
     },
@@ -51,7 +51,8 @@
       return b;
     },
     /* getCtrl: liefert (falls vorhanden) den Spieler-Controller; dann erscheint auch die Wahl des Stimmeffekts. */
-    openSettings(from, getCtrl) {
+    /* opts.lang: 'host' | 'player' = im Raum (Lobby/Spiel): zusätzlich Sprachwahl; auf der Startseite gibt es dafür den Knopf oben. */
+    openSettings(from, getCtrl, opts) {
       if (document.querySelector('.modal.set-modal')) return;
       const ctrl = getCtrl && getCtrl();
       const close = () => { box.remove(); document.removeEventListener('keydown', onKey); if (from && from.isConnected) from.focus(); };
@@ -84,10 +85,23 @@
         h('div', { class: 'set-item' }, subs, h('p', { class: 'muted', text: VD.t('Untertitel: Die Filmzeile wird unten im Bild eingeblendet.') }))
       ];
       if (ctrl && ctrl.fxAllowed && ctrl.fxAllowed()) items.push(h('div', { class: 'set-item' }, mkSwitch(VD.t('Stimmeffekte'), () => ctrl.fxEnabled(), (v) => ctrl.fxToggle(v))));
-      items.push(h('div', { class: 'set-item' }, mkSwitch(VD.t('Musik'), () => VD.music.isOn(), (v) => { if (v !== VD.music.isOn()) VD.music.toggle(); })));
       const pct = h('b', { class: 'set-pct', text: Math.round(VD.music.volume() * 100) + ' %' });
       const rng = h('input', { type: 'range', class: 'set-range', min: '0', max: '100', step: '1', value: String(Math.round(VD.music.volume() * 100)), 'aria-label': VD.t('Musik-Lautstärke'), oninput: () => { VD.music.setVolume(Number(rng.value) / 100); pct.textContent = rng.value + ' %'; } });
-      items.push(h('div', { class: 'set-item' }, h('span', { class: 'field-l' }, VD.t('Musik-Lautstärke') + ' ', pct), rng));
+      items.push(h('div', { class: 'set-item' }, mkSwitch(VD.t('Musik'), () => VD.music.isOn(), (v) => { if (v !== VD.music.isOn()) VD.music.toggle(); }),
+        h('span', { class: 'field-l' }, VD.t('Musik-Lautstärke') + ' ', pct), rng));
+      if (opts && opts.lang) {   // im Raum: Sprache hier statt außen. Wechsel lädt die Seite neu; der Host schließt dabei seinen Raum, deshalb dort erst bestätigen.
+        const host = opts.lang === 'host';
+        const note = h('p', { class: 'muted', role: 'status', text: host ? VD.t('Beim Sprachwechsel wird die Seite neu geladen und der Raum geschlossen.') : VD.t('Beim Sprachwechsel wird die Seite neu geladen. Danach steigst du mit einem Tipp wieder in den Raum ein.') });
+        let ask = '';
+        const wrap = h('div', { class: 'fx-chips', role: 'radiogroup', 'aria-label': VD.t('Sprache') }, ...VD.LANGS.map((l) => h('button', {
+          type: 'button', role: 'radio', lang: l.c, 'aria-checked': String(l.c === VD.lang), class: 'fx-chip' + (l.c === VD.lang ? ' on' : ''),
+          onclick: () => {
+            if (l.c === VD.lang) return;
+            if (host && ask !== l.c) { ask = l.c; note.textContent = VD.t('Zum Bestätigen noch einmal tippen: Der Raum wird geschlossen und die Seite neu geladen.'); note.classList.add('warn'); click(); return; }
+            click(); VD.setLang(l.c);
+          } }, l.n)));
+        items.push(h('div', { class: 'set-item' }, h('span', { class: 'field-l', text: VD.t('Sprache') }), wrap, note));
+      }
       const box = h('div', { class: 'modal set-modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'set-t', onclick: (e) => { if (e.target === box) close(); } },
         h('div', { class: 'modal-card' },
           h('h2', { id: 'set-t', text: VD.t('Einstellungen') }),

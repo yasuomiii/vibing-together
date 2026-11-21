@@ -39,7 +39,7 @@
       this.roomChip = h('div', { class: 'room-chip' });
       const full = h('button', { class: 'icon-btn', title: VD.t('Vollbild'), 'aria-label': VD.t('Vollbild'), onclick: () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } }, '⛶');
       this.dnBtn = VD.Denoise.iconEl(); this.dnBtn.hidden = true;
-      const header = h('header', { class: 'h-top' }, h('div', { class: 'brand', text: window.VD_CONFIG.appName }), this.roomChip, h('div', { class: 'h-tools' }, this.dnBtn, VD.ui.themeBtn(), VD.ui.settingsBtn(() => this.local && this.local.ctrl), full));
+      const header = h('header', { class: 'h-top' }, h('div', { class: 'brand', text: window.VD_CONFIG.appName }), this.roomChip, h('div', { class: 'h-tools' }, this.dnBtn, VD.ui.themeBtn(), VD.ui.settingsBtn(() => this.local && this.local.ctrl, { lang: 'host' }), full));
       this.root.replaceChildren(header, this.stage, this.strip, this.bar);
       this.stripMap = new Map();
       this.barRefs = null;
@@ -69,10 +69,7 @@
 
     updateRoomChip() {
       if (!this.code) { this.roomChip.replaceChildren(h('span', { class: 'rc-off', text: VD.t('Nur lokal') })); return; }
-      const url = VD.joinUrl(this.code);
-      const qr = h('div', { class: 'rc-qr', title: url });
-      qr.innerHTML = qrSvg(url);
-      this.roomChip.replaceChildren(h('span', { class: 'rc-l', text: VD.t('Raum') }), h('b', { class: 'rc-code', text: this.code }), qr);
+      this.roomChip.replaceChildren(h('span', { class: 'rc-l', text: VD.t('Raum') }), h('b', { class: 'rc-code', text: this.code }));
     },
 
     /* ---------- Spielerleiste ---------- */

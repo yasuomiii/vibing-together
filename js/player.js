@@ -206,7 +206,7 @@
     renderTop() {
       // Im Spiel sitzt der Filter-Knopf oben; der Host hat ihn in seiner eigenen Kopfzeile
       const dn = this.canRecord && !this.local && this.phase !== 'lobby' ? VD.Denoise.iconEl() : null;
-      this.top.replaceChildren(VD.ui.avatar(this.profile, 'sm'), h('span', { class: 'pc-name', text: this.profile.name }), ...(dn ? [dn] : []), ...(this.local ? [] : [VD.ui.themeBtn(), VD.ui.settingsBtn(() => this)]));
+      this.top.replaceChildren(VD.ui.avatar(this.profile, 'sm'), h('span', { class: 'pc-name', text: this.profile.name }), ...(dn ? [dn] : []), ...(this.local ? [] : [VD.ui.themeBtn(), VD.ui.settingsBtn(() => this, { lang: 'player' })]));
     }
     setView(key, build, force) {
       if (this.viewKey === key && !force) return this.body.firstElementChild;

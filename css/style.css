@@ -479,11 +479,9 @@ html[data-theme="light"] .wordmark { background: linear-gradient(180deg, #8c68ff
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, .35), 0 3px 0 #3f26a3;
   -webkit-mask: none;
 }
-.room-chip { display: flex; align-items: center; gap: .65rem; height: 48px; padding: 0 .3rem 0 1rem; border-radius: 999px; background: var(--surface-3); box-shadow: 0 3px 0 var(--ledge); }
+.room-chip { display: flex; align-items: center; gap: .65rem; height: 48px; padding: 0 1.1rem; border-radius: 999px; background: var(--surface-3); box-shadow: 0 3px 0 var(--ledge); }
 .rc-l { color: var(--tx-3); font-size: .88rem; font-weight: 700; }
 .rc-code { font-size: 1.35rem; letter-spacing: .16em; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--accent-2); }
-.rc-qr { width: 40px; height: 40px; background: #fff; border-radius: 14px; padding: 6px; }
-.rc-qr svg { display: block; width: 100%; height: 100%; }
 .rc-off { color: var(--tx-2); padding-right: .7rem; font-size: .92rem; }
 .h-tools { display: flex; gap: .4rem; }
 
@@ -789,7 +787,7 @@ body:has(.local-dock.big) .h-stage, body:has(.local-dock.big) .h-strip { visibil
   .h-top { gap: .5rem; padding-left: .9rem; }
   .brand { font-size: 1.1rem; }
   .brand::before { display: none; }
-  .rc-qr, .rc-l { display: none; }
+  .rc-l { display: none; }
   .h-bar { flex-direction: column; align-items: stretch; border-radius: var(--r-xl); padding: .8rem; }
   .bar-l { text-align: center; }
   .bar-btns .btn { flex: 1; }
@@ -1032,6 +1030,12 @@ html[data-theme="light"] .btn.mk-launch, html[data-theme="light"] .btn.mk-launch
 
 /* ===== Einstellungen (Startseite), Stimmeffekt-Auswahl ===== */
 .set-item { display: grid; gap: .4rem; justify-items: start; }
+.set-modal .set-item { padding-top: .95rem; border-top: 2px dashed var(--line-soft); }
+.set-modal h2 + .set-item { padding-top: 0; border-top: 0; }
+.set-modal .set-item + .set-item { margin-top: .05rem; }
+.set-modal .set-note { padding-top: .95rem; border-top: 2px dashed var(--line-soft); text-align: center; }
+.set-modal .set-item .muted.warn { color: var(--warm); }
+.set-modal .set-range { width: 100%; }
 .set-item .muted, .set-note { font-size: .88rem; }
 .set-modal .seg { justify-self: start; flex-wrap: nowrap; max-width: 100%; }
 .set-modal .seg-b { padding: .45em .75em; font-size: .92rem; white-space: nowrap; }
