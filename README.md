@@ -6,7 +6,7 @@ A browser party game for dubbing movie scenes together, based on the principle o
 
 1. The **host** (PC) creates a room and loads a **dub pack** (GameBanana, Choicer Voicer format) into the lobby.
 2. Players join via room code or QR code (phone or PC, microphone required).
-3. Everyone is assigned characters (for example, one player gets Brian, another gets Peter) and records **independently and at their own pace**. Anyone who finishes waits and can see the other players' progress.
+3. Everyone is assigned characters (for example, one player speaks the hero, another the villain) and records **independently and at their own pace**. Anyone who finishes waits and can see the other players' progress.
 4. For each line there is a still image and these buttons:
    - **Original**: the scene with the original audio, with the text shown on screen.
    - **Record**: the scene muted, and you speak your lines.
