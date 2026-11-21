@@ -18,6 +18,7 @@
       this.root = root; this.mic = opt.mic; this.profile = opt.profile; this.local = !!opt.local;
       this.onKicked = opt.onKicked || (() => {}); this.onAttention = opt.onAttention || (() => {}); this.onBig = opt.onBig || (() => {}); this.onLeave = opt.onLeave || (() => {}); this.room = opt.room || null;
       this.canRecord = !!opt.mic; this.phase = 'lobby';
+      this.pvc = new VD.PvClient(this);   // gemeinsame Pack-Vorschau vom Host (js/pvclient.js)
       this.ready = false; this.players = [];
       this.resetScene();
       this.top = h('header', { class: 'pc-top' });
@@ -50,6 +51,7 @@
 
     /* ---------- Verbindung ---------- */
     attach(link) {
+      this.pvc.close();   // eine neue Verbindung nimmt nicht an einer laufenden Vorschau teil
       this.link = link;
       link.on('msg', (m) => this.onMsg(m));
       link.on('blob', (k, meta, bytes) => this.onBlob(k, meta, bytes));
@@ -116,6 +118,7 @@
         case 'phase': this.onPhase(m); break;
         case 'scene': this.onScene(m); break;
         case 'assets_end': this.onAssetsEnd(m); break;
+        case 'pv_start': case 'pv_end': case 'pv_play': case 'pv_pause': case 'pv_close': this.pvc.msg(m); break;
         case 'replay': this.onReplay(VD.clamp(Number(m.in) || 1500, 200, 10000)); break;
         case 'prog_all': this.roster = m.list || []; if (this.viewKey === 'submitted' || this.viewKey === 'spectate') this.updateRoster(); break;
         default: break;
@@ -124,6 +127,7 @@
 
     /* ---------- Szene laden ---------- */
     async onScene(m) {
+      this.pvc.close();
       this.resetScene();
       this.scene = m; this.sceneId = m.id;
       this.lines = (m.lines || []).map((l) => Object.assign({ img: null, orig: null }, l));
@@ -166,6 +170,7 @@
     }
 
     onBlob(kind, meta, bytes) {
+      if (typeof kind === 'string' && kind.startsWith('pv')) { this.pvc.blob(kind, meta, bytes); return; }
       if (!this.scene) return;
       if (kind === 'img' && this.scene.watch) {
         if (meta.still && !this.stillUrl) { this.stillUrl = URL.createObjectURL(new Blob([bytes], { type: meta.mime || 'image/png' })); this.imgUrls.push(this.stillUrl); }
@@ -289,6 +294,7 @@
     onPhase(m) {
       const was = this.phase;
       this.phase = m.phase;
+      if (m.phase !== 'lobby') this.pvc.close();   // Runde beginnt: die Vorschau endet
       if ((was === 'lobby') !== (m.phase === 'lobby')) this.renderTop();
       if (m.phase !== 'lobby') clearTimeout(this._mtimer);
       if (!this.local && VD.music) VD.music.where(m.phase === 'lobby' ? 'lobby' : 'game');
@@ -953,6 +959,7 @@
 
     destroy() {
       this.destroyed = true;
+      this.pvc.close();
       this.stopAll();
       clearTimeout(this.replayTimer); this.stopPremiere();
       clearInterval(this._lvl); clearTimeout(this._mtimer);

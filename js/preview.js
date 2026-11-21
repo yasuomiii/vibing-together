@@ -8,11 +8,14 @@
 
   const fmt = (s) => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
 
-  function open(pack) {
-    if (document.querySelector('.pv-modal')) return;
+  /* ctl: der Host (VD.Host) in der Lobby. Mit ihm läuft die Vorschau gleichzeitig auf allen verbundenen Handys (siehe Host.pvBegin);
+     ohne ctl oder ohne verbundene Handys nur auf diesem Bildschirm. */
+  function open(pack, ctl) {
+    if (document.querySelector('.pv-modal') || (ctl && ctl.pv)) return;
     const V = VD.Video;
     let disposed = false, playing = false, loaded = false, pos = 0, total = 0, token = 0, raf = 0;
     let scene = null, bufs = null, video = null, sync = null, handles = [], audioFrom = 0, audioT0 = 0;
+    let pvs = null, shared = false, pvStarted = false, timedOut = false, hintT = 0;   // gemeinsame Vorschau: Sitzung, aktiv?, schon gestartet?, Wartezeit um?
     const urls = [], stills = new Map();
 
     /* ---------- Oberfläche ---------- */
@@ -26,6 +29,8 @@
     const track = h('div', { class: 'pv-track', role: 'slider', tabindex: '0', 'aria-label': VD.t('Position'), 'aria-valuemin': '0', 'aria-valuemax': '0', 'aria-valuenow': '0' }, fill);
     const time = h('span', { class: 'pv-time', text: '0:00' });
     const playBtn = h('button', { class: 'btn primary sm pv-play', type: 'button', disabled: true, onclick: () => toggle() }, '▶ ' + VD.t('Abspielen'));
+    const playLabel = () => '▶ ' + (shared && !pvStarted ? VD.t('Jetzt starten') : VD.t('Abspielen'));
+    const soloBtn = h('button', { class: 'btn solo sm', type: 'button', hidden: true, title: VD.t('Die anderen Spieler sehen davon nichts'), onclick: () => goSolo() }, VD.t('Nur auf meinem Bildschirm ansehen'));
     /* Lautstärke der Vorschau (pro Gerät gespeichert, Standard 100 %) */
     let pvVol = Math.min(1, Math.max(0, Number(VD.store.get('pvvol', 1)))); if (!Number.isFinite(pvVol)) pvVol = 1;
     let master = null;
@@ -41,7 +46,7 @@
         h('h2', { id: 'pv-t', text: VD.t('Vorschau') + ': ' + pack.name }),
         screen, status,
         h('div', { class: 'pv-ctl' }, playBtn, track, time), volRow,
-        h('div', { class: 'modal-btns' }, closeBtn)));
+        h('div', { class: 'modal-btns' }, soloBtn, closeBtn)));
 
     /* ---------- Anzeige ---------- */
     const lineAt = (t) => { // Zeile, die gerade gesprochen wird (oder null)
@@ -102,20 +107,22 @@
       if (pos >= total - 0.05) pos = 0;
       playing = true; playBtn.textContent = '❚❚ ' + VD.t('Pause');
       const my = ++token;
+      let inMs = null;
+      if (shared && ctl && ctl.pv) { inMs = ctl.pvPlay(pos); pvStarted = true; status.hidden = false; status.textContent = VD.t('Gleich geht es los …'); clearTimeout(hintT); hintT = setTimeout(() => { if (pvStarted) status.hidden = true; }, inMs + 400); }
       try { await VD.audio.ensure(); } catch { /* ignore */ }
       const ctx = VD.audio.ctx;
       let started = false;
       if (video) {
         try {
           const from = pos;
-          sync = await V.syncPlay(video, from, (off, delay) => { audioFrom = from + off; audioT0 = ctx.currentTime + delay; return startAudio(audioFrom, delay); });
+          sync = await V.syncPlay(video, from, (off, delay) => { audioFrom = from + off; audioT0 = ctx.currentTime + delay; return startAudio(audioFrom, delay); }, inMs != null ? { inMs } : {});
           if (my !== token || disposed) { sync.stop(); return; }
           started = true;
           V.frameReady(video, sync.vt0).then(() => { if (my === token && !disposed) { video.hidden = false; still.hidden = true; } });
         } catch (e) { console.warn('Vorschau-Video startet nicht', e); }
       }
       if (my !== token || disposed) return;
-      if (!started) { audioFrom = pos; audioT0 = ctx.currentTime + 0.03; startAudio(pos, 0.03); }
+      if (!started) { const d = inMs != null ? Math.max(0.03, inMs / 1000) : 0.03; audioFrom = pos; audioT0 = ctx.currentTime + d; startAudio(pos, d); }
       cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
     }
     function pause() {
@@ -125,7 +132,8 @@
       if (sync) { sync.stop(); sync = null; }
       stopAudio();
       if (video) { try { video.pause(); } catch { /* ignore */ } }
-      playBtn.textContent = '▶ ' + VD.t('Abspielen');
+      playBtn.textContent = playLabel();
+      if (shared && ctl && ctl.pv) ctl.pvPause(pos);   // alle Handys halten an derselben Stelle an
       render();
     }
     const toggle = () => (playing ? pause() : play());
@@ -134,6 +142,7 @@
       const was = playing;
       if (was) pause();
       pos = Math.max(0, Math.min(total, t));
+      if (!was && shared && ctl && ctl.pv) ctl.pvPause(pos);   // Fortschrittsbalken der Handys mitführen
       render();
       if (video && !video.hidden) { await V.seek(video, pos); }
       if (was && !disposed) play();
@@ -157,9 +166,34 @@
     };
     const onVis = () => { if (document.hidden && playing) pause(); };
 
+    /* ---------- Gemeinsame Vorschau ---------- */
+    function sharedInfo() {
+      if (!shared || disposed) return;
+      const st = ctl.pvStatus();
+      if (!st) { shared = false; soloBtn.hidden = true; return; }
+      if (!pvStarted) { status.hidden = false; status.textContent = VD.t('Vorschau wird geladen: {r} von {n} bereit', { r: st.ready, n: st.total }); }
+      autoStart(st);
+    }
+    function autoStart(st) {
+      if (!shared || pvStarted || !loaded || disposed || playing) return;
+      st = st || ctl.pvStatus();
+      if (st && ((st.total > 0 && st.ready >= st.total) || timedOut)) play();   // alle bereit oder Wartezeit um
+    }
+    function goSolo() {
+      if (!pvs || !ctl || ctl.pv !== pvs) return;
+      if (playing) pause();
+      ctl.pvClose(); pvs = null; shared = false; soloBtn.hidden = true;
+      clearTimeout(hintT);
+      status.hidden = loaded; if (!loaded) status.textContent = VD.t('Lade Vorschau …');
+      playBtn.textContent = playing ? playBtn.textContent : playLabel();
+    }
+
     function close() {
       if (disposed) return;
       disposed = true; token++; try { if (master) master.disconnect(); } catch { /* ignore */ }
+      clearTimeout(hintT);
+      if (pvs && ctl && ctl.pv === pvs) ctl.pvClose();   // alle Handys beenden die Vorschau
+      pvs = null; shared = false;
       cancelAnimationFrame(raf);
       if (sync) { try { sync.stop(); } catch { /* ignore */ } }
       stopAudio();
@@ -182,6 +216,11 @@
         await VD.audio.ensure();
         scene = await VD.Scene.build(pack, (t) => { if (!disposed) status.textContent = t; });
         if (disposed) return;
+        if (ctl && ctl.pvBegin) {   // Handys bekommen Bilder, Ton und Video, während es hier weiterlädt
+          pvs = ctl.pvBegin(pack, scene, { change: () => sharedInfo(), timeout: () => { timedOut = true; autoStart(); }, abort: () => close() });
+          shared = !!pvs; soloBtn.hidden = !shared;
+          if (shared) { status.textContent = VD.t('Vorschau wird geladen: {r} von {n} bereit', { r: 0, n: ctl.pvStatus().total }); }
+        }
         bufs = bufCache.get(pack);
         if (!bufs) {
           bufs = { lines: scene.lines.map((l) => ({ idx: l.idx, ts: l.ts, dur: l.dur, caption: l.caption, char: l.char, buf: VD.audio.fromFloat(l.v16, 16000) })), back: scene.back24 ? VD.audio.fromFloat(scene.back24, 24000) : null };
@@ -199,12 +238,16 @@
         }
         track.setAttribute('aria-valuemax', String(Math.round(total)));
         loaded = true;
-        status.hidden = true;
+        status.hidden = shared && !pvStarted ? false : true;
         playBtn.disabled = false;
+        playBtn.textContent = playLabel();
         render();
         playBtn.focus();
+        sharedInfo();
       } catch (e) {
         console.error(e);
+        if (pvs && ctl && ctl.pv === pvs) { ctl.pvClose(); }
+        pvs = null; shared = false; soloBtn.hidden = true;
         if (!disposed) status.textContent = VD.t('Vorschau nicht möglich');
       }
     })();

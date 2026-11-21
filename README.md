@@ -1,6 +1,6 @@
 # Vibing Together
 
-A browser party game for dubbing movie scenes together, based on the principle of *Choicer Voicer* and *Dub Together*. It runs entirely in the browser, is free, and supports mixed PC and mobile play (crossplay).
+A browser party game for dubbing movie scenes together, based on the principle of *Choicer Voicer*. It runs entirely in the browser, is free, and supports mixed PC and mobile play (crossplay).
 
 ## How a game works
 
@@ -143,6 +143,12 @@ If a phone loses the connection (dead spot, app in the background, screen locked
 ## Pack preview
 
 Every pack in the host lobby's list has a **Preview** button (a small ▶ plus text, only the ▶ on phones) left of *Select*/*Selected*. It opens a dialog (`js/preview.js`, `VD.PackPreview.open(pack)`) that plays the original scene: video (muted, through `VD.Video`, including the ogv.js fallback), all original lines at their times plus the background track, and the line text as subtitle with the character name. Controls: play/pause, a clickable and keyboard-operable progress bar (arrow keys jump 5 s), close (button, Esc or click outside). Audio comes from `VD.Scene.build`, so it is decoded only once per pack (the `WeakMap` cache in `scene.js`) and reopening is fast; the preview uses the same 16 kHz line audio the players hear. Without a playable video, or without a video at all, the still images of the lines are shown in turn. Closing stops everything immediately and revokes all object URLs. The preview never changes the selected pack and the list is only shown in the lobby.
+
+### Shared preview
+
+When the host taps "Preview" in the lobby, the preview runs on every connected device at the same time. The host first sends the small data (one mixed original sound, texts, character names, timings, stills) and then the video, in chunks, over the same transfer and the same phone-side cache (`js/vcache.js`) that a normal round uses, so a video loaded for the preview is not sent again in the real round. The host screen shows how many devices are ready and can start at any time ("Start now"). Without intervention it starts when all devices have the video or after `game.previewWaitMs` (`js/config.js`); the start uses `game.replayDelayMs` so the sound begins at about the same moment everywhere.
+
+A device that has no video at the start gets a simple version (sound, text, stills) until the end. Only the host controls it (play, pause, jump, close). "Watch only on my screen" keeps the preview local. Players who join or reconnect during a preview see the lobby and take part in the next one. Starting a round, choosing another pack, or closing the preview ends it everywhere; the lobby music is paused on all devices meanwhile.
 
 ## Random pack ("Surprise me")
 

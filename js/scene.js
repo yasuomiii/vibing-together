@@ -158,6 +158,20 @@
     return toI16(out);
   };
 
+  /* Ganze Szene für die gemeinsame Pack-Vorschau: Originalstimmen + Musik/Geräusche zu einer Spur gerechnet, mono 16 kHz */
+  Scene.previewMix = function (scene) {
+    const n = Math.round(scene.dur * 16000);
+    const out = new Float32Array(n);
+    if (scene.back16) for (let i = 0; i < n; i++) out[i] = (scene.back16[i] || 0) * G.backingInOriginal;
+    for (const l of scene.lines) {
+      const at = Math.round(l.ts * 16000);
+      for (let i = 0; i < l.v16.length && at + i < n; i++) out[at + i] += l.v16[i];
+    }
+    let pk = 0; for (let i = 0; i < n; i++) { const a = Math.abs(out[i]); if (a > pk) pk = a; }
+    if (pk > 0.95) { const k = 0.95 / pk; for (let i = 0; i < n; i++) out[i] *= k; }
+    return out;
+  };
+
   /* Fertiger Mix (Float32 @ SR): Aufnahmen der Spieler (p.takes: Map<Zeile, {raw}>), fehlende Zeilen bleiben still */
   Scene.finalMix = function (scene, recs) {
     const n = Math.round(scene.dur * SR);

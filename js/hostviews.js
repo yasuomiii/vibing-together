@@ -375,6 +375,8 @@
     },
 
     onPacksChanged() {
+      // Anderes Pack gewählt oder das Vorschau-Pack gelöscht: Vorschau endet überall
+      if (this.pv) { const c = VD.Packs.current(); if ((c ? c.id : null) !== this.pv.curId || !VD.Packs.list.some((x) => x.id === this.pv.pack.id)) this.pvAbort(); }
       // Wunschrollen, die es im neuen Pack nicht gibt, fallen weg; alle sehen die neuen Charaktere
       const pk = VD.Packs.current();
       this.list().forEach((p) => { if (p.wish && !(pk && pk.chars.includes(p.wish))) p.wish = null; });
@@ -445,7 +447,7 @@
         const on = cur && cur.id === p.id, fav = !!favs[p.id];
         const thumb = h('span', { class: 'pk-thumb' }, p.iconUrl ? h('img', { src: p.iconUrl, alt: '' }) : '🎬');
         const sw2 = on ? h('span', { class: 'pk-on', text: VD.t('✓ Ausgewählt') }) : h('button', { class: 'btn sm', onclick: () => VD.Packs.select(p.id) }, VD.t('Auswählen'));
-        const pv = h('button', { class: 'btn sm pk-pv', type: 'button', title: VD.t('Vorschau'), 'aria-label': VD.t('Vorschau') + ': ' + p.name, onclick: () => VD.PackPreview.open(p) }, h('span', { 'aria-hidden': 'true', text: '▶' }), h('span', { class: 'pk-pv-t', text: VD.t('Vorschau') }));
+        const pv = h('button', { class: 'btn sm pk-pv', type: 'button', title: VD.t('Vorschau'), 'aria-label': VD.t('Vorschau') + ': ' + p.name, onclick: () => VD.PackPreview.open(p, this) }, h('span', { 'aria-hidden': 'true', text: '▶' }), h('span', { class: 'pk-pv-t', text: VD.t('Vorschau') }));
         const lab = fav ? VD.t('{name} aus den Favoriten entfernen', { name: p.name }) : VD.t('{name} zu den Favoriten', { name: p.name });
         return h('div', { class: 'pk' + (on ? '' : ' off'), 'data-id': p.id }, thumb,
           h('div', { class: 'pk-m' }, h('b', { text: p.name }), h('small', { text: `${VD.lines(p.lines.length)} · ${p.chars.join(', ')}${p.author ? ' · ' + p.author : ''}` })),
