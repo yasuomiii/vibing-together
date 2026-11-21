@@ -1088,7 +1088,7 @@ html[data-theme="light"] .btn.mk-launch, html[data-theme="light"] .btn.mk-launch
 .pv-opts { display: flex; align-items: flex-end; gap: .8rem; width: 100%; }
 .pv-opts .pv-volrow { flex: 1 1 auto; min-width: 0; width: auto; }
 .pv-cc, .btn.sm.pv-cc { flex: none; display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap; min-height: 32px; padding: .2em .7em; font-size: .8rem; box-shadow: 0 2px 0 var(--ledge); }
-.pv-cc-i { font-size: .62rem; line-height: 1; padding: .14rem .24rem; border-radius: 5px; border: 2px solid currentColor; letter-spacing: .02em; }
+.pv-cc .pv-cc-i { font-size: .5rem; line-height: 1; padding: .1rem .2rem; border-radius: 4px; border: 1.5px solid currentColor; letter-spacing: .02em; font-weight: 800; }
 .pv-cc[aria-pressed="true"] { background: var(--teal); border-color: var(--teal-deep); color: #fff; }
 .pv-cc:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
 @media (max-width: 30rem) { .pv-cc-t { display: none; } .pv-ctl .pv-cc { order: 2; } }
