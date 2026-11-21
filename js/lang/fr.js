@@ -2,6 +2,11 @@
 (function () {
   const VD = (window.VD = window.VD || {});
   VD.addLang('fr', {
+  "Vorschau vom Host": "Aperçu de l’hôte",
+  "Vorschau wird geladen: {r} von {n} bereit": "Chargement de l’aperçu : {r} sur {n} prêts",
+  "Jetzt starten": "Démarrer maintenant",
+  "Nur auf meinem Bildschirm ansehen": "Regarder uniquement sur mon écran",
+  "Die Vorschau läuft beim Host.": "L’aperçu est lu sur l’écran de l’hôte.",
   "Helles oder dunkles Design": "Mode clair ou sombre",
   "Rauschunterdrückung ist in diesem Browser nicht verfügbar.": "La suppression du bruit n'est pas disponible dans ce navigateur.",
   "Während der Aufnahme lässt sich der Filter nicht umschalten.": "Le filtre ne peut pas être modifié pendant l'enregistrement.",

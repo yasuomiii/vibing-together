@@ -1,7 +1,7 @@
 /* Service Worker: App-Dateien offline verfügbar machen. Spielen mit anderen braucht weiterhin Internet (WebRTC).
    WICHTIG: Bei jeder Änderung an den Dateien VERSION erhöhen, sonst sehen Geräte mit altem Cache die Änderung nicht
    (bzw. erst nach dem Neuladen im Hintergrund). Neue Dateien auch in APP_FILES eintragen. */
-const VERSION = 4;
+const VERSION = 7;
 const APP_CACHE = 'vibing-app-v' + VERSION;      // App-Dateien, wird bei jeder neuen Version ersetzt
 const BIG_CACHE = 'vibing-big-v1';               // große Bibliotheken (ogv, transformers, rnnoise.wasm): erst beim ersten Benutzen
 
@@ -14,7 +14,7 @@ const APP_FILES = [
   'js/config.js', 'js/util.js', 'js/i18n.js', 'js/analysis.js', 'js/audio.js', 'js/music.js', 'js/vcache.js',
   'js/takestore.js', 'js/net.js', 'js/packs.js',
   'js/ui.js', 'js/denoise.js', 'js/translate.js', 'js/video.js', 'js/export.js', 'js/scene.js', 'js/fx.js', 'js/player.js', 'js/host.js',
-  'js/preview.js', 'js/hostviews.js', 'js/maker.js', 'js/subtitles.js', 'js/main.js', 'js/whisper-worker.js',
+  'js/preview.js', 'js/pvclient.js', 'js/hostviews.js', 'js/maker.js', 'js/subtitles.js', 'js/main.js', 'js/whisper-worker.js',
   'js/lang/de.js', 'js/lang/en.js', 'js/lang/es.js', 'js/lang/fr.js', 'js/lang/pt.js', 'js/lang/ru.js', 'js/lang/hi.js'
 ];
 const BIG_RE = /\/(vendor\/(ogv|transformers)\/|vendor\/rnnoise\/rnnoise\.wasm|audio\/music\/)/;

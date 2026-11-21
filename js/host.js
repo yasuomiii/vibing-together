@@ -78,10 +78,11 @@
       p.emoji = VD.AVATARS.includes(m.emoji) ? m.emoji : '🎤';
       p.canRecord = !!m.canRecord;
       p.link = link; p.connected = true; p.lvl = 0; p.skipped = false;
+      if (this.pv) this.pvMemberLost(p);   // eine neue Verbindung ist nie Teil einer laufenden Vorschau
       p.helloScene = m.sceneId || null;
       link.on('msg', (msg) => this.onPlayerMsg(p, msg));
       link.on('blob', (k, meta, bytes) => this.onPlayerBlob(p, k, meta, bytes));
-      link.on('close', () => { if (p.link === link) { p.connected = false; this.onRosterChanged(); this.progress(); if (this.updatePlay) this.updatePlay(); } });
+      link.on('close', () => { if (p.link === link) { p.connected = false; if (this.pv) this.pvMemberLost(p); this.onRosterChanged(); this.progress(); if (this.updatePlay) this.updatePlay(); } });
       const snap = p.active ? this.lastPhase : this.lateJoinPhase();
       link.send({ t: 'welcome', pid, color: p.color, snap: snap.phase === 'lobby' || (p.assign && p.active && this.state === 'playing') ? null : snap });
       if (this.state === 'lobby') link.send({ t: 'phase', phase: 'lobby' });
@@ -119,6 +120,8 @@
           break;
         case 'done': if (this.phase === 'play' && p.assign) { p.wantDone = true; this.checkDone(p); } break;
         case 'undone': if (p.assign) { p.wantDone = false; p.done = false; this.sendProgress(); this.refreshStrip(); if (this.updatePlay) this.updatePlay(); } break;
+        case 'pv_caps': this.pvOnCaps(p, m); break;
+        case 'pv_ready': this.pvOnReady(p, m); break;
         case 'leave': this.removePlayer(p, false); break;
         case 'wish': {
           // Wunschrolle aus der Lobby; gilt nur für Charaktere des gewählten Packs
@@ -244,6 +247,7 @@
 
     /* Raum schließen und zur Startseite: alle Spieler erfahren es, danach wird neu geladen */
     closeRoom() {
+      this.pvAbort();
       this.bcast({ t: 'closed' });
       this.removeLocalPlayer(true);
       setTimeout(() => { try { this.net && this.net.close(); } catch { /* ignore */ } location.href = location.pathname; }, 350);
@@ -299,6 +303,7 @@
         await VD.audio.ensure();
       } finally { this._starting = false; }
       if (this.state !== 'lobby') return;
+      this.pvAbort();   // eine laufende Vorschau endet überall, bevor die Runde beginnt
       this.state = 'playing'; this.pending = null;
       this.list().forEach((p) => { p.active = p.connected; p.skipped = false; p.ready = false; p.assign = null; p.takes = new Map(); p.done = false; p.wantDone = false; p.loaded = false; p.loadFailed = false; p.assetsSent = false; p.prog = null; p.watchSent = null; p.watchLoaded = false; p.hasMix = false; });
       this.onRosterChanged();
@@ -372,6 +377,81 @@
         p.link.send({ t: 'assets_end', video: withVideo });
       } catch (e) { console.warn('Medien für Zuschauer', e); }
     }
+
+    /* ---------- Gemeinsame Pack-Vorschau (nur in der Lobby) ----------
+       Eigener Zustand this.pv, unabhängig von Spielzustand, Zuteilung, Aufnahmen und Pack-Auswahl. Die Anzeige beim Host steht in
+       js/preview.js, die Anzeige am Handy in js/pvclient.js. ui: { change(), timeout(), abort() } der Host-Anzeige. */
+    pvBegin(pack, scene, ui) {
+      if (this.pv || this.state !== 'lobby') return null;
+      const members = new Map();
+      this.list().forEach((p) => { if (p.connected && !p.isLocal && p.link) members.set(p.pid, { p, link: p.link, caps: false, ready: false }); });
+      if (!members.size) return null;
+      const bytes = new Uint8Array(VD.f32ToI16(Scene.previewMix(scene)).buffer);
+      if (bytes.length > CFG.limits.maxBlobBytes) return null;   // zu lang zum Verschicken: nur auf diesem Bildschirm
+      const vsize = pack.video && pack.video.size <= CFG.limits.maxBlobBytes ? pack.video.size : 0;
+      const cur = VD.Packs.current();
+      const pv = this.pv = { id: VD.uid(), pack, scene, bytes, vsize, members, ui, curId: cur ? cur.id : null, timer: 0 };
+      members.forEach((mb) => mb.link.send({
+        t: 'pv_start', id: pv.id, title: pack.name, dur: scene.dur, videoMime: Scene.videoMime(pack), videoSize: vsize, videoKey: pack.id + ':' + (pack.video ? pack.video.size : 0),
+        lines: scene.lines.map((l) => ({ i: l.idx, caption: l.caption, char: l.char, ts: l.ts, dur: l.dur, hasImg: !!l.imgBlob }))
+      }));
+      pv.timer = setTimeout(() => { if (this.pv === pv && ui && ui.timeout) ui.timeout(); }, CFG.game.previewWaitMs);
+      return pv;
+    }
+    pvStatus() { const pv = this.pv; if (!pv) return null; let ready = 0; pv.members.forEach((m) => { if (m.ready) ready++; }); return { ready, total: pv.members.size }; }
+    pvChanged() { const pv = this.pv; if (pv && pv.ui && pv.ui.change) pv.ui.change(); }
+    pvMemberLost(p) { const pv = this.pv; if (pv && pv.members.delete(p.pid)) this.pvChanged(); }
+    pvOnCaps(p, m) {
+      const pv = this.pv, mb = pv && pv.members.get(p.pid);
+      if (!mb || mb.link !== p.link || m.id !== pv.id || mb.caps) return;
+      mb.caps = true;
+      this.pvSend(pv, mb, m.video === true && pv.vsize > 0, m.cached === true);
+    }
+    pvOnReady(p, m) {
+      const pv = this.pv, mb = pv && pv.members.get(p.pid);
+      if (!mb || mb.link !== p.link || m.id !== pv.id || !mb.caps || mb.ready) return;
+      mb.ready = true; this.pvChanged();
+    }
+    /* Bilder, Ton und (falls nötig) das Video an ein Handy. Das Video geht über dieselbe Übertragung und denselben Zwischenspeicher am
+       Handy (Schlüssel wie beim Spielstart), so wird es in der echten Runde nicht noch einmal geschickt. */
+    async pvSend(pv, mb, video, cached) {
+      const p = mb.p, link = mb.link, sc = pv.scene;
+      const alive = () => this.pv === pv && pv.members.get(p.pid) === mb && p.connected && p.link === link;
+      try {
+        for (const l of sc.lines) {
+          if (!l.imgBlob) continue;
+          if (!alive()) return;
+          await link.sendBlob('pvimg', { pv: pv.id, i: l.idx, mime: l.imgBlob.type || 'image/png' }, l._img || (l._img = new Uint8Array(await l.imgBlob.arrayBuffer())));
+        }
+        if (!alive()) return;
+        await link.sendBlob('pvmix', { pv: pv.id, sr: 16000 }, pv.bytes);
+        if (video && !cached) {
+          if (!alive()) return;
+          await link.sendBlob('pvvideo', { pv: pv.id, mime: pv.pack.video.type || Scene.videoMime(pv.pack), key: pv.pack.id + ':' + pv.pack.video.size }, await this.videoBytes(sc));
+        }
+        if (!alive()) return;
+        link.send({ t: 'pv_end', id: pv.id });
+      } catch (e) { console.warn('Vorschau senden', e); this.pvMemberLost(p); }
+    }
+    /* Gemeinsamer Start: jeder bekommt „in X ms“ abzüglich seiner halben Laufzeit (wie bei „Nochmal ansehen“). Liefert den Vorlauf für den Host. */
+    pvPlay(pos) {
+      const pv = this.pv, ms = CFG.game.replayDelayMs;
+      if (!pv) return ms;
+      clearTimeout(pv.timer);
+      pv.members.forEach((mb) => { if (mb.p.connected && mb.p.link === mb.link) mb.link.send({ t: 'pv_play', id: pv.id, pos, in: Math.max(300, Math.round(ms - (mb.link.rtt || 0) / 2)) }); });
+      return ms;
+    }
+    pvPause(pos) {
+      const pv = this.pv; if (!pv) return;
+      pv.members.forEach((mb) => { if (mb.p.connected && mb.p.link === mb.link) mb.link.send({ t: 'pv_pause', id: pv.id, pos }); });
+    }
+    /* Ende der Vorschau (Schließen, „nur für mich“, Abbruch): alle Handys räumen auf, der Zustand ist weg */
+    pvClose() {
+      const pv = this.pv; if (!pv) return;
+      this.pv = null; clearTimeout(pv.timer);
+      pv.members.forEach((mb) => { try { if (mb.p.connected && mb.p.link === mb.link) mb.link.send({ t: 'pv_close', id: pv.id }); } catch { /* ignore */ } });
+    }
+    pvAbort() { const pv = this.pv; if (!pv) return; if (pv.ui && pv.ui.abort) pv.ui.abort(); this.pvClose(); }
 
     /* Das Video wird nur einmal eingelesen, auch wenn mehrere Handys es brauchen (spart bis zu 80 MB Speicher pro Handy) */
     videoBytes(sc) { return sc._vbytes || (sc._vbytes = sc.pack.video.arrayBuffer().then((b) => new Uint8Array(b))); }

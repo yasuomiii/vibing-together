@@ -2,6 +2,11 @@
 (function () {
   const VD = (window.VD = window.VD || {});
   VD.addLang('hi', {
+  "Vorschau vom Host": "होस्ट की ओर से झलक",
+  "Vorschau wird geladen: {r} von {n} bereit": "झलक लोड हो रही है: {n} में से {r} तैयार",
+  "Jetzt starten": "अभी शुरू करें",
+  "Nur auf meinem Bildschirm ansehen": "सिर्फ़ मेरी स्क्रीन पर देखें",
+  "Die Vorschau läuft beim Host.": "झलक होस्ट की स्क्रीन पर चल रही है।",
   "Helles oder dunkles Design": "लाइट या डार्क मोड",
   "Rauschunterdrückung ist in diesem Browser nicht verfügbar.": "इस ब्राउज़र में शोर कम करने की सुविधा उपलब्ध नहीं है।",
   "Während der Aufnahme lässt sich der Filter nicht umschalten.": "रिकॉर्डिंग के दौरान फ़िल्टर बदला नहीं जा सकता।",

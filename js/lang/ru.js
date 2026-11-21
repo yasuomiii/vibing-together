@@ -2,6 +2,11 @@
 (function () {
   const VD = (window.VD = window.VD || {});
   VD.addLang('ru', {
+  "Vorschau vom Host": "Предпросмотр от хоста",
+  "Vorschau wird geladen: {r} von {n} bereit": "Загрузка предпросмотра: готово {r} из {n}",
+  "Jetzt starten": "Начать сейчас",
+  "Nur auf meinem Bildschirm ansehen": "Смотреть только на моём экране",
+  "Die Vorschau läuft beim Host.": "Предпросмотр идёт на экране хоста.",
   "Helles oder dunkles Design": "Светлая или тёмная тема",
   "Rauschunterdrückung ist in diesem Browser nicht verfügbar.": "Шумоподавление недоступно в этом браузере.",
   "Während der Aufnahme lässt sich der Filter nicht umschalten.": "Во время записи фильтр переключить нельзя.",

@@ -2,6 +2,11 @@
 (function () {
   const VD = (window.VD = window.VD || {});
   VD.addLang('pt', {
+  "Vorschau vom Host": "Pré-visualização do anfitrião",
+  "Vorschau wird geladen: {r} von {n} bereit": "Carregando pré-visualização: {r} de {n} prontos",
+  "Jetzt starten": "Começar agora",
+  "Nur auf meinem Bildschirm ansehen": "Assistir só na minha tela",
+  "Die Vorschau läuft beim Host.": "A pré-visualização está passando na tela do anfitrião.",
   "Helles oder dunkles Design": "Modo claro ou escuro",
   "Rauschunterdrückung ist in diesem Browser nicht verfügbar.": "A supressão de ruído não está disponível neste navegador.",
   "Während der Aufnahme lässt sich der Filter nicht umschalten.": "O filtro não pode ser alterado durante a gravação.",

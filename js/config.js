@@ -68,7 +68,7 @@ window.VD_CONFIG = {
   limits: {
     maxPlayers: 8,
     maxNameLength: 14,
-    maxBlobBytes: 80 * 1024 * 1024, // größte Datei Host→Handy (Video)
+    maxBlobBytes: 100 * 1024 * 1024, // größte Datei Host→Handy (Video)
     maxTakeBytes: 6 * 1024 * 1024,   // größte erlaubte Aufnahme vom Handy
     maxZipBytes: 400 * 1024 * 1024,  // größte Pack-Datei
     maxClipBytes: 40 * 1024 * 1024,  // größter einzelner Sprach-Clip im Pack
@@ -85,6 +85,7 @@ window.VD_CONFIG = {
     backingInMix: 0.4,     // Lautstärke von Musik/Geräuschen im fertigen Ergebnis (0 = aus, 1 = voll)
     backingInOriginal: 0.55, // Lautstärke von Musik/Geräuschen beim Knopf "Original"
     loadTimeoutMs: 90000,  // so lange wartet der Host höchstens, bis alle Geräte die Szene geladen haben
-    replayDelayMs: 2500    // Vorlauf, damit bei "Nochmal ansehen" alle Geräte gleichzeitig starten
+    replayDelayMs: 2500,   // Vorlauf, damit bei "Nochmal ansehen" und bei der gemeinsamen Pack-Vorschau alle Geräte gleichzeitig starten
+    previewWaitMs: 20000   // gemeinsame Pack-Vorschau: so lange wartet der Host höchstens, bis alle Geräte das Video haben
   }
 };

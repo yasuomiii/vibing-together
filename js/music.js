@@ -10,8 +10,9 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
   let on = VD.store.get('music', true) !== false;
-  let vol = clamp(Number(VD.store.get('musicvol', CFG.volume)), 0, 1);
-  if (!isFinite(vol)) vol = CFG.volume;
+  // Gespeicherte Lautstärke: nur eine echte Zahl zählt, alles andere (leer, Text, kaputt) fällt auf den leisen Standard
+  const safeVol = (v) => (typeof v === 'number' && v >= 0 && v <= 1 ? v : clamp(Number(CFG.volume) || 0.25, 0, 1));
+  let vol = safeVol(VD.store.get('musicvol', CFG.volume));
   let started = false;                 // erst nach der ersten Bedienung (Browser-Regel)
   let where = 'home';
   const holds = new Set();
@@ -96,18 +97,20 @@
     if (!bus || bus.context !== ctx) { bus = ctx.createGain(); bus.gain.value = 0; bus.connect(ctx.destination); }
     return true;
   }
-  function update() {
+  function update(quick) {
     if (!started || !VD.audio.ctx || !ensureBus()) return;
     const ctx = VD.audio.ctx, fade = Math.max(0.1, CFG.fadeSec);
     if (wanted()) {
       clearTimeout(offTimer);
       if (ctx.state !== 'running') { ctx.resume && ctx.resume().catch(() => {}); }
-      if (!engine) {
+      const fresh = !engine;
+      if (fresh) {
         const tracks = fileFailed ? [] : (CFG.tracks || []).filter((t) => t && t.file);
         engine = tracks.length ? fileEngine(tracks) : genEngine();
       }
       bus.gain.cancelScheduledValues(ctx.currentTime);
-      bus.gain.setTargetAtTime(vol, ctx.currentTime, fade / 3);
+      if (fresh) bus.gain.setValueAtTime(0, ctx.currentTime);   // jeder Start beginnt bei null und blendet ein
+      bus.gain.setTargetAtTime(vol, ctx.currentTime, quick === true ? 0.04 : fade / 3);   // Regler: kurze Glättung, sonst Einblendung
     } else if (engine) {
       bus.gain.cancelScheduledValues(ctx.currentTime);
       bus.gain.setTargetAtTime(0, ctx.currentTime, fade / 3);
@@ -120,7 +123,7 @@
   M.where = (key) => { if (where !== key) { where = key; update(); } };
   M.hold = (key, yes) => { if (yes) holds.add(key); else holds.delete(key); update(); };
   M.toggle = () => { on = !on; VD.store.set('music', on); update(); changed(); };
-  M.setVolume = (v) => { vol = clamp(Number(v) || 0, 0, 1); VD.store.set('musicvol', vol); update(); changed(); };
+  M.setVolume = (v) => { vol = clamp(Number(v) || 0, 0, 1); VD.store.set('musicvol', vol); update(true); changed(); };
 
   document.addEventListener('visibilitychange', update);
   const first = () => {

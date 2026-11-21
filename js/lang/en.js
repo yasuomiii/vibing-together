@@ -2,6 +2,11 @@
 (function () {
   const VD = (window.VD = window.VD || {});
   VD.addLang('en', {
+  "Vorschau vom Host": "Preview from the host",
+  "Vorschau wird geladen: {r} von {n} bereit": "Loading preview: {r} of {n} ready",
+  "Jetzt starten": "Start now",
+  "Nur auf meinem Bildschirm ansehen": "Watch only on my screen",
+  "Die Vorschau läuft beim Host.": "The preview is playing on the host’s screen.",
   "Helles oder dunkles Design": "Light or dark mode",
   "Rauschunterdrückung ist in diesem Browser nicht verfügbar.": "Noise suppression isn't available in this browser.",
   "Während der Aufnahme lässt sich der Filter nicht umschalten.": "The filter can't be switched while recording.",
