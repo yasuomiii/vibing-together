@@ -167,7 +167,8 @@ html[data-theme="light"] {
   --ring-a: #7a55f0; --ring-b: #0f9d8c; --ring-oa: .3; --ring-ob: .24;
   --blob-a1: 46%; --blob-a2: 40%; --blob-a3: 34%; --blob-a4: 30%;
 }
-.bg-fx { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; contain: strict; }
+.bg-fx { position: fixed; top: 0; left: 0; right: 0; bottom: -80px; z-index: -1; overflow: hidden; pointer-events: none; contain: strict; }   /* reicht unten über den Rand hinaus: auf dem iPhone bleibt so kein Streifen */
+.bg-fx::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 22vh; background: linear-gradient(180deg, transparent, var(--bg)); }   /* unten läuft der Hintergrund in die Grundfarbe aus, falls das Gerät dort doch einen Rand zeigt */
 .bg-fx i { position: absolute; display: block; }
 .bg-glow {
   inset: -6%;
