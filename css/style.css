@@ -469,7 +469,7 @@ html[data-theme="light"] .wordmark { background: linear-gradient(180deg, #8c68ff
 .h-top {
   position: relative; z-index: 50;
   display: flex; align-items: center; gap: 1rem;
-  height: var(--top-h); margin: var(--gap) var(--gap) 0; padding: 0 .65rem 0 1.1rem;
+  height: var(--top-h); margin: calc(var(--gap) + env(safe-area-inset-top, 0px)) var(--gap) 0; padding: 0 .65rem 0 1.1rem;
   border-radius: 26px; background: var(--bar-bg);
 }
 .brand { font-weight: 600; font-size: 1.25rem; margin-right: auto; display: flex; align-items: center; gap: .65rem; }
@@ -485,7 +485,7 @@ html[data-theme="light"] .wordmark { background: linear-gradient(180deg, #8c68ff
 .rc-off { color: var(--tx-2); padding-right: .7rem; font-size: .92rem; }
 .h-tools { display: flex; gap: .4rem; }
 
-.h-stage { position: relative; overflow: auto; padding: clamp(1rem, 2.6vw, 2rem) clamp(var(--gap), 2.6vw, 2rem); padding-top: calc(var(--gap) + var(--top-h) + clamp(1rem, 2.6vw, 2rem)); scroll-padding-top: calc(var(--gap) + var(--top-h) + 1rem); }
+.h-stage { position: relative; overflow: auto; padding: clamp(1rem, 2.6vw, 2rem) clamp(var(--gap), 2.6vw, 2rem); padding-top: calc(var(--gap) + env(safe-area-inset-top, 0px) + var(--top-h) + clamp(1rem, 2.6vw, 2rem)); scroll-padding-top: calc(var(--gap) + env(safe-area-inset-top, 0px) + var(--top-h) + 1rem); }
 .stage-view { min-height: 100%; }
 .boot { min-height: 60vh; }
 
@@ -753,7 +753,7 @@ body.dragging::after {
 .local-dock { display: none; }
 .local-dock.big {
   display: block; position: fixed; z-index: 30;
-  left: 0; right: 0; top: calc(var(--gap) + var(--top-h)); bottom: calc(var(--bar-real, var(--bar-h)) + var(--gap) * 2 + env(safe-area-inset-bottom));
+  left: 0; right: 0; top: calc(var(--gap) + env(safe-area-inset-top, 0px) + var(--top-h)); bottom: calc(var(--bar-real, var(--bar-h)) + var(--gap) * 2 + env(safe-area-inset-bottom));
   background: transparent; overflow: hidden;
 }
 /* Bühne darunter ausblenden, damit nichts durchscheint */
@@ -799,7 +799,7 @@ body:has(.local-dock.big) .h-stage, body:has(.local-dock.big) .h-strip { visibil
   .app-mark::after { border-radius: 26px; }
   .app-mark i { width: 8px; }
   .lobby-foot { border-radius: var(--r-xl); }
-  .home { padding-top: 4.8rem; }
+  .home { padding-top: calc(4.8rem + env(safe-area-inset-top, 0px)); }
   .code-input { width: auto; flex: 1 1 6em; min-width: 0; }
   .code-form .btn { flex: 0 0 auto; }
   .btn { min-height: 50px; }
@@ -898,7 +898,7 @@ html.theme-fade, html.theme-fade *, html.theme-fade *::before, html.theme-fade *
 }
 
 /* ---------- Dub-Pack-Ersteller (zusammen mit js/maker.js entfernbar) ---------- */
-.maker { min-height: 100dvh; padding: 1rem 1rem 3rem; overflow-x: hidden; }
+.maker { min-height: 100dvh; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem 3rem; overflow-x: hidden; }
 .mk-wrap { max-width: 52rem; margin: 0 auto; display: grid; gap: 1rem; min-width: 0; }
 .mk-top { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
 .mk-top h1 { font-size: 1.6rem; margin-right: auto; }
