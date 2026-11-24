@@ -167,8 +167,7 @@ html[data-theme="light"] {
   --ring-a: #7a55f0; --ring-b: #0f9d8c; --ring-oa: .3; --ring-ob: .24;
   --blob-a1: 46%; --blob-a2: 40%; --blob-a3: 34%; --blob-a4: 30%;
 }
-.bg-fx { position: fixed; top: 0; left: 0; right: 0; bottom: -80px; z-index: -1; overflow: hidden; pointer-events: none; contain: strict; }   /* reicht unten über den Rand hinaus: auf dem iPhone bleibt so kein Streifen */
-.bg-fx::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 22vh; background: linear-gradient(180deg, transparent, var(--bg)); }   /* unten läuft der Hintergrund in die Grundfarbe aus, falls das Gerät dort doch einen Rand zeigt */
+.bg-fx { position: fixed; top: 0; left: 0; right: 0; bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); z-index: -1; overflow: hidden; pointer-events: none; contain: strict; }   /* am PC ändert sich nichts; auf dem iPhone reicht der Hintergrund unten bis in den Rand */
 .bg-fx i { position: absolute; display: block; }
 .bg-glow {
   inset: -6%;
@@ -183,7 +182,7 @@ html[data-theme="light"] {
 .bg-rings-a, .bg-rings-b { --rs: min(64vmax, 760px); width: var(--rs); height: var(--rs); }
 .bg-rings-b { --rs: min(46vmax, 540px); }
 .bg-rings-a { right: 0; top: 0; --rc: var(--ring-a); --ro: var(--ring-oa); }
-.bg-rings-b { left: 0; bottom: 0; --rc: var(--ring-b); --ro: var(--ring-ob); }
+.bg-rings-b { left: 0; bottom: env(safe-area-inset-bottom, 0px); --rc: var(--ring-b); --ro: var(--ring-ob); }
 /* Jeder Ring ist ein Viertelkreis um die Ecke. Er wächst von der Ecke nach außen und verblasst, nie zurück nach innen. Drei Ringe laufen versetzt, so entsteht ein gleichmäßiges Ausstrahlen. */
 .bg-rings-a b, .bg-rings-b b { position: absolute; inset: 0; opacity: 0; border: 2.5px solid var(--rc); animation: bgWave var(--T) linear calc(var(--k) * var(--T) / -8) infinite; }
 .bg-rings-a b { border-style: none none solid solid; border-radius: 0 0 0 100%; transform-origin: 100% 0; }
@@ -194,7 +193,7 @@ html[data-theme="light"] {
 .bg-rings-b { --T: 56s; }
 @keyframes bgWave { 0% { transform: scale(.04); opacity: 0; } 5% { opacity: var(--ro); } 100% { transform: scale(1); opacity: 0; } }
 /* Pegelbalken: jeder Balken hat eigene Dauer, eigenen Hub und eigenen Versatz (von util.js gesetzt), darum wiederholt sich nichts sichtbar */
-.bg-fx .bg-eq { left: 0; right: 0; bottom: 0; height: var(--eq-h); display: flex; align-items: flex-end; gap: 10px; padding-left: 5px; width: max-content; right: auto; animation: bgEqLeft 36s linear infinite; }
+.bg-fx .bg-eq { left: 0; right: 0; bottom: env(safe-area-inset-bottom, 0px); height: var(--eq-h); display: flex; align-items: flex-end; gap: 10px; padding-left: 5px; width: max-content; right: auto; animation: bgEqLeft 36s linear infinite; }
 @keyframes bgEqLeft { to { translate: -480px 0; } }
 .bg-eq b { flex: 0 0 14px; height: 100%; border-radius: 7px 7px 0 0; background: linear-gradient(180deg, var(--eq-a1), var(--eq-a2)); transform-origin: 50% 100%; scale: 1 var(--hi, .7); animation: bgBar var(--d, 2.4s) ease-in-out var(--dl, 0s) infinite alternate; }
 .bg-eq b:nth-child(3n) { background: linear-gradient(180deg, var(--eq-b1), var(--eq-b2)); }
