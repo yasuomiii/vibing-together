@@ -870,8 +870,8 @@ html[data-theme="light"] .lang-opt-ck { color: var(--teal-deep); }
 .home { position: relative; }
 
 /* ----- Hinweisfenster (Weiterleitung) ----- */
-.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 1.25rem; background: color-mix(in srgb, var(--bg) 90%, transparent); animation: fadeIn var(--dur) var(--ease) backwards; }
-.modal-card { width: min(30rem, 100%); display: grid; gap: .8rem; padding: 1.7rem; border-radius: var(--r-xl); text-align: left; background: var(--card-bg); border: 2px solid var(--line); box-shadow: var(--shine), 0 6px 0 var(--ledge), var(--shadow); animation: modalIn var(--dur-slow) var(--spring-soft) backwards; }
+.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 1.25rem; background: color-mix(in srgb, var(--bg) 90%, transparent); animation: fadeIn var(--dur-fast) ease-out backwards; }
+.modal-card { width: min(30rem, 100%); display: grid; gap: .8rem; padding: 1.7rem; border-radius: var(--r-xl); text-align: left; background: var(--card-bg); border: 2px solid var(--line); box-shadow: var(--shine), 0 6px 0 var(--ledge), var(--shadow); animation: modalFade var(--dur-fast) ease-out backwards, modalIn var(--dur-slow) var(--spring-soft) backwards; }
 .modal-card h2 { font-size: 1.7rem; line-height: 1.12; }
 .modal-card p { margin: 0; color: var(--tx-2); }
 .modal-card .modal-site { color: var(--tx); font-weight: 800; font-size: 1.05rem; }
@@ -1153,7 +1153,8 @@ html[data-theme="light"] .btn.mk-launch, html[data-theme="light"] .btn.mk-launch
    Zeiten und Kurven kommen aus den Variablen ganz oben (--dur-*, --ease, --spring).
    ========================================================================== */
 @keyframes fadeIn { from { opacity: 0; } }
-@keyframes modalIn { from { opacity: 0; transform: translateY(var(--lift)) scale(.97); } }
+@keyframes modalFade { from { opacity: 0; } }
+@keyframes modalIn { from { transform: translateY(var(--lift)) scale(.97); } }
 @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } }
 
 /* Startseite und Beitritt blenden beim Wechsel weich ein (die Ansichten werden per hidden umgeschaltet, die Animation startet dabei neu) */

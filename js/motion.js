@@ -8,7 +8,7 @@
    1. Gleitende Markierung in Umschaltern (.seg).
    2. Listen: Einträge rücken sanft nach, neue blenden ein, entfernte blenden aus (FLIP, Schlüssel: data-id / data-k / Text).
    3. VD.motion.swap / VD.motion.leave: die alte Ansicht blendet weich aus, während die neue kommt.
-   4. Fenster wachsen aus ihrem Auslöser und ziehen sich beim Schließen dorthin zurück; Sprachmenü blendet beim Schließen aus.
+   4. Fenster: Einblenden per CSS, beim Schließen blendet eine Kopie aus; Sprachmenü blendet beim Schließen aus.
    5. Zähler und Statustexte wechseln mit kurzer Auf-/Ab-Bewegung; Knöpfe federn beim Zustandswechsel. */
 (function () {
   const VD = (window.VD = window.VD || {});
@@ -239,31 +239,9 @@
   /* ------------------------------------------------------------------
      4. Fenster und Menüs
      ------------------------------------------------------------------ */
-  let trig = null;   // zuletzt angetippter Auslöser
-  const noteTrig = (e) => {
-    const t = e.target && e.target.closest ? e.target.closest('button, a, [role="button"], .pk, .settings-btn') : null;
-    if (t) trig = { el: t, at: Date.now() };
-  };
-  document.addEventListener('pointerdown', noteTrig, true);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') noteTrig(e); }, true);
-
   const cardOf = (m) => m.querySelector('.modal-card') || m.firstElementChild;
-  function openModal(m) {
-    if (m._moOpen) return;
-    m._moOpen = true;
-    if (!can()) return;
-    const card = cardOf(m);
-    if (!card) return;
-    try {
-      const t = trig && Date.now() - trig.at < 1000 && trig.el.isConnected ? trig.el.getBoundingClientRect() : null;
-      if (!t || !t.width) return;   // ohne bekannten Auslöser bleibt die normale Einblendung
-      const r = card.getBoundingClientRect();
-      const ox = Math.max(0, Math.min(r.width, t.left + t.width / 2 - r.left)), oy = Math.max(0, Math.min(r.height, t.top + t.height / 2 - r.top));
-      card.style.transformOrigin = ox + 'px ' + oy + 'px';
-      card.style.animation = 'none';
-      run(card, [{ opacity: 0, transform: 'scale(.78)' }], { duration: dur().slow + 40, easing: spring() });
-    } catch { /* ignore */ }
-  }
+  /* Öffnen: reine CSS-Einblendung (Hintergrund und Fenster blenden gleich schnell ein, das Fenster federt nur leicht).
+     Schließen: eine Kopie des ganzen Fensters blendet aus. */
   function closeModal(n) {
     if (!can() || !n.getClientRects) return;
     try {
@@ -279,7 +257,7 @@
       document.body.append(g);
       const d = dur();
       run(g, [{ opacity: 1 }, { opacity: 0 }], { duration: d.mid, easing: 'ease-out' }, () => g.remove());
-      if (card) run(card, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.82)' }], { duration: d.mid, easing: ease() });
+      if (card) run(card, [{ transform: 'none' }, { transform: 'scale(.9)' }], { duration: d.mid, easing: ease() });   // nur die Größe: das Ausblenden macht die ganze Kopie gemeinsam mit dem Hintergrund
     } catch { /* ignore */ }
   }
   function initMenu(menu) {
@@ -366,7 +344,6 @@
     each(n, POPS, initPop);
     each(n, '.fx-chip, .role', initSel);
     each(n, '.lang-menu', initMenu);
-    if (n.classList.contains('modal') && n.parentNode === document.body) openModal(n);
   };
   M.scan = scan;
   const start = () => {
