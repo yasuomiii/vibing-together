@@ -11,7 +11,7 @@
   /* ctl: der Host (VD.Host) in der Lobby. Mit ihm läuft die Vorschau gleichzeitig auf allen verbundenen Handys (siehe Host.pvBegin);
      ohne ctl oder ohne verbundene Handys nur auf diesem Bildschirm. */
   function open(pack, ctl) {
-    if (document.querySelector('.pv-modal') || (ctl && ctl.pv)) return;
+    if (document.querySelector('.pv-modal:not(.mo-ghost)') || (ctl && ctl.pv)) return;
     const V = VD.Video;
     let disposed = false, playing = false, loaded = false, pos = 0, total = 0, token = 0, raf = 0;
     let scene = null, bufs = null, video = null, sync = null, handles = [], audioFrom = 0, audioT0 = 0;

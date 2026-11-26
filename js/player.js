@@ -217,11 +217,12 @@
     }
     setView(key, build, force) {
       if (this.viewKey === key && !force) return this.body.firstElementChild;
+      const same = this.viewKey === key && !!this.body.firstElementChild;   // dieselbe Ansicht wird nur neu gezeichnet
       this.viewKey = key;
       this.onBig(key === 'play' || key === 'submitted' || key === 'load', key);
       const el = build();
-      el.classList.add('view-in');
-      this.body.replaceChildren(el);
+      if (same) VD.motion.replace(this.body, el);   // ohne Aus- und Einblenden: es ändert sich ja nichts Sichtbares
+      else { VD.motion.enter(el); VD.motion.swap(this.body, el); }   // alte Ansicht blendet weich aus
       return el;
     }
     fx(name) { if (!this.local) { VD.sfx.play(name); } }
@@ -257,7 +258,7 @@
     }
     updateLobbyList() {
       if (!this._list) return;
-      this._list.replaceChildren(...this.players.map((p) => h('li', { class: p.connected ? '' : 'off' }, VD.ui.avatar(p, 'xs'), h('span', { text: p.name }), p.ready ? h('em', { text: '✓' }) : null)));
+      this._list.replaceChildren(...this.players.map((p) => h('li', { 'data-id': p.pid, class: p.connected ? '' : 'off' }, VD.ui.avatar(p, 'xs'), h('span', { text: p.name }), p.ready ? h('em', { text: '✓' }) : null)));
     }
     /* Wunschrolle: antippen wählt, nochmal antippen hebt auf. Wer welchen Charakter will, sieht man an den kleinen Symbolen. */
     updateRoles() {
@@ -889,7 +890,7 @@
       if (!this._roster || !this._roster.isConnected) return;
       const open = this.roster.filter((p) => !p.done).length;
       const w = VD.$('#wait-n', this.body); if (w) w.textContent = this.roster.length ? (open ? VD.t('Warte noch auf {n} Spieler …', { n: open }) : VD.t('Alle sind fertig!')) : VD.t('Warte auf die anderen …');
-      this._roster.replaceChildren(...this.roster.map((p) => h('div', { class: 'ro-card' + (p.done ? ' done' : ''), style: { '--c': p.color } },
+      this._roster.replaceChildren(...this.roster.map((p) => h('div', { class: 'ro-card' + (p.done ? ' done' : ''), 'data-id': p.pid, style: { '--c': p.color } },
         VD.ui.avatar(p, 'lg'), h('b', { text: p.pid === this.pub ? VD.t('{name} (du)', { name: p.name }) : p.name }),
         h('small', { text: p.done ? VD.t('✓ Fertig') : VD.t('Zeile {c}/{t}', { c: p.cur, t: p.total }) }))));
     }

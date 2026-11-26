@@ -73,11 +73,13 @@
     },
 
     showStage(key, build) {
+      const same = this.stageKey === key && !!this.stage.firstElementChild;   // dieselbe Ansicht wird nur neu gezeichnet
       this.stageKey = key;
       if (VD.music) VD.music.where(key === 'lobby' ? 'lobby' : 'game');   // Hintergrundmusik nur in der Lobby
       const el = build();
-      el.classList.add('stage-view', 'view-in');
-      this.stage.replaceChildren(el);
+      el.classList.add('stage-view');
+      if (same) VD.motion.replace(this.stage, el);   // ohne Aus- und Einblenden: es ändert sich ja nichts Sichtbares
+      else { VD.motion.enter(el); VD.motion.swap(this.stage, el); }   // alte Ansicht blendet weich aus
       return el;
     },
 
@@ -343,7 +345,7 @@
           const key = (p.emoji || '') + '|' + p.color + '|' + p.name;
           if (!c || c.key !== key || c.p !== p) {
             const st = h('em', { class: 'pc-s' });
-            const el = h('div', { class: 'pcard', style: { '--c': p.color } }, VD.ui.avatar(p, 'lg'), h('span', { class: 'pc-n', text: p.name }), st,
+            const el = h('div', { class: 'pcard', 'data-id': p.pid, style: { '--c': p.color } }, VD.ui.avatar(p, 'lg'), h('span', { class: 'pc-n', text: p.name }), st,
               h('button', { class: 'kick', 'aria-label': VD.t('{name} entfernen', { name: p.name }), title: VD.t('Entfernen'), onclick: () => this.removePlayer(p, !p.isLocal) }, '✕'));
             if (c) c.el.replaceWith(el);
             c = { el, st, key, p, sig: null }; cards.set(p.pid, c);
@@ -507,7 +509,7 @@
         const key = (p.emoji || '') + '|' + p.color + '|' + p.name;
         if (!c || c.key !== key) {
           const st = h('small');
-          const el = h('div', { class: 'cast-card', style: { '--c': p.color } }, VD.ui.avatar(p, 'lg'), h('b', { text: p.name }), st);
+          const el = h('div', { class: 'cast-card', 'data-id': p.pid, style: { '--c': p.color } }, VD.ui.avatar(p, 'lg'), h('b', { text: p.name }), st);
           if (c) c.el.replaceWith(el);
           c = { el, st, key, ok: null }; cards.set(p.pid, c);
         }
@@ -529,7 +531,7 @@
         h('div', { class: 'pv-cards' }, players.map((p) => {
           const fill = h('i', { class: 'pv-fill' });
           const st = h('em', { class: 'pv-st', text: '' });
-          const card = h('div', { class: 'pv-card', style: { '--c': p.color } }, VD.ui.avatar(p, 'lg'), h('b', { text: p.name }),
+          const card = h('div', { class: 'pv-card', 'data-id': p.pid, style: { '--c': p.color } }, VD.ui.avatar(p, 'lg'), h('b', { text: p.name }),
             h('small', { class: 'pv-char', text: p.assign.chars.join(' · ') + ' · ' + VD.lines(p.assign.lineIdx.length) }), h('div', { class: 'pv-bar' }, fill), st);
           cards.set(p.pid, { card, fill, st, p });
           return card;
@@ -585,10 +587,13 @@
     },
     finalInfo(recs) {
       const r = this.finalRefs; if (!r) return;
-      r.btns.hidden = true;
-      r.chips.replaceChildren(...recs.map((p) => h('span', { class: 'pr-chip', style: { '--c': p.color } }, VD.ui.avatar(p, 'xs'), h('b', { text: p.name }), h('small', { class: 'muted', text: ' ' + VD.t('als {chars}', { chars: p.assign.chars.join(' + ') }) }))));
+      if (!r.btns.hidden) r.btns.hidden = true;
+      const sig = recs.map((p) => p.pid + '|' + p.name + '|' + p.color + '|' + p.assign.chars.join(',')).join(';');
+      if (r.sig === sig && r.chips.firstChild) return;   // gleiche Namen wie eben ("Nochmal ansehen"): nicht neu bauen und nicht noch einmal einblenden
+      r.sig = sig;
+      r.chips.replaceChildren(...recs.map((p) => h('span', { class: 'pr-chip', 'data-id': p.pid, style: { '--c': p.color } }, VD.ui.avatar(p, 'xs'), h('b', { text: p.name }), h('small', { class: 'muted', text: ' ' + VD.t('als {chars}', { chars: p.assign.chars.join(' + ') }) }))));
     },
-    finalButtons(show) { if (this.finalRefs) this.finalRefs.btns.hidden = !show; },
+    finalButtons(show) { const r = this.finalRefs; if (r && r.btns.hidden === !!show) r.btns.hidden = !show; },
   };
 
   Object.assign(VD.Host.prototype, views);

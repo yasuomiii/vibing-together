@@ -53,7 +53,7 @@
     /* getCtrl: liefert (falls vorhanden) den Spieler-Controller; dann erscheint auch die Wahl des Stimmeffekts. */
     /* opts.lang: 'host' | 'player' = im Raum (Lobby/Spiel): zusätzlich Sprachwahl; auf der Startseite gibt es dafür den Knopf oben. */
     openSettings(from, getCtrl, opts) {
-      if (document.querySelector('.modal.set-modal')) return;
+      if (document.querySelector('.modal.set-modal:not(.mo-ghost)')) return;
       const ctrl = getCtrl && getCtrl();
       const close = () => { box.remove(); document.removeEventListener('keydown', onKey); if (from && from.isConnected) from.focus(); };
       const onKey = (e) => { if (e.key === 'Escape') close(); };

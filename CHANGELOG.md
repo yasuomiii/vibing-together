@@ -1,0 +1,50 @@
+# Changelog
+
+All notable changes to Vibing Together. Newest first.
+
+## 2026-11-21
+
+### Added
+- **Shared pack preview.** When the host taps "Preview" in the lobby, the preview now plays on all connected devices at the same time. Everyone sees and hears what is coming up.
+  - The host sends the small data first (sound, texts, stills), then the video, using the same transfer and phone cache as a normal round. A video loaded for the preview is not sent again when the round starts.
+  - The host sees how many devices are ready and can start at any time ("Start now"). Otherwise it starts when everyone has the video or after a short wait (`game.previewWaitMs` in `config.js`).
+  - The start is synchronized with a lead time, like "Watch again" in the premiere.
+  - Devices without the video at the start get a simple version (sound, text, stills) until the end.
+  - Only the host controls pause, continue, seek and close. Players see "Preview from the host" with a progress bar.
+  - New host button "Watch only on my screen" keeps the preview local (nothing is sent).
+  - Starting a round or changing the pack ends the preview everywhere. Lobby music is paused during the preview.
+- Maximum video size for transfer to phones raised to 100 MB (`limits.maxBlobBytes`).
+
+- **Subtitles switch** ("CC") in the preview and in the settings, saved per device.
+- **Switch the language inside a room** without reloading, so nobody gets kicked out.
+
+### Changed
+- **Fluid motion everywhere (new `js/motion.js`, look unchanged).** Selector highlights glide between options; lobby players, pack lists and chips slide into their new places while new entries fade in and removed ones fade out; the old view now fades out as the new one fades in; dialogs grow out of the button that opened them and shrink back; counters and button state changes move briefly; selected role and effect chips spring slightly. Everything respects reduced motion, is skipped while recording, and is cached for offline use (service worker version 21).
+- **Visual polish (look and motion only, no changes to features or texts).**
+  - Shared motion values (durations and easing) at the top of `style.css`; all buttons, round buttons, role chips and switches now react to hover, focus and press in the same rhythm.
+  - Soft fade-in when switching between the start page and the join page; shorter, calmer view transitions in the lobby, recording and result views.
+  - Windows fade in without moving the backdrop and never grow taller than the screen (inner scrolling on small phones). Notifications and progress bars no longer overshoot.
+  - Lobby bar on phones is one row instead of a tall block; on very narrow phones (360 px) the title makes room for the room code so nothing is cut off.
+  - Recording view: the main action stands out (record, then "Done"); "Original", "My take" and "Back" are quieter.
+  - Result view: title, picture, speaker chips and buttons appear one after another.
+  - Contrast raised to WCAG AA in both themes (hint text in dark, red record button, red/green/orange texts in light).
+- Phones with a notch or rounded corners: the top bar, the background and the host stage now respect the safe areas (nothing is hidden under the notch or the bottom bar). The PC layout is unchanged.
+
+### Security
+- Player IDs are now secret between the phone and the host; other players only get a public ID.
+- Player names are cleaned (no invisible or direction-changing characters, limited stacked accents).
+- Incoming data from other devices is checked more strictly: line lists, colors, recordings (length and loudness) and message rate. Spamming devices are disconnected, and the number of connections is limited.
+- Pack import is protected against oversized or manipulated ZIP files and overly long audio lines.
+
+### Fixed
+- **Motion fixes.** Fading-out copies of the old view, closed dialogs and removed list entries no longer replay their fade-in animations; views with their own staggered entrances (lobby, loading, result) no longer fade in twice; redrawing the same view (language switch, a player joining mid-round, replaying the result) no longer fades out and in again; list entries without a stable key are no longer faded out and in at the same time; the selection spring on role and effect chips only plays when the selection really changes. Service worker version 23. When an old view fades out, the new one no longer fades in as well (it only rises slightly), so there is no dip in brightness.
+- Lobby music was too loud for the first 1 to 2 seconds. It now fades in cleanly.
+- Pack delete now asks for a second tap ("Sure?") to avoid accidental deletion.
+- Translation errors are no longer cached, so a failed translation can be retried.
+- Several smaller fixes from a full code review: audio of a stopped video, wake lock handling, name length limit from config, cleanup when leaving a game, keyboard focus in the info dialog, contrast of a text color in the light theme, unused translation keys removed.
+
+## Earlier
+
+- Reconnecting phones (screen lock, signal loss, page reload) and "Rejoin?" prompt.
+- Pack preview for the host, pack favorites, random pack and preferred role.
+- Dub pack maker with subtitles (Whisper in the browser), background music, and six more interface languages.

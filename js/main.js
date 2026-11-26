@@ -5,6 +5,8 @@
   const screens = ['home', 'join', 'maker', 'host', 'player'];
   // Fehlt ein Bereich (z. B. der Ersteller wurde aus index.html entfernt), wird er einfach übersprungen
   const show = (name) => {
+    const cur = screens.map((s) => $('#v-' + s)).find((el) => el && !el.hidden);
+    if (cur && cur.id !== 'v-' + name) VD.motion.leave(cur);   // alte Ansicht blendet weich aus
     screens.forEach((s) => { const el = $('#v-' + s); if (el) el.hidden = s !== name; });
     // Hintergrundmusik: Startseite und Beitritt ja; Ersteller nein; Host und Spieler melden ihre Phase selbst
     if (VD.music) VD.music.where(name === 'home' || name === 'join' ? name : 'off');

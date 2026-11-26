@@ -38,7 +38,7 @@
   /* Text */
   --tx: #f4f1ff;
   --tx-2: #c3bde8;
-  --tx-3: #918bc4;
+  --tx-3: #a29cd3;
 
   /* Farben mit Aufgabe */
   --accent: #9b7dff;
@@ -49,7 +49,7 @@
   --teal: #4fdcc9;
   --teal-deep: #1b9a8c;
   --rec: #ff6f8a;
-  --rec-btn: #ef4a6c;
+  --rec-btn: #d6335a;
   --rec-deep: #b82a48;
   --ok: #52e0a5;
   --warm: #ffc778;
@@ -68,6 +68,14 @@
   --top-h: 64px;
   --bar-h: 62px;
   --ease: cubic-bezier(.2, .8, .2, 1);
+  /* Bewegung: wenige Zeiten für die ganze Seite (Ausnahme: Hintergrund und Dauer-Animationen) */
+  --dur-fast: .16s;      /* Hover, Druck, Schalter */
+  --dur: .24s;           /* Farben, Einblenden kleiner Dinge */
+  --dur-view: .32s;      /* Ansichtswechsel */
+  --dur-slow: .36s;      /* Fenster, Meldungen, Karten */
+  --spring-soft: cubic-bezier(.3, 1.25, .5, 1);   /* federt am Ende nur ganz leicht über */
+  --stagger: 60ms;       /* Versatz bei nacheinander erscheinenden Dingen */
+  --lift: 14px;          /* Weg beim Einblenden */
   --spring: cubic-bezier(.34, 1.5, .64, 1);
   --font: 'Nunito', ui-rounded, 'SF Pro Rounded', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-d: 'Fredoka', 'Nunito', ui-rounded, 'SF Pro Rounded', 'Segoe UI', system-ui, sans-serif;
@@ -107,11 +115,11 @@ html[data-theme="light"] {
   --accent-soft: rgba(122, 85, 240, .14);
   --teal: #0f9d8c;
   --teal-deep: #0b7a6d;
-  --rec: #d93a5f;
-  --rec-btn: #e4476a;
+  --rec: #c82b50;
+  --rec-btn: #cc3156;
   --rec-deep: #a8233f;
-  --ok: #129a68;
-  --warm: #b86e0a;
+  --ok: #0a7650;
+  --warm: #9c5a05;
 
   --wave-bg: rgba(91, 63, 210, .06);
   --wave-a: rgba(122, 85, 240, .38);
@@ -252,12 +260,12 @@ canvas { display: block; width: 100%; }
 .screen { min-height: 100dvh; }
 /* Beim Laden: Inhalt erst zeigen, wenn Sprache und Design fertig sind (main.js nimmt die Klasse weg) */
 html.booting .screen { visibility: hidden; }
-.view-in { animation: viewIn .5s var(--spring) backwards; }
+.view-in { animation: viewIn var(--dur-view) var(--ease) backwards; }
 /* Der Ersteller blendet nur ein, ohne sich zu bewegen: Verschiebt sich die Seite beim Einblenden (auch nur um Pixel, z. B. durch eine Scrollleiste), wirkt das wie ein Springen zur Seite. */
 .maker.view-in { animation: makerIn .4s ease-out backwards; }
 @keyframes makerIn { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .view-in, .maker.view-in { animation: none; } }
-@keyframes viewIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
 /* ----- Karten: die eine Fläche, aus der alles gebaut ist. Weich gerundet, mit einer Kante unten ----- */
 
@@ -340,10 +348,10 @@ html.booting .screen { visibility: hidden; }
 
 /* ----- Hinweise ----- */
 #toasts { position: fixed; z-index: 100; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 96px); transform: translateX(-50%); display: grid; justify-items: center; gap: .5rem; width: min(92vw, 520px); pointer-events: none; }
-.toast { border-radius: 999px; padding: .7rem 1.3rem; font-size: .96rem; font-weight: 700; text-align: center; background: var(--surface-3); animation: toastIn .5s var(--spring) backwards; }
+.toast { border-radius: 999px; padding: .7rem 1.3rem; font-size: .96rem; font-weight: 700; text-align: center; background: var(--surface-3); animation: toastIn var(--dur-slow) var(--spring-soft) backwards; }
 .toast.warn { border-color: color-mix(in srgb, var(--warm) 60%, transparent); }
-.toast.out { opacity: 0; transform: translateY(8px) scale(.97); transition: .3s var(--ease); }
-@keyframes toastIn { from { opacity: 0; transform: translateY(18px) scale(.9); } }
+.toast.out { opacity: 0; transform: translateY(8px) scale(.97); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(14px) scale(.96); } }
 
 /* ----- Spieler-Symbole: runder Sticker in der Farbe des Spielers ----- */
 .avatar {
@@ -622,7 +630,7 @@ body.dragging::after {
 .pv-card.live { border-color: var(--rec); transform: translateY(-3px); box-shadow: var(--shine), 0 5px 0 var(--ledge), 0 0 0 5px color-mix(in srgb, var(--rec) 18%, transparent), var(--shadow); }
 .pv-char { color: var(--tx-2); font-size: .92rem; font-weight: 700; }
 .pv-bar { width: 100%; height: 12px; border-radius: 8px; background: var(--fill-2); overflow: hidden; margin-top: .25rem; border: 2px solid var(--line-soft); }
-.pv-fill { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, var(--accent), var(--teal)); border-radius: 8px; transition: transform .5s var(--spring); }
+.pv-fill { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, var(--accent), var(--teal)); border-radius: 8px; transition: transform var(--dur-slow) var(--ease); }
 .pv-card.done .pv-fill { background: var(--ok); }
 .pv-st { color: var(--tx-3); font-size: .9rem; font-weight: 700; font-style: normal; font-variant-numeric: tabular-nums; }
 .pv-card.live .pv-st { color: var(--rec); }
@@ -816,7 +824,6 @@ body:has(.local-dock.big) .h-stage, body:has(.local-dock.big) .h-strip { visibil
   .app-mark { animation: none; }
   .medal { animation: pop .8s var(--spring); filter: none; }
   .wordmark, html[data-theme="light"] .wordmark { filter: none; }
-  .view-in { animation-duration: .35s; }
 }
 
 /* Weniger Bewegung: Animationen aus */
@@ -863,8 +870,8 @@ html[data-theme="light"] .lang-opt-ck { color: var(--teal-deep); }
 .home { position: relative; }
 
 /* ----- Hinweisfenster (Weiterleitung) ----- */
-.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 1.25rem; background: color-mix(in srgb, var(--bg) 90%, transparent); animation: viewIn .35s var(--ease) backwards; }
-.modal-card { width: min(30rem, 100%); display: grid; gap: .8rem; padding: 1.7rem; border-radius: var(--r-xl); text-align: left; background: var(--card-bg); border: 2px solid var(--line); box-shadow: var(--shine), 0 6px 0 var(--ledge), var(--shadow); animation: pop .45s var(--spring) backwards; }
+.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 1.25rem; background: color-mix(in srgb, var(--bg) 90%, transparent); animation: fadeIn var(--dur) var(--ease) backwards; }
+.modal-card { width: min(30rem, 100%); display: grid; gap: .8rem; padding: 1.7rem; border-radius: var(--r-xl); text-align: left; background: var(--card-bg); border: 2px solid var(--line); box-shadow: var(--shine), 0 6px 0 var(--ledge), var(--shadow); animation: modalIn var(--dur-slow) var(--spring-soft) backwards; }
 .modal-card h2 { font-size: 1.7rem; line-height: 1.12; }
 .modal-card p { margin: 0; color: var(--tx-2); }
 .modal-card .modal-site { color: var(--tx); font-weight: 800; font-size: 1.05rem; }
@@ -1140,3 +1147,87 @@ html[data-theme="light"] .btn.mk-launch, html[data-theme="light"] .btn.mk-launch
 .pv-away-list { display: grid; gap: .5rem; margin-top: .9rem; }
 .pv-away-list:empty { display: none; }
 .pv-away { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .6rem; padding: .6rem .9rem; border-radius: 999px; background: var(--surface-3); border: 1px solid color-mix(in srgb, var(--c, var(--accent)) 55%, transparent); font-weight: 700; }
+
+/* ==========================================================================
+   Feinschliff: gleiche Bewegung, ruhigere Rangfolge, sauberere Fenster.
+   Zeiten und Kurven kommen aus den Variablen ganz oben (--dur-*, --ease, --spring).
+   ========================================================================== */
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes modalIn { from { opacity: 0; transform: translateY(var(--lift)) scale(.97); } }
+@keyframes riseIn { from { opacity: 0; transform: translateY(10px); } }
+
+/* Startseite und Beitritt blenden beim Wechsel weich ein (die Ansichten werden per hidden umgeschaltet, die Animation startet dabei neu) */
+#v-home:not([hidden]), #v-join:not([hidden]) { animation: viewRise var(--dur-view) var(--ease) backwards; }
+
+/* Alles Anklickbare: gleicher Rhythmus bei Hover, Druck und Farbwechsel */
+.btn, .icon-btn, .role, .fx-chip, .av-opt {
+  transition: transform var(--dur-fast) var(--spring), background-color var(--dur), border-color var(--dur), box-shadow var(--dur-fast), color var(--dur), opacity var(--dur);
+}
+.icon-btn:active { transform: scale(.92); }
+.btn:focus-visible, .icon-btn:focus-visible, .role:focus-visible, .seg-b:focus-visible, .lang-pick:focus-visible, .fx-chip:focus-visible, .av-opt:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+
+/* Fenster: Hintergrund blendet nur ein (er verrutscht nicht mehr), die Karte hebt sich sanft; auf kleinen Bildschirmen nie höher als der Bildschirm */
+.modal { padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
+.modal-card { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+.modal-btns .btn, .btn.solo { white-space: normal; text-align: center; text-wrap: balance; }
+
+/* Untere Leiste am Handy: eine ruhige Reihe statt eines hohen Blocks; bei vielen Knöpfen bricht sie sauber um */
+@media (max-width: 700px) {
+  .h-bar { flex-direction: row; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; padding: .5rem .55rem .5rem 1rem; border-radius: 28px; }
+  .bar-l { text-align: left; flex: 1 1 auto; min-width: 0; }
+  .bar-btns { flex: 0 1 auto; justify-content: flex-end; }
+  .bar-btns .btn { flex: 0 1 auto; }
+  .h-top { padding-right: .5rem; }
+  .lobby-foot { flex-wrap: nowrap; gap: .5rem; padding: .5rem .5rem .5rem .6rem; }
+  .lobby-foot .home-btn { flex: 1 1 auto; min-width: 0; padding: .5em .7em; font-size: .95rem; line-height: 1.2; white-space: normal; text-align: left; justify-content: flex-start; }
+  .lobby-foot .btn.xl { flex: 0 0 auto; padding-inline: 1.3em; }
+}
+
+/* Sehr schmale Handys (360 px): der Raum-Code ist wichtiger als der Schriftzug, sonst läuft die Leiste über den Rand */
+@media (max-width: 380px) {
+  .h-top .brand { display: none; }
+  .h-top .room-chip { margin-right: auto; }
+  .h-top { gap: .4rem; }
+}
+
+.rec-top .kicker { font-family: var(--font-d); font-size: 1.12rem; font-weight: 600; color: var(--tx); }
+
+/* Aufnahme-Ansicht: die Hauptaktion fällt auf (Aufnahme, danach "Fertig"), Original, Mein Take und Zurück sind leiser */
+.dp-btns .btn:not(.dp-rec):not(.primary) { background: var(--fill); border-color: var(--line-soft); box-shadow: none; font-weight: 500; }
+.dp-btns .btn:not(.dp-rec):not(.primary):hover { background: var(--fill-2); border-color: var(--line); transform: none; box-shadow: none; }
+.dp-btns .btn:not(.dp-rec):not(.primary):active { transform: scale(.97); box-shadow: none; }
+.dp-btns .dp-rec { min-height: 56px; font-size: 1.1rem; }
+.dp-btns .btn.primary { min-height: 56px; }
+
+/* Ergebnis / Premiere: Titel, Bild, Namen und Knöpfe erscheinen nacheinander */
+.premiere > .rec-top { animation: riseIn var(--dur-slow) var(--ease) backwards; }
+.premiere > .dub-screen.big { animation: fadeIn calc(var(--dur-slow) + .1s) var(--ease) backwards; animation-delay: var(--stagger); }
+.premiere > .col-c, .premiere > .fin-row, .premiere > .dl-row { animation: riseIn var(--dur-slow) var(--ease) backwards; animation-delay: calc(var(--stagger) * 3); }
+.pr-chip { animation: riseIn var(--dur-slow) var(--ease) backwards; animation-delay: calc(var(--stagger) * 2); }
+.pr-chip:nth-child(2) { animation-delay: calc(var(--stagger) * 3); }
+.pr-chip:nth-child(3) { animation-delay: calc(var(--stagger) * 4); }
+.pr-chip:nth-child(n+4) { animation-delay: calc(var(--stagger) * 5); }
+
+@media (prefers-reduced-motion: reduce) {
+  #v-home:not([hidden]), #v-join:not([hidden]), .modal, .modal-card, .premiere > *, .pr-chip { animation: none; }
+}
+
+/* ==========================================================================
+   Bewegung (js/motion.js): gleitende Markierung, nachrückende Listen, sanfte Wechsel
+   ========================================================================== */
+@keyframes viewRise { from { transform: translateY(10px); } }
+.mo-ghost { pointer-events: none; }
+/* Kopien der alten Ansicht (und entfernte Einträge) dürfen nichts neu einblenden: nur das Ausblenden der Kopie selbst läuft (Web Animations API) */
+.mo-ghost, .mo-ghost *, .mo-ghost *::before, .mo-ghost *::after { animation: none !important; transition: none !important; }
+/* Ansichten, deren Inhalt schon nacheinander einblendet: die Ansicht selbst bewegt sich nur leicht (kein zweites Einblenden) */
+.view-rise { animation: viewRise var(--dur-view) var(--ease) backwards; }
+
+/* Umschalter: die Markierung liegt hinter den Knöpfen und gleitet zum gewählten Knopf. Ohne Markierung gilt das normale Aussehen. */
+.seg.mo-g { position: relative; }
+.seg.mo-g > .seg-b { position: relative; z-index: 1; }
+.seg.mo-g > .mo-ind { position: absolute; left: 0; top: 0; z-index: 0; border-radius: 14px; background: var(--accent-btn); box-shadow: 0 3px 0 var(--accent-deep); transform-origin: 0 0; pointer-events: none; opacity: 0; will-change: transform; }
+.seg.mo-live > .mo-ind { opacity: 1; }
+.seg.mo-live > .seg-b.on { background: transparent; box-shadow: none; }
+
+/* Auswahl-Chips und Wunschrollen: das Einfedern des gewählten Chips kommt aus js/motion.js, und nur wenn sich die Auswahl wirklich ändert */
+@media (prefers-reduced-motion: reduce) { .view-rise { animation: none; } .seg.mo-g > .mo-ind { transition: none; } }
