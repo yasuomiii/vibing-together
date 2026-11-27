@@ -268,7 +268,7 @@
       box.hidden = !chars.length || this.wishOn === false;
       const me = this.players.find((p) => p.pid === this.pub);
       const mine = me ? me.wish : null;
-      box.lastChild.replaceChildren(...chars.map((c) => {
+      VD.motion.keepFocus(box.lastChild, () => box.lastChild.replaceChildren(...chars.map((c) => {
         const who = this.players.filter((p) => p.wish === c.n);
         return h('button', { class: 'role' + (mine === c.n ? ' on' : ''), type: 'button', 'aria-pressed': String(mine === c.n), onclick: () => {
           const next = mine === c.n ? null : c.n;
@@ -279,7 +279,7 @@
       }).concat(h('button', { class: 'role' + (!mine ? ' on' : ''), type: 'button', 'aria-pressed': String(!mine), onclick: () => {
         if (me) me.wish = null;
         this.send({ t: 'wish', c: null }); this.fx('tap'); this.updateRoles();
-      } }, h('b', { text: VD.t('Überrasch mich') }))));
+      } }, h('b', { text: VD.t('Überrasch mich') })))));
     }
     /* Pegelbalken in der Lobby. Das Mikro liefert nur etwa alle 20 ms einen neuen Wert und der Balken gleitet per CSS,
        deshalb reichen 30 Schritte pro Sekunde über einen Zeitgeber (kein Dauerlauf mit jedem Bild). */
@@ -978,4 +978,13 @@
       if (!this.local) VD.wake.off();
     }
   };
+
+  /* Listen gleiten beim Neuzeichnen weich an ihre neuen Plätze (js/motion.js, VD.motion.flip) */
+  const P = VD.Controller.prototype, F = VD.motion.wrapFlip;
+  F(P, 'updateRoles', function () { return this._roles && this._roles.lastChild; }, { pop: true });
+  F(P, 'updateLobbyList', function () { return this._list; });
+  F(P, 'updateRoster', function () { return this._roster; });
+  // Handy-Lobby: Teile darunter rutschen weich nach, wenn die Wunschrollen oder die Spielerliste die Höhe ändern
+  const parts = function () { const v = this.viewKey === 'lobby' && this.body && this.body.firstElementChild; return v ? v.children : null; };
+  ['updateRoles', 'updateLobbyList'].forEach((n) => VD.motion.wrapLayout(P, n, parts));
 })();

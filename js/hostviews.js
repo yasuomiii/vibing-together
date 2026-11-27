@@ -374,7 +374,7 @@
       const pk = VD.Packs.current();
       box.hidden = !(me && pk && pk.chars.length && this.wishOn());
       if (box.hidden) return;
-      box.lastChild.replaceChildren(...pk.chars.map((c) => {
+      VD.motion.keepFocus(box.lastChild, () => box.lastChild.replaceChildren(...pk.chars.map((c) => {
         const k = pk.lines.filter((l) => l.char === c).length;
         const who = this.list().filter((p) => p.canRecord && p.wish === c);
         return h('button', { class: 'role' + (me.wish === c ? ' on' : ''), type: 'button', 'aria-pressed': String(me.wish === c), onclick: () => {
@@ -384,7 +384,7 @@
         who.length ? h('span', { class: 'role-who' }, ...who.map((p) => VD.ui.avatar(p, 'xs'))) : null);
       }).concat(h('button', { class: 'role' + (!me.wish ? ' on' : ''), type: 'button', 'aria-pressed': String(!me.wish), onclick: () => {
         me.wish = null; VD.sfx.play('tap'); this.onRosterChanged();
-      } }, h('b', { text: VD.t('Überrasch mich') }))));
+      } }, h('b', { text: VD.t('Überrasch mich') })))));
     },
 
     onPacksChanged() {
@@ -597,4 +597,16 @@
   };
 
   Object.assign(VD.Host.prototype, views);
+
+  /* Listen gleiten beim Neuzeichnen weich an ihre neuen Plätze (js/motion.js, VD.motion.flip) */
+  const P = VD.Host.prototype, F = VD.motion.wrapFlip;
+  F(P, 'renderPacks', function () { return this.lobbyRefs && this.lobbyRefs.packs; });
+  F(P, 'renderLobbyPlayers', function () { return this.stageKey === 'lobby' && this.lobbyRefs && this.lobbyRefs.players; });
+  F(P, 'renderHostRoles', function () { const r = this.lobbyRefs && this.lobbyRefs.hostRoles; return r && r.lastChild; }, { pop: true });
+  F(P, 'refreshStrip', function () { return this.strip; });
+  F(P, 'updateLoad', function () { return VD.$('#load-cast'); });
+  // Die Karten der Lobby rutschen weich nach, wenn sich darüber etwas in der Höhe ändert (Wunschrolle, Hinweise, Status)
+  const panels = function () { return this.state === 'lobby' && this.stageKey === 'lobby' ? this.stage.querySelectorAll('.lobby .panel') : null; };
+  ['renderPacks', 'renderLobbyPlayers', 'renderHostRoles', 'updateLobbySummary', 'setStatus', 'onPacksChanged', 'onSettingsChanged'].forEach((n) => VD.motion.wrapLayout(P, n, panels));
+  VD.motion.wrapLayout(P, 'onRosterChanged', panels);
 })();

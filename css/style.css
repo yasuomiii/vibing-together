@@ -1232,3 +1232,5 @@ html[data-theme="light"] .btn.mk-launch, html[data-theme="light"] .btn.mk-launch
 
 /* Auswahl-Chips und Wunschrollen: das Einfedern des gewählten Chips kommt aus js/motion.js, und nur wenn sich die Auswahl wirklich ändert */
 @media (prefers-reduced-motion: reduce) { .view-rise { animation: none; } .seg.mo-g > .mo-ind { transition: none; } }
+/* Die Lobby glättet Höhenänderungen selbst (js/motion.js). Das automatische Mitscrollen des Browsers würde dagegen arbeiten und die ganze Seite springen lassen. */
+.h-stage, .pc-root, .pc-body { overflow-anchor: none; }

@@ -108,9 +108,14 @@
   };
 
   /* ------------------------------------------------------------------
-     2. Listen (FLIP): Position merken, Änderung abwarten, vom alten zum neuen Platz gleiten
+     2. Listen (FLIP): VD.motion.flip(box, neuZeichnen)
+     Direkt vor dem Neuzeichnen wird gemessen, wo jeder Eintrag gerade SICHTBAR ist (auch mitten in einer Bewegung),
+     direkt danach, wo er jetzt steht. Dann gleitet er von dort an den neuen Platz. Einträge werden über einen festen
+     Schlüssel wiedererkannt (data-id, data-k oder ihr Name), auch wenn sie neu gebaut wurden.
+     - wirklich neue Einträge blenden einmal ein (eigene CSS-Einblendung, sonst kurz per Web Animations API)
+     - neu gebaute, aber gleiche Einträge blenden NICHT noch einmal ein
+     - entfernte Einträge blenden an ihrem alten Platz aus (Kopie ohne eigene Animationen)
      ------------------------------------------------------------------ */
-  const lists = new WeakMap();
   const keyOf = (el) => {
     const d = el.dataset || {};
     if (d.id) return 'i:' + d.id;
@@ -119,75 +124,150 @@
     const t = (b ? b.textContent : el.tagName === 'LI' ? el.textContent : '').trim();
     return t ? 't:' + t : null;
   };
-  function initList(box) {
-    if (lists.has(box)) return;
-    const born = performance.now();
-    const S = { cache: new Map(), anims: new WeakMap(), born };
-    lists.set(box, S);
-    const kids = () => Array.from(box.children).filter((c) => !c.classList.contains('mo-ghost'));
-    const rel = (el) => {
-      const r = el.getBoundingClientRect(), b = box.getBoundingClientRect();
-      return { x: r.left - b.left - box.clientLeft + box.scrollLeft, y: r.top - b.top - box.clientTop + box.scrollTop, w: r.width, h: r.height };
-    };
-    const visible = () => box.isConnected && box.getClientRects().length > 0;
-    const snap = () => {
-      const m = new Map();
-      if (!visible()) return m;
-      kids().forEach((el) => { const k = keyOf(el); if (k != null) m.set(k, { r: rel(el), node: el }); });
-      return m;
-    };
-    later(() => { S.cache = snap(); }, 520);
-    const hasCss = (el) => { try { return getComputedStyle(el).animationName !== 'none'; } catch { return true; } };
-    const onChange = () => {
-      if (!visible()) { S.cache = new Map(); return; }
-      const list = kids();
-      const go = can() && performance.now() - S.born > 520 && list.length <= 160 && S.cache.size > 0;
-      const vis = new Map();
-      if (go) list.forEach((el) => { const a = S.anims.get(el); if (a) { vis.set(el, rel(el)); try { a.cancel(); } catch { /* ignore */ } S.anims.delete(el); } });
-      const now = new Map();
-      list.forEach((el) => { const k = keyOf(el); if (k != null) now.set(k, { r: rel(el), node: el }); });
-      // Eintrag wurde nur neu gebaut (gleicher Schlüssel): CSS-Einblendung nicht noch einmal abspielen; neu gewählt: kurz einfedern
-      now.forEach((cur, key) => {
-        const o = S.cache.get(key);
-        if (!o || o.node === cur.node || o.node.isConnected) return;
-        if (hasCss(cur.node) && getComputedStyle(cur.node).animationIterationCount.indexOf('infinite') < 0) cur.node.style.animation = 'none';
-        if (can() && cur.node.classList.contains('on') && !o.node.classList.contains('on')) run(cur.node, [{ transform: 'scale(.92)' }], { duration: dur().slow, easing: spring() });
-      });
-      if (go) {
-        const vh = window.innerHeight, br = box.getBoundingClientRect();
-        const d = dur();
-        now.forEach((cur, key) => {
-          const el = cur.node, was = vis.get(el) || (S.cache.get(key) && S.cache.get(key).r);
-          const top = br.top + cur.r.y - box.scrollTop;
-          if (top > vh + 80 || top + cur.r.h < -80) return;   // nur Sichtbares wird bewegt
-          if (was) {
-            const dx = was.x - cur.r.x, dy = was.y - cur.r.y;
-            if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-              const a = run(el, [{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }], { duration: d.slow, easing: ease() }, () => S.anims.delete(el));
-              if (a) S.anims.set(el, a);
-            }
-          } else if (!hasCss(el)) {
-            run(el, [{ opacity: 0, transform: 'translateY(10px) scale(.97)' }], { duration: d.slow, easing: ease() });
-          }
-        });
-        // Entfernte Einträge: blenden an ihrem alten Platz aus (als Kopie über der Seite)
-        S.cache.forEach((old, key) => {
-          if (now.has(key) || old.node.isConnected) return;
-          const top = br.top + old.r.y - box.scrollTop;
-          if (top > vh + 80 || top + old.r.h < -80) return;
-          const g = old.node;
-          g.classList.add('mo-ghost');
-          g.style.cssText += ';position:fixed;margin:0;pointer-events:none;z-index:30;left:' + (br.left + box.clientLeft + old.r.x - box.scrollLeft) + 'px;top:' + top + 'px;width:' + old.r.w + 'px;height:' + old.r.h + 'px;';
-          g.setAttribute('aria-hidden', 'true'); g.querySelectorAll('button, a, input').forEach((x) => { x.tabIndex = -1; });
-          document.body.append(g);
-          run(g, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.96)' }], { duration: d.mid, easing: ease() }, () => g.remove());
-        });
+  const hasCss = (el) => { try { const cs = getComputedStyle(el); return cs.animationName !== 'none' && cs.animationIterationCount.indexOf('infinite') < 0; } catch { return false; } };
+  const flips = new WeakMap();   // Eintrag -> laufende Gleit-Animation
+  let layDepth = 0, layEls = [];
+  const layQueue = [];
+  /* Eintrag vom sichtbaren alten Platz br an den neuen gleiten lassen. ox/oy: so weit wird er schon von der umgebenden Karte verschoben */
+  const glide = (el, br, pop, ox, oy, r0) => {
+    if (!el.isConnected) return;
+    const r = r0 || el.getBoundingClientRect();
+    const dx = br.left - r.left - ox, dy = br.top - r.top - oy;
+    const moved = Math.abs(dx) > 1 || Math.abs(dy) > 1;
+    if (!moved && !pop) return;
+    const from = (moved ? 'translate(' + dx + 'px,' + dy + 'px)' : '') + (pop ? ' scale(.92)' : '');
+    const a = run(el, [{ transform: from.trim() }, { transform: 'none' }], { duration: dur().slow, easing: pop && !moved ? spring() : ease() }, () => { if (flips.get(el) === a) flips.delete(el); });
+    if (a) flips.set(el, a);
+  };
+  M.flip = (box, mutate, opts) => {
+    const go = box && box.isConnected && can() && box.children.length <= 160 && box.getClientRects().length > 0;
+    if (!go) { mutate(); return; }
+    // Steckt die Liste in einer Karte, die selbst gleitet (flipEls): deren Platz jetzt messen, im selben Moment wie die Einträge
+    const panel = layDepth ? layEls.find((x) => x.contains(box)) || null : null;
+    const pr = panel ? panel.getBoundingClientRect() : { left: 0, top: 0 };
+    const before = new Map();
+    for (const el of box.children) {
+      const k = keyOf(el);
+      if (k != null && !before.has(k)) before.set(k, { r: el.getBoundingClientRect(), node: el, on: el.classList.contains('on') });
+    }
+    // laufende Bewegungen beenden (der sichtbare Platz ist schon gemessen)
+    before.forEach((b) => { const a = flips.get(b.node); if (a) { try { a.cancel(); } catch { /* ignore */ } flips.delete(b.node); } });
+    mutate();
+    if (!box.isConnected) return;
+    const d = dur(), vh = window.innerHeight, seen = new Set();
+    for (const el of box.children) {
+      const k = keyOf(el);
+      if (k == null || seen.has(k)) continue;
+      seen.add(k);
+      const b = before.get(k);
+      if (b && b.node !== el && hasCss(el)) el.style.animation = 'none';   // nur neu gebaut: nicht noch einmal einblenden
+      const r = el.getBoundingClientRect();
+      const off = (x) => x.bottom < -80 || x.top > vh + 80;
+      if (off(r) && (!b || off(b.r))) continue;   // nur was vorher oder nachher zu sehen ist, wird bewegt
+      if (b) {
+        const pop = !!(opts && opts.pop && el.classList.contains('on') && !b.on);   // neu gewählt: kurz einfedern
+        if (layDepth) layQueue.push({ el, panel, bx: b.r.left - pr.left, by: b.r.top - pr.top, pop });   // bewegt wird danach (flipEls)
+        else glide(el, b.r, pop, 0, 0);
+      } else if (!hasCss(el)) {
+        run(el, [{ opacity: 0, transform: 'translateY(8px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: d.slow, easing: ease() });
       }
-      S.cache = now;
+    }
+    // Entfernte Einträge: eine Kopie blendet an der alten Stelle aus
+    before.forEach((b, k) => {
+      if (seen.has(k) || b.node.isConnected) return;
+      const r = b.r;
+      if (r.bottom < -80 || r.top > vh + 80 || !r.width) return;
+      const g = b.node.cloneNode(true);
+      g.querySelectorAll('[id]').forEach((x) => x.removeAttribute('id')); g.removeAttribute('id');
+      g.classList.add('mo-ghost'); g.setAttribute('aria-hidden', 'true');
+      g.querySelectorAll('button, a, input').forEach((x) => { x.tabIndex = -1; });
+      g.style.cssText += ';position:fixed;margin:0;pointer-events:none;z-index:30;box-sizing:border-box;left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px;transform:none;';
+      document.body.append(g);
+      run(g, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.96)' }], { duration: d.mid, easing: ease() }, () => g.remove());
+    });
+  };
+  /* Größere Bereiche (z. B. die Karten der Lobby): Ändert sich darüber etwas in der Höhe, rutschen sie weich statt hart nach.
+     Verschachtelte Aufrufe zählen als einer (nur der äußerste misst und bewegt). */
+  const lays = new WeakMap();
+  const scrollerOf = (el) => {
+    for (let n = el && el.parentElement; n && n !== document.body; n = n.parentElement) { const o = getComputedStyle(n).overflowY; if (o === 'auto' || o === 'scroll') return n; }
+    return document.scrollingElement || document.documentElement;
+  };
+  /* Höhe des Inhalts ohne die laufenden Verschiebungen (die zählen sonst kurz mit und der Browser zieht die Bildlaufposition später ruckartig nach) */
+  const naturalHeight = (sc) => {
+    let bottom = 0;
+    const top0 = sc.getBoundingClientRect().top - sc.scrollTop;
+    for (const c of sc.children) { if (c.classList.contains('mo-ghost')) continue; const r = c.getBoundingClientRect(); bottom = Math.max(bottom, r.top - top0 + c.offsetHeight + (parseFloat(getComputedStyle(c).marginBottom) || 0)); }
+    return bottom + (parseFloat(getComputedStyle(sc).paddingBottom) || 0);
+  };
+  M.flipEls = (els, mutate) => {
+    if (layDepth || !els || !els.length || !can()) { mutate(); return; }
+    layQueue.length = 0;
+    layDepth++;
+    let before, sc = null;
+    try {
+      before = els.map((el) => ({ el, r: el.getBoundingClientRect() }));
+      before.forEach((b) => { const a = lays.get(b.el); if (a) { try { a.cancel(); } catch { /* ignore */ } lays.delete(b.el); } });
+      sc = scrollerOf(els[0]);
+      layEls = els;
+      mutate();
+    } finally { layDepth--; layEls = []; }
+    // Wird der Inhalt kürzer, während man ganz unten ist: Bildlaufposition sofort anpassen, die Bewegung unten gleicht es weich aus
+    try {
+      if (sc && sc !== document.scrollingElement) { const max = Math.max(0, Math.ceil(naturalHeight(sc) - sc.clientHeight)); if (sc.scrollTop > max) sc.scrollTop = max; }
+    } catch { /* ignore */ }
+    const vh = window.innerHeight, d = dur();
+    // Erst alles messen (Karten und Einträge), dann erst bewegen: sonst misst man schon verschobene Plätze
+    const offs = new Map(), after = new Map();
+    before.forEach((b) => {
+      const el = b.el;
+      if (!el.isConnected) return;
+      const r = el.getBoundingClientRect();
+      after.set(el, r);
+      const dx = b.r.left - r.left, dy = b.r.top - r.top;
+      const off = (x) => x.top > vh + 80 || x.bottom < -80;
+      if ((Math.abs(dx) < 2 && Math.abs(dy) < 2) || (off(r) && off(b.r))) return;   // vorher und nachher außer Sicht: nichts zu sehen
+      offs.set(el, { dx, dy });
+    });
+    const q = layQueue.splice(0).map((it) => Object.assign(it, { r: it.el.isConnected ? it.el.getBoundingClientRect() : null }));
+    offs.forEach((o, el) => {
+      const a = run(el, [{ transform: 'translate(' + o.dx + 'px,' + o.dy + 'px)' }, { transform: 'none' }], { duration: d.slow, easing: ease() }, () => { if (lays.get(el) === a) lays.delete(el); });
+      if (a) lays.set(el, a);
+    });
+    // Einträge in den Listen: ihre Bewegung abzüglich der Bewegung ihrer Karte (sonst würden sie doppelt verschoben)
+    q.forEach((it) => {
+      if (!it.r || !it.el.isConnected) return;
+      const pr = (it.panel && after.get(it.panel)) || { left: 0, top: 0 };
+      // Platz in der Karte vorher und nachher; die Karte selbst gleitet schon für sich
+      const br = { left: it.bx + pr.left, top: it.by + pr.top };
+      glide(it.el, br, it.pop, 0, 0, it.r);
+    });
+  };
+  M.wrapLayout = (proto, name, elsOf) => {
+    const f = proto[name];
+    if (typeof f !== 'function' || f._moLay) return;
+    const w = function (...args) {
+      let out, els = null;
+      try { els = elsOf.call(this); } catch { els = null; }
+      M.flipEls(els ? Array.from(els) : null, () => { out = f.apply(this, args); });
+      return out;
     };
-    new MutationObserver(onChange).observe(box, { childList: true });
-    if (window.ResizeObserver) new ResizeObserver(() => { if (performance.now() - S.born > 520) S.cache = snap(); }).observe(box);
-  }
+    w._moLay = true;
+    proto[name] = w;
+  };
+  /* Methode eines Objekts so umhüllen, dass ihre Liste gleitet: wrapFlip(proto, 'renderPacks', function () { return box; }) */
+  M.wrapFlip = (proto, name, boxOf, opts) => {
+    const f = proto[name];
+    if (typeof f !== 'function' || f._moFlip) return;
+    const w = function (...args) {
+      let out, box = null;
+      try { box = boxOf.call(this); } catch { box = null; }
+      M.flip(box, () => { out = f.apply(this, args); }, opts);
+      return out;
+    };
+    w._moFlip = true;
+    proto[name] = w;
+  };
 
   /* ------------------------------------------------------------------
      3. Ansichtswechsel: die alte Ansicht blendet aus, während die neue einblendet (Kopfleiste, Raumcode, Logo bleiben stehen)
@@ -283,15 +363,14 @@
   function initTick(el) {
     if (el._moTick) return;
     el._moTick = true;
-    let last = el.textContent, t0 = 0;
+    let last = el.textContent, a = null;
     new MutationObserver(() => {
       const now = el.textContent;
       if (now === last) return;
       last = now;
-      const t = performance.now();
-      if (t - t0 < 120 || !can() || !el.getClientRects().length) return;
-      t0 = t;
-      run(el, [{ opacity: .25, transform: 'translateY(7px)' }], { duration: dur().mid, easing: ease() });
+      if (a) { try { a.cancel(); } catch { /* ignore */ } a = null; }   // schnell hintereinander: neu ansetzen, nie hart abbrechen
+      if (!can() || !el.getClientRects().length) return;
+      a = run(el, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: dur().mid, easing: ease() }, () => { a = null; });
     }).observe(el, { childList: true, characterData: true, subtree: true });
   }
   function initPop(btn) {
@@ -323,6 +402,31 @@
     }).observe(chip, { attributes: true, attributeFilter: ['class'] });
   }
 
+  /* Bereiche, die per hidden erscheinen (Wunschrolle, Hinweise, Fehler): blenden leicht ein, aber nur wenn sie nach dem Einfügen sichtbar werden
+     (Bereiche, die schon sichtbar mit der Ansicht kommen, blenden nicht noch einmal ein) */
+  function initReveal(el) {
+    if (el._moRev) return;
+    el._moRev = true;
+    let was = el.hidden;
+    new MutationObserver(() => {
+      const hid = el.hidden;
+      if (was && !hid && can() && el.getClientRects().length) run(el, [{ opacity: 0, transform: 'translateY(8px)' }], { duration: dur().slow, easing: ease() });
+      was = hid;
+    }).observe(el, { attributes: true, attributeFilter: ['hidden'] });
+  }
+  /* Liste neu zeichnen, ohne dass der Tastaturfokus verloren geht: der fokussierte Eintrag wird nach dem Neuzeichnen wiedergefunden */
+  M.keepFocus = (box, fn) => {
+    const a = document.activeElement;
+    const had = a && a !== document.body && box.contains(a);
+    const idx = had ? Array.from(box.children).findIndex((c) => c.contains(a)) : -1;
+    const label = had ? (a.textContent || '').trim() : '';
+    fn();
+    if (!had) return;
+    const kids = Array.from(box.children);
+    const hit = kids.find((c) => (c.textContent || '').trim() === label) || kids[idx];
+    if (hit && hit.focus) { try { hit.focus({ preventScroll: true }); } catch { /* ignore */ } }
+  };
+
   /* Hell/Dunkel: das Symbol dreht sich weich ein */
   document.addEventListener('vt-theme', () => {
     if (!can()) return;
@@ -332,17 +436,16 @@
   /* ------------------------------------------------------------------
      Alles automatisch anschließen, sobald die passenden Elemente auftauchen
      ------------------------------------------------------------------ */
-  const LISTS = '.players, .pack-list, .h-strip, .mini-players, .roster, .pr-cast, .role-list, .pv-cards';
   const TICKS = '.dp-n, .sum, .pv-status, .pc-s';
   const POPS = '.dp-btns .btn';
   const each = (n, sel, fn) => { if (n.matches && n.matches(sel)) fn(n); if (n.querySelectorAll) n.querySelectorAll(sel).forEach(fn); };
   const scan = (n) => {
     if (!n || n.nodeType !== 1 || n.classList.contains('mo-ghost')) return;
     each(n, '.seg', initGlide);
-    each(n, LISTS, initList);
     each(n, TICKS, initTick);
     each(n, POPS, initPop);
     each(n, '.fx-chip, .role', initSel);
+    each(n, '.roles, .warn', initReveal);
     each(n, '.lang-menu', initMenu);
   };
   M.scan = scan;
