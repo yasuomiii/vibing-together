@@ -412,7 +412,7 @@
       on = o;
       if (!o || !can() || !chip.getClientRects().length) return;
       if (a) { try { a.cancel(); } catch { /* ignore */ } }
-      a = run(chip, [{ transform: 'scale(.92)' }], { duration: dur().slow, easing: spring() });
+      a = run(chip, [{ transform: 'scale(.92)' }, { transform: 'none' }], { duration: dur().slow, easing: spring() });
     }).observe(chip, { attributes: true, attributeFilter: ['class'] });
   }
 
@@ -424,7 +424,7 @@
     let was = el.hidden;
     new MutationObserver(() => {
       const hid = el.hidden;
-      if (was && !hid && can() && el.getClientRects().length) run(el, [{ opacity: 0, transform: 'translateY(8px)' }], { duration: dur().slow, easing: ease() });
+      if (was && !hid && can() && el.getClientRects().length) run(el, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: dur().slow, easing: ease() });
       was = hid;
     }).observe(el, { attributes: true, attributeFilter: ['hidden'] });
   }
@@ -444,7 +444,7 @@
   /* Hell/Dunkel: das Symbol dreht sich weich ein */
   document.addEventListener('vt-theme', () => {
     if (!can()) return;
-    document.querySelectorAll('.theme-btn').forEach((b) => run(b, [{ transform: 'rotate(-80deg) scale(.7)', opacity: .2 }], { duration: dur().slow, easing: spring() }));
+    document.querySelectorAll('.theme-btn').forEach((b) => run(b, [{ transform: 'rotate(-80deg) scale(.7)', opacity: .2 }, { transform: 'none', opacity: 1 }], { duration: dur().slow, easing: spring() }));
   });
 
   /* ------------------------------------------------------------------
