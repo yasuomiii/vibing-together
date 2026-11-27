@@ -182,6 +182,12 @@
       g.classList.add('mo-ghost'); g.setAttribute('aria-hidden', 'true');
       g.querySelectorAll('button, a, input').forEach((x) => { x.tabIndex = -1; });
       g.style.cssText += ';position:fixed;margin:0;pointer-events:none;z-index:30;box-sizing:border-box;left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px;transform:none;';
+      // Die Kopie liegt über allem; unter der festen unteren Leiste bzw. der oberen Leiste darf sie deshalb nicht hindurchscheinen
+      let cutT = 0, cutB = 0;
+      const foot = document.querySelector('.lobby-foot'), top = document.querySelector('.h-top, .pc-top');
+      if (foot) { const f = foot.getBoundingClientRect(); if (f.height && f.top < r.bottom && f.bottom > r.top) cutB = Math.max(0, r.bottom - f.top + 1); }
+      if (top) { const f = top.getBoundingClientRect(); if (f.height && f.bottom > r.top && f.top < r.bottom) cutT = Math.max(0, f.bottom - r.top + 1); }
+      if (cutT || cutB) g.style.clipPath = 'inset(' + Math.min(cutT, r.height) + 'px 0 ' + Math.min(cutB, r.height) + 'px 0)';
       document.body.append(g);
       run(g, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.96)' }], { duration: d.mid, easing: ease() }, () => g.remove());
     });
@@ -373,20 +379,28 @@
       a = run(el, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: dur().mid, easing: ease() }, () => { a = null; });
     }).observe(el, { childList: true, characterData: true, subtree: true });
   }
+  /* Knöpfe der Aufnahme: nur wenn ein Knopf seinen Zustand wirklich wechselt (z. B. Aufnahme <-> Stopp, Original <-> Stopp),
+     federt er kurz. Werden Knöpfe nur wieder freigegeben (nach Aufnahme oder Wiedergabe), bewegt sich nichts:
+     sonst hüpften alle Knöpfe gleichzeitig. */
   function initPop(btn) {
     if (btn._moPop) return;
     btn._moPop = true;
-    let on = btn.classList.contains('on'), dis = btn.disabled;
+    let on = btn.classList.contains('on');
     new MutationObserver(() => {
-      const o = btn.classList.contains('on'), d = btn.disabled;
-      const changed = o !== on || d !== dis;
-      const enabling = dis && !d;
-      on = o; dis = d;
-      if (!changed || M.reduced() || document.hidden || (d && !enabling) || !btn.getClientRects().length) return;
+      const o = btn.classList.contains('on');
+      if (o === on) return;
+      on = o;
+      if (M.reduced() || document.hidden || btn.disabled || !btn.getClientRects().length) return;
       if (btn._moPopA) { try { btn._moPopA.cancel(); } catch { /* ignore */ } }
-      btn._moPopA = run(btn, [{ transform: 'scale(.93)' }], { duration: dur().slow, easing: spring() });
-    }).observe(btn, { attributes: true, attributeFilter: ['class', 'disabled'] });
+      btn._moPopA = run(btn, [{ transform: 'scale(.94)' }, { transform: 'none' }], { duration: dur().slow, easing: spring() });
+    }).observe(btn, { attributes: true, attributeFilter: ['class'] });
   }
+  /* Kleiner Wechsel innerhalb derselben Ansicht (z. B. nächste Zeile): diese Teile blenden kurz ein, dir = Richtung (1 vor, -1 zurück) */
+  M.soft = (els, dir) => {
+    if (!can()) return;
+    const x = (dir || 0) * 12;
+    Array.from(els || []).forEach((el) => run(el, [{ opacity: 0, transform: 'translateX(' + x + 'px)' }, { opacity: 1, transform: 'none' }], { duration: dur().mid, easing: ease() }));
+  };
   /* Auswahl-Chips und Wunschrollen: nur wenn die Auswahl wirklich wechselt, federt der neu gewählte kurz ein */
   function initSel(chip) {
     if (chip._moSel) return;

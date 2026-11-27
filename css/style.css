@@ -1193,12 +1193,12 @@ html[data-theme="light"] .btn.mk-launch, html[data-theme="light"] .btn.mk-launch
 
 .rec-top .kicker { font-family: var(--font-d); font-size: 1.12rem; font-weight: 600; color: var(--tx); }
 
-/* Aufnahme-Ansicht: die Hauptaktion fällt auf (Aufnahme, danach "Fertig"), Original, Mein Take und Zurück sind leiser */
-.dp-btns .btn:not(.dp-rec):not(.primary) { background: var(--fill); border-color: var(--line-soft); box-shadow: none; font-weight: 500; }
-.dp-btns .btn:not(.dp-rec):not(.primary):hover { background: var(--fill-2); border-color: var(--line); transform: none; box-shadow: none; }
-.dp-btns .btn:not(.dp-rec):not(.primary):active { transform: scale(.97); box-shadow: none; }
-.dp-btns .dp-rec { min-height: 56px; font-size: 1.1rem; }
-.dp-btns .btn.primary { min-height: 56px; }
+/* Aufnahme-Ansicht: Original, Mein Take und Zurück bleiben dunkel, haben aber dieselbe 3D-Kante wie Aufnahme und Weiter */
+.dp-btns .btn:not(.dp-rec):not(.primary) { background: var(--surface-3); border-color: var(--line); box-shadow: 0 4px 0 var(--ledge); font-weight: 600; }
+.dp-btns .btn:not(.dp-rec):not(.primary):hover { background: color-mix(in srgb, var(--surface-3) 80%, var(--accent)); border-color: color-mix(in srgb, var(--line) 50%, var(--accent)); transform: translateY(-2px); box-shadow: 0 6px 0 var(--ledge); }
+.dp-btns .btn:not(.dp-rec):not(.primary):active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ledge); }
+.dp-btns .btn { min-height: 56px; }
+.dp-btns .dp-rec { font-size: 1.1rem; }
 
 /* Ergebnis / Premiere: Titel, Bild, Namen und Knöpfe erscheinen nacheinander */
 .premiere > .rec-top { animation: riseIn var(--dur-slow) var(--ease) backwards; }
@@ -1234,3 +1234,4 @@ html[data-theme="light"] .btn.mk-launch, html[data-theme="light"] .btn.mk-launch
 @media (prefers-reduced-motion: reduce) { .view-rise { animation: none; } .seg.mo-g > .mo-ind { transition: none; } }
 /* Die Lobby glättet Höhenänderungen selbst (js/motion.js). Das automatische Mitscrollen des Browsers würde dagegen arbeiten und die ganze Seite springen lassen. */
 .h-stage, .pc-root, .pc-body { overflow-anchor: none; }
+@media (prefers-reduced-motion: reduce) { .dp-btns .btn:not(.dp-rec):not(.primary):hover, .dp-btns .btn:not(.dp-rec):not(.primary):active { transform: none; } }

@@ -387,7 +387,11 @@
         h('div', { class: 'dp-livewrap' }, live, pos), status,
         h('div', { class: 'dp-btns' }, bBack, bOrig, bRec, bTake, bNext),
         (this.ui.fxp = this.fxPill()));
+      const wasPlay = this.viewKey === 'play', prevIdx = this._shownIdx;
       this.setView('play', () => el, true);
+      this._shownIdx = idx;
+      // Nächste oder vorige Zeile: die Ansicht wird ohne Einblenden ersetzt, nur Zähler, Rolle und Text gleiten kurz in Laufrichtung herein
+      if (wasPlay && prevIdx != null && prevIdx !== idx) VD.motion.soft(el.querySelectorAll('.dp-n, .dp-who, .dp-cap, .dp-tr:not([hidden])'), idx > prevIdx ? 1 : -1);
       this.sendProg('idle');
       this.saveState();
       return el;
@@ -699,7 +703,9 @@
       const end = Math.min(this.mic.mark(), this.recMark + Math.round(this.recDur * sr) + lat);
       const raw = this.mic.slice(this.recMark + lat, end);
       u.status.textContent = VD.t('Verarbeite …');
-      try {
+      // Sofort wieder gestoppt (z. B. schnell zweimal getippt): kaum Ton da. Kein Fehler, nur der Hinweis wie bei einer stillen Aufnahme.
+      const tooShort = raw.length < Math.round(sr * 0.08);
+      if (!tooShort) try {
         const res = await VD.audio.resample(raw, sr, SR);
         const n = A.normalize(res, SR, { targetDb: G.voiceTargetDb });
         const pad = Math.round((this.recShift || 0) * SR);
@@ -714,7 +720,8 @@
       if (this.ui !== u) return;                        // inzwischen woanders
       this.setBusy(null);
       const t = this.takes.get(line.i);
-      u.status.textContent = !t ? VD.t('Die Aufnahme hat nicht geklappt. Versuche es nochmal.')
+      u.status.textContent = tooShort ? VD.t('Ich habe fast nichts gehört. Sprich näher ans Mikro und nimm nochmal auf.')
+        : !t ? VD.t('Die Aufnahme hat nicht geklappt. Versuche es nochmal.')
         : t.silent ? VD.t('Ich habe fast nichts gehört. Sprich näher ans Mikro und nimm nochmal auf.')
         : this.syncInfo(t);
       this.sendProg('idle');

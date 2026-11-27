@@ -34,6 +34,7 @@
     },
     async resample(f32, from, to) {
       if (from === to) return f32;
+      if (!f32.length) return new Float32Array(0);   // leere Aufnahme: nichts umzurechnen (createBuffer mit Länge 0 wäre ein Fehler)
       const len = Math.max(1, Math.ceil((f32.length * to) / from));
       const off = new OfflineAudioContext(1, len, to);
       const b = off.createBuffer(1, f32.length, from);
