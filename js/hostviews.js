@@ -36,7 +36,7 @@
     buildHeader() {
       const full = h('button', { class: 'icon-btn', title: VD.t('Vollbild'), 'aria-label': VD.t('Vollbild'), onclick: () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } }, '⛶');
       this.dnBtn = VD.Denoise.iconEl(); this.dnBtn.hidden = true;
-      const header = h('header', { class: 'h-top' }, h('div', { class: 'brand', text: window.VD_CONFIG.appName }), this.roomChip, h('div', { class: 'h-tools' }, this.dnBtn, VD.ui.themeBtn(), VD.ui.settingsBtn(() => this.local && this.local.ctrl, { lang: 'host' }), full));
+      const header = h('header', { class: 'h-top' }, h('div', { class: 'brand', text: window.VD_CONFIG.appName }), this.roomChip, h('div', { class: 'h-tools' }, this.dnBtn, VD.ui.themeBtn(), VD.ui.settingsBtn(() => this.local && this.local.ctrl, { lang: 'host', canLang: () => this.state === 'lobby' }), full));
       return header;
     },
     /* Sprachwechsel im Raum (ohne Neuladen): Kopfzeile, Leisten und die Lobby neu zeichnen. Andere Bildschirme (Aufnahme, Ergebnis) wechseln beim nächsten Schritt. */
@@ -161,7 +161,7 @@
       if (!on) return;
       if (!this.barRefs) {
         const label = h('span', { class: 'bar-l' });
-        const next = h('button', { class: 'btn sm', onclick: () => this.hostNext() }, h('span', { text: VD.t('Weiter') }), h('kbd', { text: VD.t('Leertaste') }));
+        const next = h('button', { class: 'btn sm', onclick: () => this.hostNext() }, h('span', { text: VD.t('Weiter') }), h('kbd', { text: 'P' }));
         const end = h('button', { class: 'btn sm ghost', onclick: (e) => {
           const b = e.currentTarget;
           if (b.dataset.sure) { this.hostEnd(); return; }

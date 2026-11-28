@@ -51,8 +51,10 @@
     }
 
     onKey(e) {
-      if (/^(input|textarea|select|button|a)$/i.test(e.target.tagName || '')) return;   // Leertaste auf einem Knopf drückt nur diesen Knopf
-      if (e.code === 'Space' && this.state === 'playing') { e.preventDefault(); this.hostNext(); }
+      if (/^(input|textarea|select|button|a)$/i.test(e.target.tagName || '')) return;
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+      // „Weiter“ / „Jetzt ansehen“ mit P (die Leertaste drückt man zu leicht aus Versehen)
+      if ((e.key || '').toLowerCase() === 'p' && this.state === 'playing') { e.preventDefault(); this.hostNext(); }
     }
 
     /* ---------- Spieler ---------- */

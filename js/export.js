@@ -94,6 +94,7 @@
   X.videoMp4 = async (o) => {
     if (!window.VideoEncoder || !window.AudioEncoder || !window.VideoFrame || !window.AudioData) return false;
     if (!(await loadMuxer())) return false;
+    const aSr = 48000, pcm = await to48k(o.f32, o.sr);   // vor dem Video: schlägt es fehl, bleibt kein verstecktes Video-Element übrig
     const ov = await openVideo(o), v = ov.v, W = ov.W, H = ov.H;
     // H.264 + AAC zuerst: Diese Kombination spielen alle Player (Windows, Handy, WhatsApp). VP9/Opus nur als Ersatz.
     // Firefox meldet H.264-Unterstützung, erzeugt aber teils fehlerhafte Videos (bekannter Fehler in dessen WebCodecs); dort gleich VP9 nehmen.
@@ -102,7 +103,6 @@
       ? [['vp9', 'vp09.00.31.08'], ['vp9', 'vp09.00.10.08']]
       : [['avc', 'avc1.42001f'], ['avc', 'avc1.4d401f'], ['avc', 'avc1.640028'], ['vp9', 'vp09.00.31.08']];
     const aCfgs = [['aac', 'mp4a.40.2'], ['opus', 'opus']];
-    const aSr = 48000, pcm = await to48k(o.f32, o.sr);
     let vc = null, ac = null;
     for (const [n, c] of vCfgs) { try { if ((await VideoEncoder.isConfigSupported({ codec: c, width: W, height: H, bitrate: 2500000, framerate: 30 })).supported) { vc = [n, c]; break; } } catch { /* nächster */ } }
     for (const [n, c] of aCfgs) { try { if ((await AudioEncoder.isConfigSupported({ codec: c, sampleRate: aSr, numberOfChannels: 1, bitrate: 128000 })).supported) { ac = [n, c]; break; } } catch { /* nächster */ } }

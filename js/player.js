@@ -129,8 +129,11 @@
     /* ---------- Szene laden ---------- */
     async onScene(m) {
       this.pvc.close();
+      const fresh = m.id !== this.sceneId;
       this.resetScene();
       this.scene = m; this.sceneId = m.id;
+      // Jede neue Runde beginnt ohne Stimmeffekt (sonst bleibt er aus Versehen an); eine erneute Übertragung derselben Szene ändert nichts
+      if (fresh && !m.watch && VD.store.get('voicefxon', false) === true) { VD.store.set('voicefxon', false); this.fxPillSync(); }
       // Zeilen vom Host: nur erwartete Felder, Texte als Text, Anzahl begrenzt
       this.lines = (Array.isArray(m.lines) ? m.lines : []).slice(0, window.VD_CONFIG.limits.maxClipsPerPack).filter((l) => l && typeof l === 'object' && Number.isInteger(l.i)).map((l) => Object.assign({ img: null, orig: null }, l, { caption: typeof l.caption === 'string' ? l.caption.slice(0, 500) : '', char: typeof l.char === 'string' ? l.char.slice(0, 60) : '' }));
       this.videoMime = m.videoMime || '';
@@ -208,7 +211,7 @@
     renderTop() {
       // Im Spiel sitzt der Filter-Knopf oben; der Host hat ihn in seiner eigenen Kopfzeile
       const dn = this.canRecord && !this.local && this.phase !== 'lobby' ? VD.Denoise.iconEl() : null;
-      this.top.replaceChildren(VD.ui.avatar(this.profile, 'sm'), h('span', { class: 'pc-name', text: this.profile.name }), ...(dn ? [dn] : []), ...(this.local ? [] : [VD.ui.themeBtn(), VD.ui.settingsBtn(() => this, { lang: 'player' })]));
+      this.top.replaceChildren(VD.ui.avatar(this.profile, 'sm'), h('span', { class: 'pc-name', text: this.profile.name }), ...(dn ? [dn] : []), ...(this.local ? [] : [VD.ui.themeBtn(), VD.ui.settingsBtn(() => this, { lang: 'player', canLang: () => this.phase === 'lobby' })]));
     }
     /* Sprachwechsel im Raum (ohne Neuladen): Kopfzeile und Lobby neu zeichnen, andere Ansichten (Aufnahme, Ergebnis) wechseln beim nächsten Schritt */
     relang() {
@@ -976,9 +979,10 @@
 
     destroy() {
       this.destroyed = true;
+      if (this.langOff) { this.langOff(); this.langOff = null; }   // sonst zeichnet ein entfernter Mitspieler bei jedem Sprachwechsel weiter
       this.pvc.close();
-      this.stopAll();
       clearTimeout(this.replayTimer); this.stopPremiere();
+      this.resetScene();   // stoppt alles und gibt Bilder, Video und Ton der Szene frei
       clearInterval(this._lvl); clearTimeout(this._mtimer);
       document.removeEventListener('vt-theme', this._onRedraw);
       window.removeEventListener('resize', this._onRedraw);

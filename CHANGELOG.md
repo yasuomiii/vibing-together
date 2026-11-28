@@ -2,6 +2,16 @@
 
 All notable changes to Vibing Together. Newest first.
 
+## 2026-11-28
+
+### Changed
+- **Code audit (no change to look, texts or behavior).** Whole code base checked for errors, dead code and needless work.
+  - `style.css`: removed leftovers of the old background sparks (`.bg-spark-*`, their variables and keyframes) and unused rules (`.mk-tools`, `.mk-warn-t`); merged duplicate and overridden rules (icon buttons, pack rows, preview bars, host bar, modal padding, favorites bar).
+  - Translations: removed keys no language uses (maker, subtitles, "Leertaste", "Nur Favoriten").
+  - Small fixes: a removed local player no longer keeps redrawing on language change and frees its scene data; a replaced subtitle video stops playing; the microphone output node is released on stop; MP4 export no longer leaves a hidden video behind if audio preparation fails.
+  - `motion.js`: the page-wide observer now needs one search per inserted element instead of six.
+  - Service worker version 34.
+
 ## 2026-11-21
 
 ### Added
@@ -40,6 +50,10 @@ All notable changes to Vibing Together. Newest first.
 - Recording view: "Original", "My take" and "Back" have their 3D edge back (dark, same height and press feel as "Record" and "Next"). Buttons no longer all bounce at once when they are re-enabled after recording or playback; only a button that really switches state (Record/Stop, Original/Stop, My take/Stop) springs briefly. Moving to the next or previous line now slides the line counter, role and caption in the direction of travel instead of switching hard (service worker version 29). "Original" and "My take" now have a solid dark fill instead of a see-through one (service worker version 30).
 - Lobby: when switching between "All packs" and "Favorites", the fading copies of removed packs no longer flash over the bottom bar (they are cut off at the bar's edge).
 - Wish roles (and warning notes) faded in twice when they re-appeared, e.g. when switching "Allow wish role" off and on, or "Random" / "In order". The fade-in was started backwards and then jumped back; it now plays once. The same fix applies to the spring of selected chips and the theme button (service worker version 31).
+- **Help window.** A "?" button at the top left of the start page opens a short explanation of the game and of the buttons (lobby, recording buttons, the icons at the top such as noise filter, settings, full screen, language, and the result). Translated into all seven languages.
+- **Voice effect resets every round.** Each new round starts without a voice effect, so it can no longer be left on by accident. A scene that is re-sent after a dropped connection does not reset it.
+- **"Watch now" / "Next" on the host screen** is now triggered with the **P** key instead of the space bar (the key hint on the button says P).
+- **Language is locked during a round.** The language can still be changed any time on the start page and in the lobby, but not while a game is running (the settings show a short note instead). Service worker version 33.
 - Pressing record and stop very quickly no longer shows "Recording could not be processed"; the empty take is ignored and the "hardly heard anything" hint appears instead (service worker version 28).
 - **Motion fixes.** Fading-out copies of the old view, closed dialogs and removed list entries no longer replay their fade-in animations; views with their own staggered entrances (lobby, loading, result) no longer fade in twice; redrawing the same view (language switch, a player joining mid-round, replaying the result) no longer fades out and in again; list entries without a stable key are no longer faded out and in at the same time; the selection spring on role and effect chips only plays when the selection really changes. Service worker version 27. Lobby lists rebuilt on a simpler, measured approach: positions are taken right before and right after each redraw, so packs (select, favourite, filter, delete, random), player cards and preferred roles glide from where they really are, even when a second redraw follows or the whole card moves because something above it changed height; the lobby cards themselves now slide instead of jumping, and the page no longer jumps when the content gets shorter while scrolled to the bottom. The player count text fades softly on every change. Lobby: the preferred-role section and notices now fade in gently when they appear (only then, never twice), and keyboard focus stays on the same role button after the list is redrawn. Dialogs (settings, information, preview) are simpler and more reliable: background and window fade in at the same speed (the window only springs slightly), and closing fades the whole dialog out together; the grow-from-button effect was removed. Dialogs: the window now becomes visible together with the dimmed background when opening, and fades out together with it when closing (before, the screen went dark first and the window arrived late, or vanished before the background). When an old view fades out, the new one no longer fades in as well (it only rises slightly), so there is no dip in brightness.
 - Lobby music was too loud for the first 1 to 2 seconds. It now fades in cleanly.

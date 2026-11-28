@@ -34,12 +34,10 @@
     'Es wurde keine Sprache erkannt.': 'No speech was found.',
     'Dein Browser kann das nicht ausführen.': 'Your browser cannot run this.',
     '3  Ergebnis': '3  Result',
-    'Der erkannte Text kann vom Gesprochenen abweichen. Prüfe ihn und korrigiere ihn hier. Zeilen, die nicht stimmen, kannst du löschen.': 'The recognised text can differ from what was said. Check it and correct it here. You can delete lines that are wrong.',
     '.srt speichern': 'Save .srt',
     '.vtt speichern': 'Save .vtt',
     'In den Ersteller übernehmen': 'Use in the builder',
     'Zeile löschen': 'Delete line',
-    'Text der Zeile {n}': 'Text of line {n}',
     '{n} Zeilen in den Ersteller übernommen.': '{n} lines added to the builder.',
     'Zum Übernehmen zuerst im Reiter „Dub-Pack bauen“ ein Video laden.': 'To use the lines, first load a video in the “Build dub pack” tab.',
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper by OpenAI, MIT licence. Run with Transformers.js and ONNX Runtime.'
@@ -72,12 +70,10 @@
     'Es wurde keine Sprache erkannt.': 'No se detectó voz.',
     'Dein Browser kann das nicht ausführen.': 'Tu navegador no puede ejecutar esto.',
     '3  Ergebnis': '3  Resultado',
-    'Der erkannte Text kann vom Gesprochenen abweichen. Prüfe ihn und korrigiere ihn hier. Zeilen, die nicht stimmen, kannst du löschen.': 'El texto reconocido puede diferir de lo dicho. Revísalo y corrígelo aquí. Puedes borrar las líneas que no sean correctas.',
     '.srt speichern': 'Guardar .srt',
     '.vtt speichern': 'Guardar .vtt',
     'In den Ersteller übernehmen': 'Usar en el creador',
     'Zeile löschen': 'Borrar línea',
-    'Text der Zeile {n}': 'Texto de la línea {n}',
     '{n} Zeilen in den Ersteller übernommen.': '{n} líneas añadidas al creador.',
     'Zum Übernehmen zuerst im Reiter „Dub-Pack bauen“ ein Video laden.': 'Para usar las líneas, primero carga un vídeo en la pestaña «Crear el pack».',
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper de OpenAI, licencia MIT. Ejecutado con Transformers.js y ONNX Runtime.'
@@ -110,12 +106,10 @@
     'Es wurde keine Sprache erkannt.': 'Aucune voix n’a été détectée.',
     'Dein Browser kann das nicht ausführen.': 'Ton navigateur ne peut pas l’exécuter.',
     '3  Ergebnis': '3  Résultat',
-    'Der erkannte Text kann vom Gesprochenen abweichen. Prüfe ihn und korrigiere ihn hier. Zeilen, die nicht stimmen, kannst du löschen.': 'Le texte reconnu peut différer de ce qui a été dit. Vérifie-le et corrige-le ici. Tu peux supprimer les lignes incorrectes.',
     '.srt speichern': 'Enregistrer en .srt',
     '.vtt speichern': 'Enregistrer en .vtt',
     'In den Ersteller übernehmen': 'Utiliser dans le créateur',
     'Zeile löschen': 'Supprimer la ligne',
-    'Text der Zeile {n}': 'Texte de la ligne {n}',
     '{n} Zeilen in den Ersteller übernommen.': '{n} lignes ajoutées au créateur.',
     'Zum Übernehmen zuerst im Reiter „Dub-Pack bauen“ ein Video laden.': 'Pour utiliser les lignes, charge d’abord une vidéo dans l’onglet « Créer le pack ».',
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper d’OpenAI, licence MIT. Exécuté avec Transformers.js et ONNX Runtime.'
@@ -148,12 +142,10 @@
     'Es wurde keine Sprache erkannt.': 'Nenhuma fala foi detectada.',
     'Dein Browser kann das nicht ausführen.': 'Seu navegador não consegue executar isso.',
     '3  Ergebnis': '3  Resultado',
-    'Der erkannte Text kann vom Gesprochenen abweichen. Prüfe ihn und korrigiere ihn hier. Zeilen, die nicht stimmen, kannst du löschen.': 'O texto reconhecido pode diferir do que foi dito. Confira e corrija aqui. Você pode apagar as linhas que estiverem erradas.',
     '.srt speichern': 'Salvar .srt',
     '.vtt speichern': 'Salvar .vtt',
     'In den Ersteller übernehmen': 'Usar no criador',
     'Zeile löschen': 'Apagar linha',
-    'Text der Zeile {n}': 'Texto da linha {n}',
     '{n} Zeilen in den Ersteller übernommen.': '{n} linhas adicionadas ao criador.',
     'Zum Übernehmen zuerst im Reiter „Dub-Pack bauen“ ein Video laden.': 'Para usar as linhas, primeiro carregue um vídeo na aba “Criar o pack”.',
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper da OpenAI, licença MIT. Executado com Transformers.js e ONNX Runtime.'
@@ -186,12 +178,10 @@
     'Es wurde keine Sprache erkannt.': 'Речь не обнаружена.',
     'Dein Browser kann das nicht ausführen.': 'Ваш браузер не может это выполнить.',
     '3  Ergebnis': '3  Результат',
-    'Der erkannte Text kann vom Gesprochenen abweichen. Prüfe ihn und korrigiere ihn hier. Zeilen, die nicht stimmen, kannst du löschen.': 'Распознанный текст может отличаться от сказанного. Проверьте и исправьте его здесь. Неверные строки можно удалить.',
     '.srt speichern': 'Сохранить .srt',
     '.vtt speichern': 'Сохранить .vtt',
     'In den Ersteller übernehmen': 'Использовать в конструкторе',
     'Zeile löschen': 'Удалить строку',
-    'Text der Zeile {n}': 'Текст строки {n}',
     '{n} Zeilen in den Ersteller übernommen.': 'Строк добавлено в конструктор: {n}.',
     'Zum Übernehmen zuerst im Reiter „Dub-Pack bauen“ ein Video laden.': 'Чтобы использовать строки, сначала загрузите видео на вкладке «Собрать пак».',
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'Whisper от OpenAI, лицензия MIT. Работает на Transformers.js и ONNX Runtime.'
@@ -224,12 +214,10 @@
     'Es wurde keine Sprache erkannt.': 'कोई आवाज़ नहीं मिली।',
     'Dein Browser kann das nicht ausführen.': 'आपका ब्राउज़र इसे नहीं चला सकता।',
     '3  Ergebnis': '3  नतीजा',
-    'Der erkannte Text kann vom Gesprochenen abweichen. Prüfe ihn und korrigiere ihn hier. Zeilen, die nicht stimmen, kannst du löschen.': 'पहचाना गया टेक्स्ट बोले गए से अलग हो सकता है। उसे यहाँ जाँचें और सुधारें। गलत पंक्तियाँ हटा सकते हैं।',
     '.srt speichern': '.srt सहेजें',
     '.vtt speichern': '.vtt सहेजें',
     'In den Ersteller übernehmen': 'निर्माता में इस्तेमाल करें',
     'Zeile löschen': 'पंक्ति हटाएँ',
-    'Text der Zeile {n}': 'पंक्ति {n} का टेक्स्ट',
     '{n} Zeilen in den Ersteller übernommen.': '{n} पंक्तियाँ निर्माता में जोड़ी गईं।',
     'Zum Übernehmen zuerst im Reiter „Dub-Pack bauen“ ein Video laden.': 'पंक्तियाँ इस्तेमाल करने के लिए पहले “पैक बनाएँ” टैब में वीडियो लोड करें।',
     'Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.': 'OpenAI का Whisper, MIT लाइसेंस। Transformers.js और ONNX Runtime से चलता है।'
@@ -305,6 +293,7 @@
         h('p', { class: 'muted mk-note', text: t('Whisper von OpenAI, Lizenz MIT. Ausgeführt mit Transformers.js und ONNX Runtime.') }));
 
       function pickFile(f) {
+        if (S.media) { try { S.media.pause(); } catch { /* ignore */ } }   // ein ausgetauschtes Video würde sonst unsichtbar weiterspielen
         if (S.url) URL.revokeObjectURL(S.url);
         S.file = f; S.segs = []; S.ran = false; R.result.hidden = true; warn(R.warn, ''); R.status.textContent = '';
         R.fileInfo.textContent = f.name;

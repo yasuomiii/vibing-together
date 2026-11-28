@@ -245,7 +245,7 @@ registerProcessor('vd-rec', VdRec);`;
       this.running = false;
       if (VD.Denoise) VD.Denoise.detach(this);
       try { this.stream.getTracks().forEach((t) => t.stop()); } catch { /* ignore */ }
-      try { this.src.disconnect(); this.node.disconnect(); this.dn && this.dn.disconnect(); } catch { /* ignore */ }
+      [this.src, this.node, this.dn, this.sink].forEach((n) => { try { n && n.disconnect(); } catch { /* ignore */ } });
     }
   };
 })();

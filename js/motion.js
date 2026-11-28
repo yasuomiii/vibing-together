@@ -452,15 +452,15 @@
      ------------------------------------------------------------------ */
   const TICKS = '.dp-n, .sum, .pv-status, .pc-s';
   const POPS = '.dp-btns .btn';
-  const each = (n, sel, fn) => { if (n.matches && n.matches(sel)) fn(n); if (n.querySelectorAll) n.querySelectorAll(sel).forEach(fn); };
+  const SEL = ['.seg', TICKS, POPS, '.fx-chip, .role', '.roles, .warn', '.lang-menu'];
+  const ALL = SEL.join(', ');
+  const INIT = [initGlide, initTick, initPop, initSel, initReveal, initMenu];
+  const attach = (x) => { SEL.forEach((s, i) => { if (x.matches(s)) INIT[i](x); }); };
+  /* Ein einziger Suchlauf pro eingefügtem Teilbaum (statt sechs): das Beobachten der ganzen Seite bleibt billig */
   const scan = (n) => {
     if (!n || n.nodeType !== 1 || n.classList.contains('mo-ghost')) return;
-    each(n, '.seg', initGlide);
-    each(n, TICKS, initTick);
-    each(n, POPS, initPop);
-    each(n, '.fx-chip, .role', initSel);
-    each(n, '.roles, .warn', initReveal);
-    each(n, '.lang-menu', initMenu);
+    if (n.matches(ALL)) attach(n);
+    n.querySelectorAll(ALL).forEach(attach);
   };
   M.scan = scan;
   const start = () => {

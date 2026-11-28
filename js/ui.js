@@ -37,6 +37,48 @@
       return b;
     },
 
+    /* Fragezeichen-Knopf (Startseite): öffnet die Hilfe */
+    helpBtn() {
+      const b = h('button', { class: 'icon-btn glass help-btn', type: 'button', title: VD.t('Hilfe'), 'aria-label': VD.t('Hilfe'), 'aria-haspopup': 'dialog', onclick: () => VD.ui.openHelp(b) }, '?');
+      return b;
+    },
+    /* Hilfe: kurze Erklärung des Spiels und der Knöpfe */
+    openHelp(from) {
+      if (document.querySelector('.modal.help-modal:not(.mo-ghost)')) return;
+      const t = VD.t;
+      const close = () => { box.remove(); document.removeEventListener('keydown', onKey); if (from && from.isConnected) from.focus(); };
+      const onKey = (e) => { if (e.key === 'Escape') close(); };
+      const ico = (c, content) => h('span', { class: 'icon-btn help-ico' + (c ? ' ' + c : ''), 'aria-hidden': 'true' }, content);
+      const gear = h('span'); gear.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>';
+      const sec = (title, ...rows) => h('section', { class: 'help-sec' }, h('h3', { text: title }), ...rows);
+      const p = (text) => h('p', { class: 'help-p', text });
+      const row = (lead, name, text) => h('div', { class: 'help-row' }, lead, h('div', {}, h('b', { text: name }), h('span', { text })));
+      const pill = (text) => h('span', { class: 'help-pill', 'aria-hidden': 'true', text });
+      const box = h('div', { class: 'modal help-modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'help-t', onclick: (e) => { if (e.target === box) close(); } },
+        h('div', { class: 'modal-card' },
+          h('h2', { id: 'help-t', text: t('So funktioniert Vibing Together') }),
+          sec(t('Worum geht es?'), p(t('Ihr seht eine kurze Filmszene ohne Originalton und sprecht die Rollen selbst. Am Ende hört ihr die Szene gemeinsam mit euren Stimmen.'))),
+          sec(t('So kommt ihr ins Spiel'), p(t('Ein Gerät ist der Host: „Raum erstellen“ zeigt die Szene auf seinem Bildschirm. Alle anderen geben den 4-stelligen Raum-Code ein oder scannen den QR-Code und tippen auf „Beitreten“.'))),
+          sec(t('In der Lobby'), p(t('Der Host wählt ein Dub-Pack (mit ★ merkst du dir Favoriten, „Überrasch mich“ wählt eins zufällig). Jeder kann sich eine Wunschrolle aussuchen und auf „Ich bin bereit“ tippen. Dann startet der Host das Spiel.'))),
+          sec(t('Aufnehmen'),
+            row(pill(t('Original')), t('Original'), t('Spielt die Originalzeile ab, damit du Ton und Tempo hörst.')),
+            row(pill(t('Aufnahme')), t('Aufnahme'), t('Startet die Aufnahme. Tippe noch einmal, um sie zu beenden.')),
+            row(pill(t('Mein Take')), t('Mein Take'), t('Spielt deine eigene Aufnahme ab. Nicht zufrieden? Nimm die Zeile einfach noch einmal auf.')),
+            row(pill('◀ ▶'), t('Weiter / Fertig'), t('Geht zur nächsten Zeile, bei der letzten heißt der Knopf „Fertig“. Mit ◀ gehst du eine Zeile zurück.')),
+            row(pill('✦'), t('Stimmeffekt'), t('Optional: verändert deine Stimme, zum Beispiel tiefer. Du schaltest ihn in den Einstellungen ein. Jede neue Runde beginnt wieder ohne Effekt.'))),
+          sec(t('Die Symbole oben'),
+            row(ico('', '☀'), t('Helles oder dunkles Design'), t('Wechselt zwischen hellem und dunklem Design.')),
+            row(ico('', gear), t('Einstellungen'), t('Auto-Sync, Countdown, Untertitel, Stimmeffekte, Musik und – in der Lobby – die Sprache.')),
+            row(ico('dn-icon', '≋'), t('Hintergrundgeräusche filtern'), t('Filtert Hintergrundgeräusche aus deinem Mikrofon, zum Beispiel Lüfter oder Straße. Ist der Knopf abgeblendet, ist der Filter aus. Während einer Aufnahme lässt er sich nicht umschalten.')),
+            row(ico('', '⛶'), t('Vollbild'), t('Vollbild an und aus.')),
+            row(ico('', VD.lang.toUpperCase()), t('Sprache'), t('Sprache. Auf der Startseite und in der Lobby jederzeit, während des Spiels nicht.'))),
+          sec(t('Das Ergebnis'), p(t('Danach läuft die Szene mit allen Stimmen. „Nochmal ansehen“ (Taste P) spielt sie noch einmal ab, „Als Video speichern“ lädt sie herunter.'))),
+          h('div', { class: 'modal-btns' }, h('button', { class: 'btn primary', type: 'button', onclick: close }, t('Schließen')))));
+      document.addEventListener('keydown', onKey);
+      document.body.append(box);
+      box.querySelector('.btn.primary').focus({ preventScroll: true });
+    },
+
     /* Einstellungen auf der Startseite (pro Gerät): Auto-Sync und Countdown. Die Werte liegen in VD.store (autosync, countdown). */
     settingsBtn(getCtrl, opts) {
       const b = h('button', { class: 'icon-btn glass settings-btn', type: 'button', title: VD.t('Einstellungen'), 'aria-label': VD.t('Einstellungen'), 'aria-haspopup': 'dialog', onclick: () => VD.ui.openSettings(b, getCtrl, opts) });
@@ -89,11 +131,14 @@
       const rng = h('input', { type: 'range', class: 'set-range', min: '0', max: '100', step: '1', value: String(Math.round(VD.music.volume() * 100)), 'aria-label': VD.t('Musik-Lautstärke'), oninput: () => { VD.music.setVolume(Number(rng.value) / 100); pct.textContent = rng.value + ' %'; } });
       items.push(h('div', { class: 'set-item' }, mkSwitch(VD.t('Musik'), () => VD.music.isOn(), (v) => { if (v !== VD.music.isOn()) VD.music.toggle(); }),
         h('span', { class: 'field-l' }, VD.t('Musik-Lautstärke') + ' ', pct), rng));
-      if (opts && opts.lang) {   // im Raum: Sprache hier statt außen. Wechsel gilt sofort, ohne Neuladen (man bleibt im Raum).
+      const langOpen = () => !opts || !opts.canLang || opts.canLang();   // nur in der Lobby; während einer Runde bleibt die Sprache fest
+      if (opts && opts.lang && !langOpen()) {
+        items.push(h('div', { class: 'set-item' }, h('span', { class: 'field-l', text: VD.t('Sprache') }), h('p', { class: 'muted', text: VD.t('Die Sprache kannst du nur auf der Startseite und in der Lobby ändern, nicht während des Spiels.') })));
+      } else if (opts && opts.lang) {   // im Raum: Sprache hier statt außen. Wechsel gilt sofort, ohne Neuladen (man bleibt im Raum).
         const wrap = h('div', { class: 'fx-chips', role: 'radiogroup', 'aria-label': VD.t('Sprache') }, ...VD.LANGS.map((l) => h('button', {
           type: 'button', role: 'radio', lang: l.c, 'aria-checked': String(l.c === VD.lang), class: 'fx-chip' + (l.c === VD.lang ? ' on' : ''),
           onclick: () => {
-            if (l.c === VD.lang) return;
+            if (l.c === VD.lang || !langOpen()) return;
             click();
             close();                 // Menü schließen und gleich in der neuen Sprache wieder öffnen
             VD.setLangLive(l.c);

@@ -23,6 +23,7 @@
 
   VD.applyI18n();
   document.querySelectorAll('.lang-slot').forEach((e) => e.append(VD.ui.themeBtn(), VD.ui.settingsBtn(), VD.langPicker()));
+  { const hs = document.querySelector('.home > .lang-slot'); if (hs) hs.prepend(VD.ui.helpBtn()); }   // Fragezeichen oben links auf der Startseite
 
   const params = new URLSearchParams(location.search);
   const cleanCode = (s) => (s || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4);
